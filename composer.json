@@ -1,0 +1,32 @@
+{
+    "name": "halestar/laravel-drop-in-cms",
+    "description": "An extremely simple content management system meant to be dropped into existing laravel projects. It makes no assumptions about users and permissions and uses as much as possible from the host's project. It has plugins to add functionality, but at it's hears it is simply meant to build pages. Initial release will also come with a Blogging plugin.",
+    "type": "add-on",
+    "require": {
+        "php": "^8.2",
+        "laravel/framework": "^11.0.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.2"
+    },
+    "license": "GPL-3",
+    "autoload": {
+        "psr-4": {
+            "halestar\\LaravelDropInCms\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "halestar\\LaravelDropInCms\\CmsServiceProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "German Kalinec",
+            "email": "german@kalinec.net"
+        }
+    ],
+    "minimum-stability": "stable"
+}
