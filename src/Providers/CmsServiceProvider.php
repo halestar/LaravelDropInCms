@@ -19,7 +19,7 @@ class CmsServiceProvider extends ServiceProvider
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ]);
 
-        foreach(config('dicms.policies') as $objClass => $policyClass)
+        foreach(config('dicms.policies', []) as $objClass => $policyClass)
             Gate::policy($objClass, $policyClass);
         $this->loadViewsFrom(__DIR__.'/../views', 'dicms');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dicms');
