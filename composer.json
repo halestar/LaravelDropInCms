@@ -18,7 +18,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "halestar\\LaravelDropInCms\\CmsServiceProvider"
+                "halestar\\LaravelDropInCms\\ProvidersProviders\\CmsServiceProvider"
             ]
         }
     },
