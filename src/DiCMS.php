@@ -105,8 +105,6 @@ final class DiCMS
             Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
             Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
 
-            Route::get('/cms/posts/show/{post}', [\App\Http\Controllers\CMS\BlogPostController::class, 'show'])->name('blog.show');
-
             Route::any('/{path?}', [FrontController::class, 'index'])->where('path', '.*')->name('front');
         });
     }

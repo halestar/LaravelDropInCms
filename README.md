@@ -12,6 +12,35 @@ So I built a simple CMS that is extensible with the following goals:
  - Made for Programmers: This CMS is not for the end-user. It's made for programmers so that they can throw something together in **front** of their brand-new, awesome new app they just built.
  - Security is a Must: Just because we don't deal with permissions or users does not mean that they're not there in the system. They system should be able to be protected with permissions, users and the rest. They should just not get in the way. 
 
+# Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Building your first Site](#building)
+- [Securing Your CMS](#securing)
+- [Plugin System](#plugins)
+- [Roadmap to 1.0](#roadmap)
+
+<a id="features"></a>
+## Features
+
+The reason I built this package is because of my other development app, [FormativeLMS](https://github.com/halestar/FormativeLMS), which I'm currently in the process of building. This app is mainly an app that works with authenticated users, with not much happening in the front end. I wanted to create a simple blog that details my struggles and thought processes building this framework and host it in my [domain](https://dev.kalinec.net).
+
+However, what I ran into was that it was really hard to put in a front end in a laravel app. The easiest solution was to make a couple of static html pages, but I wanted to build a blog, so that was out. I started looking into blogging software and CMS software and found that all of them ame with baggage. My #1 gripe being that they all had their own users or permissions system. I wanted to use my own and not deal with a 3rd party. I just wanted 5 pages that I could maybe download a design from somewhere and type up some info. A small blog that I could type my thoughts and that's all.
+
+But that was clearly too much. So I started building my own small thing, and it was like re-inventing the wheel. I didn't want to do this, I wanted something that I could "Drop-In" into my project. So I came out with this list of features:
+
+ - No Users: but allow for the project to have them. 
+ - There are 2 parts to a CMS: the internal one and external one, assign routes to each section, but let the app decide where they go
+ - We need to secure things, so we use [Policies](https://laravel.com/docs/11.x/authorization#generating-policies) to guard all aspects of the cms, but let the app override them to their own needs.
+ - A plugin system to extend it, with the first plugin being a blogger.
+ - A content editor that I can use to place HTML elements. I chose the most excellent [GrapesJS](https://grapesjs.com/) for this.
+ - A text editor to be able to edit rich-text content. I chose [CKEditor](https://ckeditor.com/) for this, but I'm not yet conviced.
+ - Have more than one site, archive them switch between them, share some assets between them.
+ - Export and Restore everything very easily. This needs to be possible through files, programmatically and through an artisan command.
+ - Least reliance on the host app's environment. Load our own layout and "force" the user into it. This way there's a clear separation of the app, but it can be customizable through view editing. Same goes for the front end. The host app can be built using tailwind, but this CMS uses bootstrap and the front end you're using is not using a framework but a css you got from a russian site that you really, *really* like. 
+
+<a id="installation"></a>
 ## Installation
 
 The installation assumes that you have a Laravel app that you have already built or are designing. Perhaps it has an authenticated section, perhaps not. Perhaps you're just starting a new app and just run the ui/auth component and have a simple admin account, or have a sprawling list of users and guards. It does not matter, the first thing to do is to import the package into your laravel app by executing:
@@ -59,4 +88,37 @@ The second entry tells the system where to show the CMS website that you've buil
     });
 
 Once you have these two routes set up, the system is up and running. The first thing you should do is login to the admin section of the CMS and create a new site. There will be instructions below for how to create your first new site.
+
+<a id="building"></a>
+## Building your First Site
+
+You now have your CMS system installed, and you can access the admin section of the CMS. Note that if you try to access anything in the front side of the CMS nothing will come up. That is because we don't have an active site yet! The first step is build one. From the admin menu, hit that "Create New Site" button and enter a name for your site and a title that will show up on the window. Click create and let it take you to your new site.
+
+This CMS is not meant to be creative and allow you to do whatever you want. If that is something that you're looking for, go to word press or write your own static pages. They point of this CMS is to make this structured and logical so that you can push out content fast.
+
+Evey site has attached to it certain components that make up the total site. The componts are:
+
+- CSS Files: Either files, links or actual css that you write.
+- JS Files: Script files that run javascript code. Also, libraries that you can import through links.
+- Headers: A Page Header that appears on the top of every page.
+- Footers: A Page Footer that appears on the bottom of every page.
+- Pages: A list of pages with URLS attached to them that display content.
+- Menus: A menu that displays on top of the site.
+
+A site can have multiple of these, but only one set to as the "Default". The Default takes over if a specific one isn't set on the page.  The idea is to create a Header, Footer, Menu and link some Css sheets and Js script to make a good site outline, then fill in the content by creating pages.
+
+Once you have all the things set up, make sure you activate the site. This will make your site "live" and you can see the results by heading to the front URL.
+
+<a id="securing"></a>
+## Securing Your CMS
+
+<a id="plugins"></a>
+## Plugin System
+
+<a id="roadmap"></a>
+## Roadmap to 1.0
+
+
+
+
 
