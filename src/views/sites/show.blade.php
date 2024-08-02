@@ -145,7 +145,7 @@
                     <div id="menuHelp"
                          class="form-text mb-3">{{ __('dicms::sites.select_default_menu_help') }}</div>
 
-                    <div class="input-group" aria-describedby="contentHeaderHelp">
+                    <div class="input-group" aria-describedby="headerHelp">
                         <label for="header_id"
                                class="input-group-text">{{ __('dicms::sites.default_header') }}</label>
                         <select name="header_id" id="header_id" class="form-select"
@@ -163,7 +163,7 @@
                                class="btn btn-outline-secondary">{{ __('dicms::admin.manage_headers') }}</a>
                         @endcan
                     </div>
-                    <div id="contentHeaderHelp"
+                    <div id="headerHelp"
                          class="form-text mb-3">{{ __('dicms::sites.select_default_header_help') }}</div>
 
                     <div class="input-group" aria-describedby="footerHelp">

@@ -42,7 +42,7 @@ class HeaderController
             ], $this->errors());
         $header = new Header();
         $header->fill($data);
-        $site->contentHeaders()->save($header);
+        $site->headers()->save($header);
         return redirect(DiCMS::dicmsRoute('admin.sites.headers.edit', ['site' => $site->id, 'header' => $header->id]));
     }
 
@@ -83,10 +83,10 @@ class HeaderController
         return redirect()->back();
     }
 
-    public function destroy(Site $site, Header $contentHeader)
+    public function destroy(Site $site, Header $header)
     {
-        Gate::authorize('delete', $contentHeader);
-        $contentHeader->delete();
+        Gate::authorize('delete', $header);
+        $header->delete();
         return redirect(DiCMS::dicmsRoute('admin.sites.headers.index', ['site' => $site->id]));
     }
 }
