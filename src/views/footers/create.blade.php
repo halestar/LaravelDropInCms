@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin", ['include_editor' => true])
+@extends("dicms::layouts.admin")
 
 @section('content')
     <div class="container">
