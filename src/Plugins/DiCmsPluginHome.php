@@ -2,7 +2,6 @@
 
 namespace halestar\LaravelDropInCms\Plugins;
 
-use Illuminate\Database\Eloquent\Model;
 
 /**
  * This object is the representation of a simple menu item that will return the entry point to your plugin.

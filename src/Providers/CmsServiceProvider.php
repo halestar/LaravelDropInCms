@@ -13,11 +13,11 @@ class CmsServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../config/dicms.php' => config_path('dicms.php'),
-        ]);
+        ], 'dicms');
 
         $this->publishesMigrations([
             __DIR__.'/../database/migrations' => database_path('migrations'),
-        ]);
+        ], 'dicms');
 
         foreach(config('dicms.policies', []) as $objClass => $policyClass)
             Gate::policy($objClass, $policyClass);

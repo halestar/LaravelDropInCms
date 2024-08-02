@@ -49,9 +49,9 @@ The installation assumes that you have a Laravel app that you have already built
 
 We next publish the vendor files by doing:
 
-    php artisan vendor:publish --provider=halestar\LaravelDropInCms\Providers\CmsServiceProvider
+    php artisan vendor:publish
 
-Which will publish the migration files and the config files. Before you run the migration, open the config file and look at the initial config. The only thing you may want to change at this time is the `table_prefix` option, if you would like to customize the table names for the CMS tables. Once you're happy, run:
+And selecting the `halestar\LaravelDropInCms\Providers\CmsServiceProvider` service provider, which will publish the migration files and the config files. Before you run the migration, open the config file and look at the initial config. The only thing you may want to change at this time is the `table_prefix` option, if you would like to customize the table names for the CMS tables. Once you're happy, run:
 
     php artisan migrate
 
@@ -112,13 +112,130 @@ Once you have all the things set up, make sure you activate the site. This will 
 <a id="securing"></a>
 ## Securing Your CMS
 
+The key to securing your CMS is two-fold, through routes and through Policy Objects.
+
+### Securing Through Routes
+
+In a way, this has been done when you installed the project. Simply by wrapping the admin routes in an auth section, or applying a permissions middleware will secure all the CMS admin routes. You can go further by creating a custom middleware that will check permissions or users before giving access to the admin routes. This, essentially, gives you a coarse protection.
+
+For most projects this will be enough. However, you can make the protections more fine-grained by the use of Policies.
+
+### Securing Through Policies
+
+Securing through Policies is the most fine-grained approach to permissions that you can have. Essentially every model that the CMS uses has a Policy class attached to it that defines what permissions a user has when manipulating this model. All the models in DiCMS have Policies and all policies can be overridden in the config file. The list of models and policies are found in the `config/dicms.php` config file in the `$policies` array. It will usually look like this:
+
+    'policies' =>
+    [
+        \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \halestar\LaravelDropInCms\Policies\SitePolicy::class),
+        \halestar\LaravelDropInCms\Models\Header::class => env('DICMS_HEADER_POLICY', \halestar\LaravelDropInCms\Policies\HeaderPolicy::class),
+        \halestar\LaravelDropInCms\Models\Footer::class => env('DICMS_FOOTER_POLICY', \halestar\LaravelDropInCms\Policies\FooterPolicy::class),
+        \halestar\LaravelDropInCms\Models\CssSheet::class => env('DICMS_CSS_SHEET_POLICY', \halestar\LaravelDropInCms\Policies\CssSheetPolicy::class),
+        \halestar\LaravelDropInCms\Models\JsScript::class => env('DICMS_JS_SCRIPT_POLICY', \halestar\LaravelDropInCms\Policies\JsScriptPolicy::class),
+        \halestar\LaravelDropInCms\Models\Page::class => env('DICMS_PAGE_POLICY', \halestar\LaravelDropInCms\Policies\PagePolicy::class),
+        \halestar\LaravelDropInCms\Models\Menu::class => env('DICMS_MENU_POLICY', \halestar\LaravelDropInCms\Policies\MenuPolicy::class),
+    ],
+
+The left side of the array is the model, such as a Site, or a Page, the right hand side is the Policy that is attached to it.  The default policy is extremely permissive, allowing users to do everything. However, you can change this by creating your own policy and overriding it.
+
+For example, lets look at the `\halestar\LaravelDropInCms\Models\Site` model.This model is the representation of a Site. We see that it has the class `\halestar\LaravelDropInCms\Policies\SitePolicy` attached. Looking at this class the definition is quite simple:
+
+    class SitePolicy
+    {
+    /**
+    * Determine whether the user can view any models.
+    */
+    public function viewAny(User $user = null): bool
+    {
+    return true;
+    }
+    
+    /**
+     * Determine whether the user can view the model.
+     */
+    public function view(User $user = null, Site $site = null): bool
+    {
+        return true;
+    }
+
+    /**
+    * Determine whether the user can create models.
+    */
+    public function create(User $user = null): bool
+    {
+        return true;
+    }
+    ...
+
+You can immediately see that all functions in this Policy (and indeed, all policies) return true, meaning that permission is granted.  So creating site will always be allowed by everyone.  But what if you wanted to change this?  What if you wanted the creation of sites to only be available to users with a specific permission?  Well, we can extend the SitePolicy class and change it into:
+
+    class MySitePolicy extends \halestar\LaravelDropInCms\Policies\SitePolicy
+    {
+        public function create(User $user = null): bool
+        {
+            return $user->can('create sites');
+        }
+    }
+
+Then we alter the policy's config:
+
+    'policies' =>
+        [
+            \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \App\Policies\MySitePolicy::class),
+            ...
+        ],
+
+Alternatively, we can add an env variable to our `.env` file:
+
+    DICMS_SITE_POLICY=\App\Policies\MySitePolicy::class
+
+Now, only the correct users can create sites.
+
 <a id="plugins"></a>
 ## Plugin System
+
+DiCms has a plugin system!
+
+Why you may ask? Because I wanted to add a blogging mechanism, but it would have complicated the development of this system. I wanted to keep it simple in what it did. The only solution then, was to make it extensible. As such, plugging support is built in by default and the first plugging, [DiCmsBlogger](https://github.com/halestar/DiCmsBlogger) was created to both add a blogging component to DiCms and to explain how to create plugins.
+
+If you're interested in creating plugins, head over to [DiCmsBlogger](https://github.com/halestar/DiCmsBlogger) GitHub page and a description on how to build plugins will be included there.
 
 <a id="roadmap"></a>
 ## Roadmap to 1.0
 
+At the time of writing this, this package is not what I consider "released". 
+My plan is officially release as a v1.0 once all the features are built. 
+This space here is meant to detail what features and upgrades I consider 
+essential to release a v1.0
 
+These requirements are subject (and in fact, most likely) to change and 
+I will cross them out (probably) as I build things.  I plan on keeping 
+stable releases as odd versions and using even versions as dev, unstable 
+releases.  For example, the first release (considered stable, I know) is 
+v0.1.0 and the latest is set to v0.1.3. Once all these new instructions are 
+written up and released, I will create a v0.3.0 release for both DiCms and 
+the Blogger Plugin.
 
+The following features need to be implemented in order to release v1.0:
 
+ - Comments need to be added. Heredoc and config comments.
+ - The user interface needs to be overhauled. It is very ugly and needs to be updated.
+ - The system needs to be able to be backed-up programmatically through an API and through an artisan command
+ - Make css and js script re-arrangeable
+ - Archive and de-archive sites
+ - Preview needs to be enabled
+ - Better asset supports for images and stuff
+ - Better editor support
+ - GrapesJs needs to be heavily customized
+ - Make sure it shows up nice on mobile
+ - Add REST API to all models with Policy hooks
+ - Upgrade the plugin system to allow for customization of css/js scripts, headers and footers from the front page.
+ - Document how to create a simple site, with pictures.
+ - Make backups more secure by zipping, creating SHA's etc.
+ - Provide a sample backup file that will build a default site.
+ - Add alternatives for other kinds of settings mechanisms, such as redis.
+ - Add publishable policies for users to easily extend. Possibly through artisan commands.
+ - Create an asset storage management system for centralized, shared management. Maybe a plugin?
+ - Duplicate sites.
+ - Update README to include better instructions and define the roadmap to include version milestones.
 
+Other things may be added to this list, or taken away.
