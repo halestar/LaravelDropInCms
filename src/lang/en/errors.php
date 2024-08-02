@@ -4,7 +4,6 @@ return
 [
     'sites.name' => 'You must enter a name for this site. It must be unique',
     'headers.name' => 'You must enter a name for this header. It must be unique',
-    'content_headers.name' => 'You must enter a name for this page header. It must be unique',
     'footers.name' => 'You must enter a name for this page footer. It must be unique',
     'sheets.name' => 'You must enter a name for this css sheet.',
     'scripts.name' => 'You must enter a name for this js script.',

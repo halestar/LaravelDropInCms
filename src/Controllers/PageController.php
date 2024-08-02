@@ -96,12 +96,10 @@ class PageController
             [
                 'title' => 'nullable',
                 'header_id' => 'nullable|exists:' . config('dicms.table_prefix') . 'headers,id',
-                'content_header_id' => 'nullable|exists:' . config('dicms.table_prefix') . 'content_headers,id',
                 'footer_id' => 'nullable|exists:' . config('dicms.table_prefix') . 'footers,id',
             ], $this->errors());
         $page->title = $data['title'];
         $page->header_id = $data['header_id'];
-        $page->content_header_id = $data['content_header_id'];
         $page->footer_id = $data['footer_id'];
         $page->save();
         return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $site->id, 'page' => $page->id]));

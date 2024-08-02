@@ -147,10 +147,10 @@
 
                     <div class="input-group" aria-describedby="contentHeaderHelp">
                         <label for="header_id"
-                               class="input-group-text">{{ __('dicms::sites.default_content_header') }}</label>
+                               class="input-group-text">{{ __('dicms::sites.default_header') }}</label>
                         <select name="header_id" id="header_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.select_default_content_header') }}</option>
+                            <option value="">{{ __('dicms::sites.select_default_header') }}</option>
                             @foreach(\halestar\LaravelDropInCms\Models\Header::all() as $header)
                                 <option value="{{ $header->id }}"
                                         @if($header->id == $site->header_id) selected @endif>{{ $header->name }}</option>
@@ -160,11 +160,11 @@
                                 @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)
                             <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.headers.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_content_headers') }}</a>
+                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_headers') }}</a>
                         @endcan
                     </div>
                     <div id="contentHeaderHelp"
-                         class="form-text mb-3">{{ __('dicms::sites.select_default_content_header_help') }}</div>
+                         class="form-text mb-3">{{ __('dicms::sites.select_default_header_help') }}</div>
 
                     <div class="input-group" aria-describedby="footerHelp">
                         <label for="footer_id" class="input-group-text">{{ __('dicms::sites.default_footer') }}</label>

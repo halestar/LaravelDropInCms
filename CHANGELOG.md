@@ -2,6 +2,11 @@
 
 All notable changes to `LaravelDropInCMS` will be documented in this file
 
+## 0.3.1
+
+fully removes all traces of content headers, which was causing a major issue.
+
+
 ## 0.3.0
 
 The official documentation of this project with a full release of the Blogger plugin is

@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists(config('dicms.table_prefix') . 'content_headers');
+        Schema::dropIfExists(config('dicms.table_prefix') . 'headers');
     }
 };

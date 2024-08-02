@@ -10,7 +10,6 @@ return
     'add' => 'Add',
     'remove' => 'Remove',
     'manage_headers' => "Manage Headers",
-    'manage_content_headers' => "Manage Page Headers",
     'manage_footers' => 'Manage Page Footers',
     'manage_menus' => 'Manage Site Menus',
     'manage_css_sheets' => 'Manage Site Css Sheets',
