@@ -99,11 +99,14 @@ final class DiCMS
     {
         Route::name('dicms.')->group(function ()
         {
-
-            Route::get('/site/{site}/script.js', [FrontController::class, 'siteJs'])->name('front.js.site');
-            Route::get('/site/{site}/style.css', [FrontController::class, 'siteCss'])->name('front.css.site');
-            Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
-            Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
+            Route::prefix('dicms')
+                ->group(function ()
+                {
+                    Route::get('/site/{site}/script.js', [FrontController::class, 'siteJs'])->name('front.js.site');
+                    Route::get('/site/{site}/style.css', [FrontController::class, 'siteCss'])->name('front.css.site');
+                    Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
+                    Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
+                });
 
             Route::any('/{path?}', [FrontController::class, 'index'])->where('path', '.*')->name('front');
         });
