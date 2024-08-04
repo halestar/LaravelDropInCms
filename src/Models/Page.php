@@ -7,6 +7,7 @@ use halestar\LaravelDropInCms\Traits\BackUpable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Log;
 
 class Page extends Model
 {
@@ -79,6 +80,7 @@ class Page extends Model
 
     public function Css(): BelongsToMany
     {
+        Log::debug("this->site: " . print_r($this->site, true));
         return ($this->pageCss()->count() > 0)? $this->pageCss(): $this->site->siteCss();
     }
 
