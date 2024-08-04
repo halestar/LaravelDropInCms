@@ -36,29 +36,33 @@ class FrontController
         abort(404);
     }
 
-    public function js(Page $page)
+    public function js($page)
     {
+        $page = Page::findOrFail($page);
         $rsp = Response::make($page->Js()->text()->get()->pluck('script')->join("\n"));
         $rsp->header('Content-Type', 'text/javascript');
         return $rsp;
     }
 
-    public function siteJs(Site $site)
+    public function siteJs($site)
     {
+        $site = Site::findOrFail($site);
         $rsp = Response::make($site->siteJs()->text()->get()->pluck('script')->join("\n"));
         $rsp->header('Content-Type', 'text/javascript');
         return $rsp;
     }
 
-    public function css(Page $page)
+    public function css($page)
     {
+        $page = Page::findOrFail($page);
         $rsp = Response::make($page->Css()->text()->get()->pluck('sheet')->join("\n"));
         $rsp->header('Content-Type', 'text/css');
         return $rsp;
     }
 
-    public function siteCss(Site $site)
+    public function siteCss($site)
     {
+        $site = Site::findOrFail($site);
         $rsp = Response::make($site->siteCss()->text()->get()->pluck('sheet')->join("\n"));
         $rsp->header('Content-Type', 'text/css');
         return $rsp;

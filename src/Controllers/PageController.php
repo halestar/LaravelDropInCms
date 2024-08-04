@@ -206,10 +206,10 @@ class PageController
         return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
     }
 
-    public function destroy(Site $site, Page $script)
+    public function destroy(Site $site, Page $page)
     {
-        Gate::authorize('delete', $script);
-        $script->delete();
-        return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
+        Gate::authorize('delete', $page);
+        $page->delete();
+        return redirect(DiCMS::dicmsRoute('admin.sites.pages.index', ['site' => $site->id]));
     }
 }

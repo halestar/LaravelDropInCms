@@ -8,6 +8,7 @@ use halestar\LaravelDropInCms\Models\JsScript;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class JsScriptController
@@ -52,15 +53,15 @@ class JsScriptController
         elseif($data['type'] == 'UPLOAD')
         {
 
-            $file = $request->file('sheet_file', null);
+            $file = $request->file('script_file', null);
             $script->type = HeadElementType::Text;
             if($file)
-                $script->sheet = file_get_contents($file->getRealPath());
+                $script->script = file_get_contents($file->getRealPath());
         }
         else
         {
             $script->type = HeadElementType::Text;
-            $script->sheet = $request->input('script', null);
+            $script->script = $request->input('script', null);
         }
         $site->jsScripts()->save($script);
         return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
@@ -99,7 +100,7 @@ class JsScriptController
         else
         {
             $script->type = HeadElementType::Text;
-            $script->sheet = $request->input('script', null);
+            $script->script = $request->input('script', null);
         }
         $script->save();
         return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
