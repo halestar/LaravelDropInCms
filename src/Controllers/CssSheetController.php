@@ -53,7 +53,7 @@ class CssSheetController
         elseif($data['type'] == 'UPLOAD')
         {
 
-            $file = $request->file('script_file', null);
+            $file = $request->file('sheet_file', null);
             $sheet->type = HeadElementType::Text;
             if($file)
                 $sheet->sheet = file_get_contents($file->getRealPath());

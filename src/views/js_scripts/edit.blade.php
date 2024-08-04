@@ -67,7 +67,6 @@
                         id="type_upload"
                         value="UPLOAD"
                         autocomplete="off"
-                        checked
                     />
                     <label
                         class="nav-link btn btn-primary"
