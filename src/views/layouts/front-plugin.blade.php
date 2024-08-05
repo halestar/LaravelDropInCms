@@ -8,8 +8,9 @@
     @foreach($site->siteCss()->links()->get() as $css)
         <link href="{{ $css->href }}" {{ $css->link_type }} />
     @endforeach
-
-    <link href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($site) }}" rel="stylesheet" type="text/css" />
+    <style>
+        {!! $site->siteCss()->text()->get()->pluck('sheet')->join("\n\n"); !!}
+    </style>
     @if($site->defaultHeader)
         <style>
             {!! $site->defaultHeader->css !!}
@@ -24,7 +25,9 @@
     @foreach($site->siteJs()->links()->get() as $js)
         <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
     @endforeach
-    <script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($site) }}" ></script>
+    <script>
+        {!! $site->siteJs()->text()->get()->pluck('script')->join("\n\n"); !!}
+    </script>
 
 </head>
 <body style="{{ $site->body_styles }}" class="{{ $site->body_classes }}">

@@ -8,8 +8,10 @@
     @foreach($page->Css()->links()->get() as $css)
         <link href="{{ $css->href }}" {{ $css->link_type }} />
     @endforeach
+    <style>
+        {!! $page->Css()->text()->get()->pluck('sheet')->join("\n\n"); !!}
+    </style>
 
-    <link href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($page) }}" rel="stylesheet" type="text/css" />
     @if($page->Header)
         <style>
             {!! $page->Header->css !!}
@@ -30,7 +32,9 @@
     @foreach($page->Js()->links()->get() as $js)
         <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
     @endforeach
-    <script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($page) }}" ></script>
+    <script>
+        {!! $site->siteJs()->text()->get()->pluck('script')->join("\n\n"); !!}
+    </script>
 
 </head>
 <body style="{{ $site->body_styles }}" class="{{ $site->body_classes }}">
