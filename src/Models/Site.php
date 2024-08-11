@@ -2,16 +2,19 @@
 
 namespace halestar\LaravelDropInCms\Models;
 
+use halestar\LaravelDropInCms\Interfaces\ContainsCssSheets;
+use halestar\LaravelDropInCms\Interfaces\ContainsJsScripts;
 use halestar\LaravelDropInCms\Traits\BackUpable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Collection;
 
-class Site extends Model
+class Site extends Model implements ContainsCssSheets, ContainsJsScripts
 {
     use BackUpable;
+
 
     protected static function getTablesToBackup(): array
         {
@@ -22,11 +25,15 @@ class Site extends Model
                     config('dicms.table_prefix') . "sites_js_scripts",
                 ];
         }
-    protected $casts =
-        [
-            'active' => 'boolean',
-            'archived' => 'boolean',
-        ];
+    protected function casts(): array
+    {
+        return
+            [
+                'active' => 'boolean',
+                'archived' => 'boolean',
+            ];
+    }
+
 
     protected $fillable = ['name', 'title'];
 
@@ -74,7 +81,7 @@ class Site extends Model
     public function siteCss(): BelongsToMany
     {
         return $this->belongsToMany(CssSheet::class, config('dicms.table_prefix') . 'sites_css_sheets',
-            'site_id', 'sheet_id')->withPivot('order_by');
+            'site_id', 'sheet_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
     public function jsScripts():HasMany
@@ -85,7 +92,7 @@ class Site extends Model
     public function siteJs(): BelongsToMany
     {
         return $this->belongsToMany(JsScript::class, config('dicms.table_prefix') . 'sites_js_scripts',
-            'site_id', 'script_id')->withPivot('order_by');
+            'site_id', 'script_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
     public function pages(): HasMany
@@ -93,4 +100,50 @@ class Site extends Model
         return $this->hasMany(Page::class, 'site_id');
     }
 
+    public function getCssSheets(): Collection
+    {
+        return $this->siteCss;
+    }
+
+    public function addCssSheet(CssSheet $cssSheet)
+    {
+        $order = $this->siteCss()->count();
+        $this->siteCss()->attach($cssSheet->id, ['order_by' => $order]);
+    }
+
+    public function removeCssSheet(CssSheet $cssSheet)
+    {
+        $this->siteCss()->detach($cssSheet->id);
+    }
+
+    public function setCssSheetOrder(CssSheet $cssSheet, int $order)
+    {
+        $this->siteCss()->updateExistingPivot($cssSheet->id, ['order_by' => $order]);
+    }
+
+    public function getJsScripts(): Collection
+    {
+        return $this->siteJs;
+    }
+
+    public function addJsScript(JsScript $script)
+    {
+        $order = $this->siteJs()->count();
+        $this->siteJs()->attach($script->id, ['order_by' => $order]);
+    }
+
+    public function removeJsScript(JsScript $script)
+    {
+        $this->siteJs()->detach($script->id);
+    }
+
+    public function setJsScriptOrder(JsScript $script, int $order)
+    {
+        $this->siteJs()->updateExistingPivot($script->id, ['order_by' => $order]);
+    }
+
+    public static function defaultSite(): Site
+    {
+        return Site::where('active', true)->first();
+    }
 }

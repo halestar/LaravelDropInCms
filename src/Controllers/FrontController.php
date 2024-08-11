@@ -5,8 +5,6 @@ namespace halestar\LaravelDropInCms\Controllers;
 use halestar\LaravelDropInCms\Models\Page;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Response;
 
 class FrontController
@@ -14,7 +12,7 @@ class FrontController
     public function index(Request $request, string $path = null)
     {
         //get the active site
-        $site = Site::where('active', true)->first();
+        $site = Site::defaultSite();
         if(!$site)
             abort(404);
         //ext, we get the page
@@ -29,8 +27,28 @@ class FrontController
         {
             if($plugin::hasPublicRoute($path))
             {
-                $plugin_content = $plugin::getPublicContent($path);
-                return view('dicms::layouts.front-plugin', compact('site', 'plugin_content'));
+                $css = $plugin::getCssFiles($path);
+                if(!$css)
+                    $css = $site->siteCss;
+                $js = $plugin::getJsFiles($path);
+                if(!$js)
+                    $js = $site->siteJs;
+                $header = $plugin::getHeader($path);
+                if(!$header)
+                    $header = $site->defaultHeader;
+                $footer = $plugin::getFooter($path);
+                if(!$footer)
+                    $footer = $site->defaultFooter;
+                $plugin =
+                    [
+                        'content' => $plugin::getPublicContent($path),
+                        'css' => $css,
+                        'js' => $js,
+                        'header' => $header,
+                        'footer' => $footer,
+                    ];
+
+                return view('dicms::layouts.front-plugin', compact('site', 'plugin'));
             }
         }
         abort(404);

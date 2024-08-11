@@ -1,6 +1,10 @@
 <?php
 
 namespace halestar\LaravelDropInCms\Plugins;
+use halestar\LaravelDropInCms\Models\Footer;
+use halestar\LaravelDropInCms\Models\Header;
+use Illuminate\Support\Collection;
+
 interface DiCmsPlugin
 {
     /**
@@ -21,6 +25,27 @@ interface DiCmsPlugin
      * content area of the CMS.
      */
     public static function getPublicContent($path): string;
+
+    /**
+     * @return array|null Returns any css files associated with this plugin for this path.
+     */
+    public static function getCssFiles($path): ?Collection;
+
+    /**
+     * @return array|null Returns any js files associated with this plugin for this path.
+     */
+    public static function getJsFiles($path): ?Collection;
+
+    /**
+     * @return array|null Returns any headers associated with this plugin for this path.
+     */
+    public static function getHeader($path): ?Header;
+
+    /**
+     * @return array|null Returns any footers associated with this plugin for this path.
+     */
+    public static function getFooter($path): ?Footer;
+
 
     /**
      * This function will return all the public pages that this plugin will allow attachments to.

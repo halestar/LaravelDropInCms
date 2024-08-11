@@ -35,7 +35,7 @@ return
     'restore' => 'Restore Site',
     'sheet' => 'Css Sheet',
     'sheets' => 'Css Sheets',
-    'sheets.assigned' => 'Css Sheets Assigned to this Site',
+    'sheets.assigned' => 'Css Sheets Assigned',
     'sheets.add' => 'Add Css Sheet',
     'sheets.add.select' => 'Select a Css Sheet',
     'sheets.add.help' => 'Select a Css Sheet to add to the Site\'s head section. It will apply to the whole site.  You can have multiple style sheets.',

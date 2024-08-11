@@ -1,8 +1,14 @@
 <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/42.0.0/ckeditor5.css" />
 <style>
     .ck-editor__editable_inline:not(.ck-comment__input *) {
-        height: 300px;
+        height: 500px;
         overflow-y: auto;
+    }
+
+    .asset-manager-mini
+    {
+        height: 550px;
+        margin-top: 2em;
     }
 
     .ck-document-outline__item {

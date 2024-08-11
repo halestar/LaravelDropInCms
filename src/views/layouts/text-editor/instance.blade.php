@@ -1,24 +1,45 @@
 <script type="module">
     import {
-        ClassicEditor,
-        Essentials,
+        Alignment,
+        AutoImage,
+        AutoLink,
+        BlockQuote,
         Bold,
-        Italic,
+        ClassicEditor,
+        Code,
+        CodeBlock,
+        Essentials,
+        FindAndReplace,
         Font,
-        Paragraph,
-        SourceEditing,
-        Indent, IndentBlock,
         GeneralHtmlSupport,
-        SimpleUploadAdapter,
+        Heading,
+        Highlight,
         Image,
         ImageCaption,
+        ImageInsert,
         ImageResize,
         ImageStyle,
         ImageToolbar,
         ImageUpload,
+        Indent,
+        IndentBlock,
+        Italic,
+        Link,
         LinkImage,
-        ImageInsert,
-        AutoImage
+        List,
+        MediaEmbed,
+        Paragraph,
+        SimpleUploadAdapter,
+        SourceEditing,
+        SpecialCharacters,
+        SpecialCharactersEssentials,
+        Strikethrough,
+        Subscript,
+        Superscript,
+        Table,
+        TableToolbar,
+        TextTransformation,
+        Underline
     } from 'ckeditor5';
 
     ClassicEditor
@@ -27,7 +48,7 @@
                 ClassicEditor,
                 Essentials,
                 Bold,
-                Italic,
+                Italic, Strikethrough, Subscript, Superscript, Underline, Code,
                 Font,
                 Paragraph,
                 SourceEditing,
@@ -42,14 +63,22 @@
                 ImageUpload,
                 LinkImage,
                 ImageInsert,
-                AutoImage
+                AutoImage,
+                List,
+                TextTransformation,
+                BlockQuote,
+                CodeBlock,
+                FindAndReplace,
+                Heading, Alignment,
+                Highlight, AutoLink, Link, MediaEmbed, SpecialCharacters, SpecialCharactersEssentials, Table, TableToolbar
             ],
             toolbar: {
                 items: [
-                    'undo', 'redo', '|', 'bold', 'italic', '|',
-                    'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', '|',
-                    'outdent', 'indent', 'sourceEditing', '|', 'insertImage'
-                ]
+                    'undo', 'redo', '|', 'bold', 'italic', 'underline', 'strikethrough', 'code', 'subscript','superscript', '|',
+                    'heading', 'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'highlight', 'blockQuote', 'codeBlock',  '|', 'alignment', 'bulletedList', 'numberedList',
+                    'outdent', 'indent', 'sourceEditing', '|', 'insertImage', 'findAndReplace', 'link', 'mediaEmbed', 'specialCharacters', 'insertTable'
+                ],
+                shouldNotGroupWhenFull: true
             },
             image: {
                 toolbar: [
@@ -65,6 +94,10 @@
                     integrations: [ 'upload', 'url' ]
                 }
             },
+            table:
+                {
+                    contentToolbar: [ 'tableColumn', 'tableRow', 'mergeTableCells' ]
+                },
             simpleUpload: {
                 // The URL that the images are uploaded to.
                 uploadUrl: '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.upload') }}',

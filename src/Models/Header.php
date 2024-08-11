@@ -11,10 +11,13 @@ class Header extends Model
     use BackUpable;
     protected $fillable = ['name','description','html', 'options', 'data', 'css'];
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "headers" ]; }
-    protected $casts =
-        [
-            'data' => 'json',
-        ];
+    protected function casts(): array
+    {
+        return
+            [
+                'data' => 'array',
+            ];
+    }
     public function __construct(array $attributes = [])
     {
         $this->table = config('dicms.table_prefix') . "headers";

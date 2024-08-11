@@ -32,6 +32,12 @@
         @endif
         <div class="row border-end border-start border-bottom rounded-bottom p-1 collapse" id="advanced_options">
             <div class="col-md">
+                <livewire:css-sheet-manager :siteId="$page->site_id" :container="$page" />
+                <livewire:js-script-manager :siteId="$page->site_id" :container="$page" />
+
+
+            </div>
+            <div class="col-md">
                 <form
                     action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.update', ['site' => $site->id, 'page' => $page->id]) }}"
                     method="POST">
@@ -93,87 +99,6 @@
                          class="form-text mb-3">{{ __('dicms::sites.select_default_footer_help') }}</div>
 
                 </form>
-            </div>
-            <div class="col-md">
-                <h4 class="border-bottom">{{ __('dicms::sites.sheets') }}</h4>
-                <form
-                    action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.css.add', ['page' => $page->id]) }}"
-                    method="POST">
-                    @csrf
-                    <div class="input-group" aria-describedby="cssSheetHelp">
-                        <label for="sheet_id" class="input-group-text">{{ __('dicms::sites.sheets.add') }}</label>
-                        <select name="sheet_id" id="sheet_id" class="form-select"
-                                @cannot('update', $page) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.sheets.add.select') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\CssSheet::whereNotIn('id', $page->pageCss->pluck('id'))->get() as $sheet)
-                                <option value="{{ $sheet->id }}">{{ $sheet->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $page) disabled @endcan>{{ __('dicms::admin.add') }}</button>
-                        @can('viewAny', \halestar\LaravelDropInCms\Models\CssSheet::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.sheets.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_css_sheets') }}</a>
-                        @endcan
-                    </div>
-                </form>
-                <div id="cssSheetHelp" class="form-text mb-3">{{ __('dicms::pages.sheets.add.help') }}</div>
-                @if($page->pageCss()->count() > 0)
-                    <h5 class="border-bottom">{{ __('dicms::pages.sheets.assigned') }}</h5>
-                    <ul class="list-group">
-                        @foreach($page->pageCss as $css)
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
-                                css_id="{{ $css->id }}">
-                                {{ $css->name }}
-                                <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.css.remove', ['page' => $page->id, 'cssSheet' => $css->id]) }}"
-                                    class="btn btn-danger"
-                                    role="button"
-                                >{{ __('dicms::admin.remove') }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                <h4 class="border-bottom mt-5">{{ __('dicms::sites.scripts') }}</h4>
-                <form
-                    action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.js.add', ['page' => $page->id]) }}"
-                    method="POST">
-                    @csrf
-                    <div class="input-group" aria-describedby="jsScriptHelp">
-                        <label for="script_id" class="input-group-text">{{ __('dicms::sites.scripts.add') }}</label>
-                        <select name="script_id" id="script_id" class="form-select"
-                                @cannot('update', $page) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.scripts.add.select') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\JsScript::whereNotIn('id', $site->siteJs->pluck('id'))->get() as $script)
-                                <option value="{{ $script->id }}">{{ $script->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $page) disabled @endcan>{{ __('dicms::admin.add') }}</button>
-                        @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_js_scripts') }}</a>
-                        @endcan
-                    </div>
-                </form>
-                <div id="jsScriptHelp" class="form-text mb-3">{{ __('dicms::pages.scripts.add.help') }}</div>
-                @if($page->pageJs()->count() > 0)
-                    <h5 class="border-bottom">{{ __('dicms::sites.scripts.assigned') }}</h5>
-                    <ul class="list-group">
-                        @foreach($page->pageJs as $js)
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
-                                js_id="{{ $js->id }}">
-                                {{ $js->name }}
-                                <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.js.remove', ['page' => $page->id, 'jsScript' => $js->id]) }}"
-                                    class="btn btn-danger"
-                                    role="button"
-                                >{{ __('dicms::admin.remove') }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
             </div>
         </div>
         <div class="row mt-0 justify-content-center">

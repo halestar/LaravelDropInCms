@@ -3,6 +3,7 @@
 namespace halestar\LaravelDropInCms;
 use halestar\LaravelDropInCms\Controllers\BackupController;
 use halestar\LaravelDropInCms\Controllers\CssSheetController;
+use halestar\LaravelDropInCms\Controllers\DataItemController;
 use halestar\LaravelDropInCms\Controllers\FooterController;
 use halestar\LaravelDropInCms\Controllers\FrontController;
 use halestar\LaravelDropInCms\Controllers\HeaderController;
@@ -11,6 +12,7 @@ use halestar\LaravelDropInCms\Controllers\MenuController;
 use halestar\LaravelDropInCms\Controllers\PageController;
 use halestar\LaravelDropInCms\Controllers\SiteController;
 use halestar\LaravelDropInCms\Models\CssSheet;
+use halestar\LaravelDropInCms\Models\DataItem;
 use halestar\LaravelDropInCms\Models\Footer;
 use halestar\LaravelDropInCms\Models\Header;
 use halestar\LaravelDropInCms\Models\JsScript;
@@ -88,6 +90,9 @@ final class DiCMS
             Route::resource('sites.pages', PageController::class);
             Route::resource('sites.menus', MenuController::class);
 
+
+            Route::get('/assets', [DataItemController::class, 'index'])->name('assets.index');
+
             foreach(config('dicms.plugins') as $plugin)
             {
                 $plugin::adminRoutes();
@@ -99,6 +104,15 @@ final class DiCMS
     {
         Route::name('dicms.')->group(function ()
         {
+            Route::prefix('dicms')
+                ->group(function ()
+                {
+                    Route::get('/site/{site}/script.js', [FrontController::class, 'siteJs'])->name('front.js.site');
+                    Route::get('/site/{site}/style.css', [FrontController::class, 'siteCss'])->name('front.css.site');
+                    Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
+                    Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
+                });
+
             Route::any('/{path?}', [FrontController::class, 'index'])->where('path', '.*')->name('front');
         });
     }
@@ -184,6 +198,7 @@ final class DiCMS
             CssSheet::class,
             Site::class,
             Page::class,
+            DataItem::class,
         ];
     }
 }

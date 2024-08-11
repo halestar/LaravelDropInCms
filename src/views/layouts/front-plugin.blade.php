@@ -5,28 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{{ $site->title }}</title>
 
-    @foreach($site->siteCss()->links()->get() as $css)
+    @foreach($plugin['css']->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Link) as $css)
         <link href="{{ $css->href }}" {{ $css->link_type }} />
     @endforeach
     <style>
-        {!! $site->siteCss()->text()->get()->pluck('sheet')->join("\n\n"); !!}
+        {!! $plugin['css']->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Text)->pluck('sheet')->join("\n\n"); !!}
     </style>
-    @if($site->defaultHeader)
+    @if($plugin['header'])
         <style>
-            {!! $site->defaultHeader->css !!}
+            {!! $plugin['header']->css !!}
         </style>
     @endif
-    @if($site->defaultFooter)
+    @if($plugin['footer'])
         <style>
-            {!! $site->defaultFooter->css !!}
+            {!! $plugin['footer']->css !!}
         </style>
     @endif
 
-    @foreach($site->siteJs()->links()->get() as $js)
+    @foreach($plugin['js']->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Link) as $js)
         <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
     @endforeach
     <script>
-        {!! $site->siteJs()->text()->get()->pluck('script')->join("\n\n"); !!}
+        {!! $plugin['js']->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Text)->pluck('script')->join("\n\n"); !!}
     </script>
 
 </head>
@@ -51,17 +51,17 @@
         </ul>
     </nav>
 @endif
-@if($site->defaultHeader)
-    <header {!! $site->defaultHeader->options !!} >
-        {!! $site->defaultHeader->html !!}
+@if($plugin['header'])
+    <header {!! $plugin['header']->options !!} >
+        {!! $plugin['header']->html !!}
     </header>
 @endif
 <section>
-    {!! $plugin_content !!}
+    {!! $plugin['content'] !!}
 </section>
-@if($site->defaultFooter)
-    <footer {!! $site->defaultFooter->options !!} >
-        {!! $site->defaultFooter->html !!}
+@if($plugin['footer'])
+    <footer {!! $plugin['footer']->options !!} >
+        {!! $plugin['footer']->html !!}
     </footer>
 @endif
 </body>

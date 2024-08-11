@@ -28,14 +28,27 @@
                 },
             assetManager:
                 {
-                    assets: ['{{ implode("','", \halestar\LaravelDropInCms\DiCMS::assets()) }}'],
-                    upload: '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.upload') }}',
-                    uploadName: 'files',
-                    autoAdd: true,
-                    custom: false,
-                    headers:
+                    custom:
                         {
-                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                            open(props)
+                            {
+                                if(!this.myModal)
+                                    this.myModal = new bootstrap.Modal('#grapesjs-assets-modal');
+                                $('#grapesjs-assets-modal').on('hidden.bs.modal', function()
+                                    {
+                                        props.close();
+                                    })
+                                    .on('asset-selected', function(e, url)
+                                    {
+                                        props.select({type: "image", src: url}, true);
+                                    });
+                                this.myModal.show();
+                            },
+                            close(props)
+                            {
+                                if(this.myModal)
+                                    this.myModal.hide();
+                            },
                         }
                 }
         });
@@ -43,9 +56,16 @@
     @if($eConfig['projectData'])
     editor.loadProjectData({!! $eConfig['projectData'] !!});
     @endif
-    @foreach(\halestar\LaravelDropInCms\DiCMS::assets() as $asset)
-    editor.AssetManager.add('{!! $asset !!}');
-    @endforeach
 
-
+    function addAssetToGrapesJs(url)
+    {
+        $('#grapesjs-assets-modal').trigger('asset-selected', [url]);
+    }
 </script>
+<div class="modal" tabindex="-1" id="grapesjs-assets-modal">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <livewire:asset-manager selectAction="addAssetToGrapesJs" />
+        </div>
+    </div>
+</div>

@@ -13,10 +13,13 @@ class JsScript extends Model
     use BackUpable;
 
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "js_scripts" ]; }
-    protected $casts =
-        [
-            'type' => HeadElementType::class,
-        ];
+    protected function casts(): array
+    {
+        return
+            [
+                'type' => HeadElementType::class,
+            ];
+    }
     protected $fillable = ['name','description','script', 'href', 'link_type','type'];
     public function __construct(array $attributes = [])
     {

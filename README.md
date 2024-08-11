@@ -17,7 +17,8 @@ So I built a simple CMS that is extensible with the following goals:
 - [Features](#features)
 - [Installation](#installation)
 - [Building your first Site](#building)
-- [Securing Your CMS](#securing)
+- [Securing your CMS](#securing)
+- [Backing up your CMS](#backup)
 - [Plugin System](#plugins)
 - [Roadmap to 1.0](#roadmap)
 
@@ -49,43 +50,49 @@ The installation assumes that you have a Laravel app that you have already built
 
 We next publish the vendor files by doing:
 
-    php artisan vendor:publish
+    php artisan vendor:publish --tag=dicms
 
-And selecting the `halestar\LaravelDropInCms\Providers\CmsServiceProvider` service provider, which will publish the migration files and the config files. Before you run the migration, open the config file and look at the initial config. The only thing you may want to change at this time is the `table_prefix` option, if you would like to customize the table names for the CMS tables. Once you're happy, run:
+And migrate your tables
 
     php artisan migrate
 
-to migrate the tables.  The last thing to do before getting started is to configure the routes. Go to your main routes file (in a normal laravel installation this would be the `routes/web.php` file) and add two entries **at the end of the file**:
+If you would like to use your own Policies, but want to base it off existing 
+policies, you can export all the DiCMS policies by doing:
 
+    php artisan vendor:publish --tag=dicms-policies
+
+The last thing to do before getting started is to configure the routes. Go to your main routes file (in a normal laravel installation this would be the `routes/web.php` file) and add two entries **at the end of the file**:
+```php
     Route::prefix('admin')->group(function()
         { 
             \halestar\LaravelDropInCms\DiCMS::adminRoutes();
         });
 
     \halestar\LaravelDropInCms\DiCMS::publicRoutes();
-
+```
 It is important to understand what these two entries mean and how to configure them correctly. The first entry sets up all the admin routes, that is, all the routes to manage the CMS, to run off the `/admin` url. If you go to `https://yoursite.com/admin` then you should see the front page of your CMS admin, asking you to create your first new site.
 
 If you, instead, wanted to run them from the url `https://yoursite.com/cms` you would make the entry:
-
-    Route::prefix('cms')->group(function()
-        {
-            \halestar\LaravelDropInCms\DiCMS::adminRoutes();
-        });
-
-If you would like to make sure that only authenticated users could reach this admin site you can change this to:
-
-    Route::prefix('admin')->middleware('auth')->group(function()
-        {
-            \halestar\LaravelDropInCms\DiCMS::adminRoutes();
-        });
-
-The second entry tells the system where to show the CMS website that you've built. If you don't wrap it around any prefix, then it will show up directly on the root of your website. This is why it is important to put this at the bottom of the routes files, as it will catch all the routes below it.  Alternatively, if you would like your app to show the website on `https://yoursite.com/front` for example, you could set up the entry as:
-
-    Route::prefix('front')->group(function()
+```php
+Route::prefix('cms')->group(function()
     {
-        \halestar\LaravelDropInCms\DiCMS::publicRoutes();
+        \halestar\LaravelDropInCms\DiCMS::adminRoutes();
     });
+```
+If you would like to make sure that only authenticated users could reach this admin site you can change this to:
+```php
+Route::prefix('admin')->middleware('auth')->group(function()
+    {
+        \halestar\LaravelDropInCms\DiCMS::adminRoutes();
+    });
+```
+The second entry tells the system where to show the CMS website that you've built. If you don't wrap it around any prefix, then it will show up directly on the root of your website. This is why it is important to put this at the bottom of the routes files, as it will catch all the routes below it.  Alternatively, if you would like your app to show the website on `https://yoursite.com/front` for example, you could set up the entry as:
+```php
+Route::prefix('front')->group(function()
+{
+    \halestar\LaravelDropInCms\DiCMS::publicRoutes();
+});
+```
 
 Once you have these two routes set up, the system is up and running. The first thing you should do is login to the admin section of the CMS and create a new site. There will be instructions below for how to create your first new site.
 
@@ -123,72 +130,152 @@ For most projects this will be enough. However, you can make the protections mor
 ### Securing Through Policies
 
 Securing through Policies is the most fine-grained approach to permissions that you can have. Essentially every model that the CMS uses has a Policy class attached to it that defines what permissions a user has when manipulating this model. All the models in DiCMS have Policies and all policies can be overridden in the config file. The list of models and policies are found in the `config/dicms.php` config file in the `$policies` array. It will usually look like this:
-
-    'policies' =>
-    [
-        \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \halestar\LaravelDropInCms\Policies\SitePolicy::class),
-        \halestar\LaravelDropInCms\Models\Header::class => env('DICMS_HEADER_POLICY', \halestar\LaravelDropInCms\Policies\HeaderPolicy::class),
-        \halestar\LaravelDropInCms\Models\Footer::class => env('DICMS_FOOTER_POLICY', \halestar\LaravelDropInCms\Policies\FooterPolicy::class),
-        \halestar\LaravelDropInCms\Models\CssSheet::class => env('DICMS_CSS_SHEET_POLICY', \halestar\LaravelDropInCms\Policies\CssSheetPolicy::class),
-        \halestar\LaravelDropInCms\Models\JsScript::class => env('DICMS_JS_SCRIPT_POLICY', \halestar\LaravelDropInCms\Policies\JsScriptPolicy::class),
-        \halestar\LaravelDropInCms\Models\Page::class => env('DICMS_PAGE_POLICY', \halestar\LaravelDropInCms\Policies\PagePolicy::class),
-        \halestar\LaravelDropInCms\Models\Menu::class => env('DICMS_MENU_POLICY', \halestar\LaravelDropInCms\Policies\MenuPolicy::class),
-    ],
-
+```php
+'policies' =>
+[
+    \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \halestar\LaravelDropInCms\Policies\SitePolicy::class),
+    \halestar\LaravelDropInCms\Models\Header::class => env('DICMS_HEADER_POLICY', \halestar\LaravelDropInCms\Policies\HeaderPolicy::class),
+    \halestar\LaravelDropInCms\Models\Footer::class => env('DICMS_FOOTER_POLICY', \halestar\LaravelDropInCms\Policies\FooterPolicy::class),
+    \halestar\LaravelDropInCms\Models\CssSheet::class => env('DICMS_CSS_SHEET_POLICY', \halestar\LaravelDropInCms\Policies\CssSheetPolicy::class),
+    \halestar\LaravelDropInCms\Models\JsScript::class => env('DICMS_JS_SCRIPT_POLICY', \halestar\LaravelDropInCms\Policies\JsScriptPolicy::class),
+    \halestar\LaravelDropInCms\Models\Page::class => env('DICMS_PAGE_POLICY', \halestar\LaravelDropInCms\Policies\PagePolicy::class),
+    \halestar\LaravelDropInCms\Models\Menu::class => env('DICMS_MENU_POLICY', \halestar\LaravelDropInCms\Policies\MenuPolicy::class),
+],
+```
 The left side of the array is the model, such as a Site, or a Page, the right hand side is the Policy that is attached to it.  The default policy is extremely permissive, allowing users to do everything. However, you can change this by creating your own policy and overriding it.
 
 For example, lets look at the `\halestar\LaravelDropInCms\Models\Site` model.This model is the representation of a Site. We see that it has the class `\halestar\LaravelDropInCms\Policies\SitePolicy` attached. Looking at this class the definition is quite simple:
+```php
+class SitePolicy
+{
+/**
+* Determine whether the user can view any models.
+*/
+public function viewAny(User $user = null): bool
+{
+return true;
+}
 
-    class SitePolicy
-    {
-    /**
-    * Determine whether the user can view any models.
-    */
-    public function viewAny(User $user = null): bool
-    {
+/**
+ * Determine whether the user can view the model.
+ */
+public function view(User $user = null, Site $site = null): bool
+{
     return true;
-    }
-    
-    /**
-     * Determine whether the user can view the model.
-     */
-    public function view(User $user = null, Site $site = null): bool
-    {
-        return true;
-    }
+}
 
-    /**
-    * Determine whether the user can create models.
-    */
+/**
+* Determine whether the user can create models.
+*/
+public function create(User $user = null): bool
+{
+    return true;
+}
+...
+```
+You can immediately see that all functions in this Policy (and indeed, all policies) return true, meaning that permission is granted.  So creating site will always be allowed by everyone.  But what if you wanted to change this?  What if you wanted the creation of sites to only be available to users with a specific permission?  Well, we can extend the SitePolicy class and change it into:
+```php
+class MySitePolicy extends \halestar\LaravelDropInCms\Policies\SitePolicy
+{
     public function create(User $user = null): bool
     {
-        return true;
+        return $user->can('create sites');
     }
-    ...
-
-You can immediately see that all functions in this Policy (and indeed, all policies) return true, meaning that permission is granted.  So creating site will always be allowed by everyone.  But what if you wanted to change this?  What if you wanted the creation of sites to only be available to users with a specific permission?  Well, we can extend the SitePolicy class and change it into:
-
-    class MySitePolicy extends \halestar\LaravelDropInCms\Policies\SitePolicy
-    {
-        public function create(User $user = null): bool
-        {
-            return $user->can('create sites');
-        }
-    }
-
+}
+```
 Then we alter the policy's config:
-
-    'policies' =>
-        [
-            \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \App\Policies\MySitePolicy::class),
-            ...
-        ],
-
+```php
+'policies' =>
+    [
+        \halestar\LaravelDropInCms\Models\Site::class => env('DICMS_SITE_POLICY', \App\Policies\MySitePolicy::class),
+        ...
+    ],
+```
 Alternatively, we can add an env variable to our `.env` file:
 
-    DICMS_SITE_POLICY=\App\Policies\MySitePolicy::class
+```php
+DICMS_SITE_POLICY=\App\Policies\MySitePolicy::class
+```
 
 Now, only the correct users can create sites.
+
+You can publish all the Policies in the system and then tweak them to your heart's
+content by executing:
+
+    php artisan vendor:publish --tag=dicms-policies
+
+<a id="securing"></a>
+## Backing up your CMS
+
+There are 3 ways to back up your CMS. Backing up means, as of version 0.4.0 a
+string or file representation of your database structure that can then be
+given to a restore method.
+
+### Programmatically
+
+The Site can be backed up programmatically by obtaining an instance of the 
+`halestar\LaravelDropInCms\Models\SystemBackup` object by instantiating it,
+such as:
+
+```php
+// This will actually generate a backup instance. So long as 
+// this object persist in memory, you have a snapshot of your 
+// database at the time this command is executed.
+$backup = new SystemBackup();
+// to access the backup data, get it by doing:
+$backupData = $backup->getBackupData();
+// $backupData now has a string containing all the information
+// in your database 
+```
+
+You can then use that data to restore it by passing it to the `halestar\LaravelDropInCms\Models\SystemBackup` as a 
+static function such as:
+```php
+SystemBackup::restore($backupData);
+```
+Your site's database is now restored.
+
+### Over the Web
+
+You can back up and restore your website over the web by going to the CMS Admin site of your DiCMS install and selecting the 
+Backups menu options. From there you'll get a page that will allow you to download a backup (aptly named backup.json), or 
+select a file that you exported previously and restore the site.
+
+### Through Artisan
+
+You can back up and restore the site through artisan commands. Use
+```php
+php artisan dicms:backup-cms
+```
+You can add the optional `--file=file_out.json` option to save the backup to a file.  To restore the Site:
+```php
+php artisan dicms::backup-cms --file=file_out.json 
+```
+This will load the data from the `file_out.json` file and restore your Site
+
+### Scheduled Backups
+
+Since this project is primary aimed at developers who want to showcase a project, it was made to be easy to 
+survive database wipes. 
+
+For example, lets say you have a demo in your app that you host for people to play with. You don't
+give them access to the CMS (through Policies), and you want to wipe and re-seed the database 
+every night. You can do this in the scheduler calling this function every night:
+```php
+public function cleanUpDb()
+{
+    // save the cms data.
+    $cmsSave = new SystemBackup();
+    $cmsData = $cmsSave->getBackupData();
+    // refresh the db, and seed it since it will probably have demo data
+    $this->call('migrate:fresh', ['--seed' => true]);
+    // restore the CMS data
+    $cmsSave->restore($cmsData);
+    // Optimize some stuff
+    $this->call('optimize:clear');
+    $this->call('optimize');
+}
+```
 
 <a id="plugins"></a>
 ## Plugin System
@@ -208,33 +295,28 @@ This space here is meant to detail what features and upgrades I consider
 essential to release a v1.0
 
 These requirements are subject (and in fact, most likely) to change and 
-I will cross them out (probably) as I build things.  I plan on keeping 
-stable releases as odd versions and using even versions as dev, unstable 
-releases.  For example, the first release (considered stable, I know) is 
-v0.1.0 and the latest is set to v0.1.3. Once all these new instructions are 
-written up and released, I will create a v0.3.0 release for both DiCms and 
-the Blogger Plugin.
+I will cross them out (probably) as I build things.
 
 The following features need to be implemented in order to release v1.0:
 
  - Comments need to be added. Heredoc and config comments.
  - The user interface needs to be overhauled. It is very ugly and needs to be updated.
- - The system needs to be able to be backed-up programmatically through an API and through an artisan command
- - Make css and js script re-arrangeable
+ - ~~The system needs to be able to be backed-up programmatically through an API and through an artisan command~~
+ - ~~Make css and js script re-arrangeable~~
  - Archive and de-archive sites
  - Preview needs to be enabled
- - Better asset supports for images and stuff
- - Better editor support
+ - ~~Better asset supports for images and stuff~~
+ - ~~Better editor support~~
  - GrapesJs needs to be heavily customized
  - Make sure it shows up nice on mobile
  - Add REST API to all models with Policy hooks
- - Upgrade the plugin system to allow for customization of css/js scripts, headers and footers from the front page.
+ - ~~Upgrade the plugin system to allow for customization of css/js scripts, headers and footers from the front page.~~
  - Document how to create a simple site, with pictures.
  - Make backups more secure by zipping, creating SHA's etc.
  - Provide a sample backup file that will build a default site.
  - Add alternatives for other kinds of settings mechanisms, such as redis.
- - Add publishable policies for users to easily extend. Possibly through artisan commands.
- - Create an asset storage management system for centralized, shared management. Maybe a plugin?
+ - ~~Add publishable policies for users to easily extend. Possibly through artisan commands.~~
+ - ~~Create an asset storage management system for centralized, shared management. Maybe a plugin?~~
  - Duplicate sites.
  - Update README to include better instructions and define the roadmap to include version milestones.
 

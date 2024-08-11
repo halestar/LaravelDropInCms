@@ -3,13 +3,16 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\DiCMS;
+use halestar\LaravelDropInCms\Interfaces\ContainsCssSheets;
+use halestar\LaravelDropInCms\Interfaces\ContainsJsScripts;
 use halestar\LaravelDropInCms\Traits\BackUpable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
-class Page extends Model
+class Page extends Model implements ContainsCssSheets, ContainsJsScripts
 {
     use BackUpable;
 
@@ -25,10 +28,14 @@ class Page extends Model
 
     protected $fillable = ['name','slug','title', 'path', 'html', 'url', 'css', 'data'];
 
-    protected $casts =
-        [
-            'published' => 'boolean',
-        ];
+    protected function casts(): array
+    {
+        return
+            [
+                'published' => 'boolean',
+            ];
+    }
+
     public function __construct(array $attributes = [])
     {
         $this->table = config('dicms.table_prefix') . "pages";
@@ -53,13 +60,13 @@ class Page extends Model
     public function pageCss(): BelongsToMany
     {
         return $this->belongsToMany(CssSheet::class, config('dicms.table_prefix') . 'pages_css_sheets',
-            'page_id', 'sheet_id')->withPivot('order_by');
+            'page_id', 'sheet_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
     public function pageJs(): BelongsToMany
     {
         return $this->belongsToMany(JsScript::class, config('dicms.table_prefix') . 'pages_js_scripts',
-            'page_id', 'script_id')->withPivot('order_by');
+            'page_id', 'script_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
     //front content
@@ -93,5 +100,47 @@ class Page extends Model
     {
         $page = Page::findOrFail($id);
         return DiCMS::dicmsPublicRoute() . "/" . $page->url;
+    }
+
+    public function getCssSheets(): Collection
+    {
+        return $this->pageCss;
+    }
+
+    public function addCssSheet(CssSheet $cssSheet)
+    {
+        $order = $this->pageCss()->count();
+        $this->pageCss()->attach($cssSheet->id, ['order_by' => $order]);
+    }
+
+    public function removeCssSheet(CssSheet $cssSheet)
+    {
+        $this->pageCss()->detach($cssSheet->id);
+    }
+
+    public function setCssSheetOrder(CssSheet $cssSheet, int $order)
+    {
+        $this->pageCss()->updateExistingPivot($cssSheet->id, ['order_by' => $order]);
+    }
+
+    public function getJsScripts(): Collection
+    {
+        return $this->pageJs;
+    }
+
+    public function addJsScript(JsScript $script)
+    {
+        $order = $this->pageJs()->count();
+        $this->pageJs()->attach($script->id, ['order_by' => $order]);
+    }
+
+    public function removeJsScript(JsScript $script)
+    {
+        $this->pageJs()->detach($script->id);
+    }
+
+    public function setJsScriptOrder(JsScript $script, int $order)
+    {
+        $this->pageJs()->updateExistingPivot($script->id, ['order_by' => $order]);
     }
 }

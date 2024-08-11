@@ -32,83 +32,8 @@
         @endif
         <div class="row">
             <div class="col-md">
-                <h4 class="border-bottom">{{ __('dicms::sites.sheets') }}</h4>
-                <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.css.add', ['site' => $site->id]) }}"
-                      method="POST">
-                    @csrf
-                    <div class="input-group" aria-describedby="cssSheetHelp">
-                        <label for="sheet_id" class="input-group-text">{{ __('dicms::sites.sheets.add') }}</label>
-                        <select name="sheet_id" id="sheet_id" class="form-select"
-                                @cannot('update', $site) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.sheets.add.select') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\CssSheet::whereNotIn('id', $site->siteCss->pluck('id'))->get() as $sheet)
-                                <option value="{{ $sheet->id }}">{{ $sheet->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.add') }}</button>
-                        @can('viewAny', \halestar\LaravelDropInCms\Models\CssSheet::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.sheets.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_css_sheets') }}</a>
-                        @endcan
-                    </div>
-                </form>
-                <div id="cssSheetHelp" class="form-text mb-3">{{ __('dicms::sites.sheets.add.help') }}</div>
-                @if($site->siteCss()->count() > 0)
-                    <h5 class="border-bottom">{{ __('dicms::sites.sheets.assigned') }}</h5>
-                    <ul class="list-group">
-                        @foreach($site->siteCss as $css)
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
-                                css_id="{{ $css->id }}">
-                                {{ $css->name }}
-                                <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.css.remove', ['site' => $site->id, 'cssSheet' => $css->id]) }}"
-                                    class="btn btn-danger"
-                                    role="button"
-                                >{{ __('dicms::admin.remove') }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
-
-                <h4 class="border-bottom mt-5">{{ __('dicms::sites.scripts') }}</h4>
-                <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.js.add', ['site' => $site->id]) }}"
-                      method="POST">
-                    @csrf
-                    <div class="input-group" aria-describedby="jsScriptHelp">
-                        <label for="script_id" class="input-group-text">{{ __('dicms::sites.scripts.add') }}</label>
-                        <select name="script_id" id="script_id" class="form-select"
-                                @cannot('update', $site) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.scripts.add.select') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\JsScript::whereNotIn('id', $site->siteJs->pluck('id'))->get() as $script)
-                                <option value="{{ $script->id }}">{{ $script->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.add') }}</button>
-                        @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_js_scripts') }}</a>
-                        @endcan
-                    </div>
-                </form>
-                <div id="jsScriptHelp" class="form-text mb-3">{{ __('dicms::sites.scripts.add.help') }}</div>
-                @if($site->siteJs()->count() > 0)
-                    <h5 class="border-bottom">{{ __('dicms::sites.scripts.assigned') }}</h5>
-                    <ul class="list-group">
-                        @foreach($site->siteJs as $js)
-                            <li class="list-group-item d-flex justify-content-between align-items-center"
-                                js_id="{{ $js->id }}">
-                                {{ $js->name }}
-                                <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.js.remove', ['site' => $site->id, 'jsScript' => $js->id]) }}"
-                                    class="btn btn-danger"
-                                    role="button"
-                                >{{ __('dicms::admin.remove') }}</a>
-                            </li>
-                        @endforeach
-                    </ul>
-                @endif
+                <livewire:css-sheet-manager :siteId="$site->id" :container="$site" />
+                <livewire:js-script-manager :siteId="$site->id" :container="$site" />
             </div>
             <div class="col-md">
                 <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.update', ['site' => $site->id]) }}"
@@ -130,7 +55,7 @@
                         <select name="menu_id" id="menu_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_menu') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Menu::all() as $menu)
+                            @foreach(\halestar\LaravelDropInCms\Models\Menu::where('site_id', $site->id)->get() as $menu)
                                 <option value="{{ $menu->id }}"
                                         @if($menu->id == $site->menu_id) selected @endif>{{ $menu->name }}</option>
                             @endforeach
@@ -151,7 +76,7 @@
                         <select name="header_id" id="header_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_header') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Header::all() as $header)
+                            @foreach(\halestar\LaravelDropInCms\Models\Header::where('site_id', $site->id)->get() as $header)
                                 <option value="{{ $header->id }}"
                                         @if($header->id == $site->header_id) selected @endif>{{ $header->name }}</option>
                             @endforeach
@@ -171,7 +96,7 @@
                         <select name="footer_id" id="footer_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_footer') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Footer::all() as $footer)
+                            @foreach(\halestar\LaravelDropInCms\Models\Footer::where('site_id', $site->id)->get() as $footer)
                                 <option value="{{ $footer->id }}"
                                         @if($footer->id == $site->footer_id) selected @endif>{{ $footer->name }}</option>
                             @endforeach

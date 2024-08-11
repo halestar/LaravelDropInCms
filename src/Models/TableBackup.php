@@ -3,7 +3,6 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Schema;
 
 final class TableBackup
 {

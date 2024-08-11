@@ -13,10 +13,14 @@ class CssSheet extends Model
     use BackUpable;
 
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "css_sheets" ]; }
-    protected $casts =
-        [
-            'type' => HeadElementType::class,
-        ];
+    protected function casts(): array
+    {
+        return
+            [
+                'type' => HeadElementType::class,
+            ];
+    }
+
     protected $fillable = ['name','description','sheet', 'href', 'link_type','type'];
     public function __construct(array $attributes = [])
     {

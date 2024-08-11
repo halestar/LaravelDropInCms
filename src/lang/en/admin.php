@@ -3,12 +3,14 @@
 return
 [
     'site_menu_item' => 'Sites',
+    'assets_menu_item' => 'Assets',
     'create' => 'Create',
     'cancel' => 'Cancel',
     'update' => 'Update',
     'delete' => 'Delete',
     'add' => 'Add',
     'remove' => 'Remove',
+    'edit' => 'Edit',
     'manage_headers' => "Manage Headers",
     'manage_footers' => 'Manage Page Footers',
     'manage_menus' => 'Manage Site Menus',
@@ -24,4 +26,8 @@ return
     'backups.restore' => 'Restore Backup',
     'backups.restore.file' => 'Restore File',
     'backups.restore.file.help' => 'A backup file to restore',
+
+    'commands.file.write.error' => "Unable to create file",
+    'commands.file.read.error' => "Unable to read file",
+    'commands.data.read.error' => "There is no data to read",
 ];
