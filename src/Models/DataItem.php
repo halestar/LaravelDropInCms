@@ -29,7 +29,7 @@ class DataItem extends Model
         if(preg_match('/image\/.+/', $this->mime))
         {
             $manager = new ImageManager(new Driver());
-            $thmb = $manager->read(file_get_contents($this->url));
+            $thmb = $manager->read(Storage::disk(config('dicms.media_upload_disk'))->get($this->name));
             if($thmb)
                 $thmb->scaleDown(height: config('dicms.thumb_max_height'));
             $path = config('dicms.thumb_folder') . "/" . pathinfo($this->path, PATHINFO_FILENAME) . ".png";

@@ -2,6 +2,12 @@
 
 All notable changes to `LaravelDropInCMS` will be documented in this file
 
+## 0.4.1
+
+Updates the asset manager to better work with S3-type remote storage locations. 
+It does this by relying less on the php functions file_get_contents
+and relying instead on Laravel's storage Facade.
+
 ## 0.4.0
 
 This update is large enough to be considered its own version, so I went ahead and updated

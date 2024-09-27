@@ -86,9 +86,9 @@ class AssetManager extends Component
         {
             foreach($this->dataItem as $file)
             {
-                if(!preg_match('/image\/.+/', $file->getMimeType))
+                if(!preg_match('/image\/.+/', $file->getMimeType()))
                     continue;
-                $img = $manager->read(file_get_contents($file->path()));
+                $img = $manager->read($file->get());
                 if($img)
                     $img->scaleDown(height: config('dicms.img_max_height'));
                 $path = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . ".png";
@@ -104,7 +104,7 @@ class AssetManager extends Component
         }
         elseif(preg_match('/image\/.+/', $this->dataItem->getMimeType()))
         {
-            $img = $manager->read(file_get_contents($this->dataItem->path()));
+            $img = $manager->read($this->dataItem->get());
             if($img)
                 $img->scaleDown(height: config('dicms.img_max_height'));
             $path = pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME) . ".png";
