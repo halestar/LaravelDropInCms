@@ -2,7 +2,6 @@
 
 namespace halestar\LaravelDropInCms\Providers;
 
-use App\Http\ViewComposers\CurrentSiteViewComposer;
 use halestar\LaravelDropInCms\Commands\BackupCms;
 use halestar\LaravelDropInCms\Commands\RestoreCms;
 use halestar\LaravelDropInCms\Livewire\AssetManager;
@@ -10,6 +9,7 @@ use halestar\LaravelDropInCms\Livewire\CssSheetManager;
 use halestar\LaravelDropInCms\Livewire\JsScriptManager;
 use halestar\LaravelDropInCms\View\Components\ErrorDisplay;
 use halestar\LaravelDropInCms\View\Components\TagSelector;
+use halestar\LaravelDropInCms\View\Composers\CurrentSiteViewComposer;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\View;
