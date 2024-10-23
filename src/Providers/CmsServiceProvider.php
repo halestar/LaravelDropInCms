@@ -42,7 +42,6 @@ class CmsServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../views', 'dicms');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dicms');
         Blade::component('error-display', ErrorDisplay::class);
-        Blade::component('tag-selector', TagSelector::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
