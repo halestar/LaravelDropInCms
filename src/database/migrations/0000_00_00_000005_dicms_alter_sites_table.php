@@ -20,10 +20,6 @@ return new class extends Migration
                 ->references('id')
                 ->on(config('dicms.table_prefix') . 'footers')
                 ->onDelete('set null');
-            $table->foreign('menu_id', 'default_menu_fk')
-                ->references('id')
-                ->on(config('dicms.table_prefix') . 'menus')
-                ->onDelete('set null');
         });
     }
 
@@ -35,7 +31,6 @@ return new class extends Migration
         Schema::table(config('dicms.table_prefix') . 'sites', function (Blueprint $table) {
             $table->dropForeign('default_header_fk');
             $table->dropForeign('default_footer_fk');
-            $table->dropForeign('default_menu_fk');
         });
     }
 };

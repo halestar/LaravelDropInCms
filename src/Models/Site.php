@@ -2,19 +2,25 @@
 
 namespace halestar\LaravelDropInCms\Models;
 
+use halestar\LaravelDropInCms\DiCMS;
+use halestar\LaravelDropInCms\Enums\WrapperTagType;
 use halestar\LaravelDropInCms\Interfaces\ContainsCssSheets;
 use halestar\LaravelDropInCms\Interfaces\ContainsJsScripts;
+use halestar\LaravelDropInCms\Models\Scopes\AvailableOnlyScope;
+use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
+#[ScopedBy([AvailableOnlyScope::class, OrderByNameScope::class])]
 class Site extends Model implements ContainsCssSheets, ContainsJsScripts
 {
     use BackUpable;
 
+    public const CURRENT_SITE_KEY = "sites.current_site_id";
 
     protected static function getTablesToBackup(): array
         {
@@ -31,11 +37,14 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
             [
                 'active' => 'boolean',
                 'archived' => 'boolean',
+                'headers_count' => 'boolean',
+                'tag' => WrapperTagType::class,
             ];
     }
 
 
-    protected $fillable = ['name', 'title'];
+    protected $fillable = ['name', 'title', 'description', 'body_attr', 'favicon',
+        'tag','options'];
 
     public function __construct(array $attributes = [])
     {
@@ -43,39 +52,14 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
         parent::__construct($attributes);
     }
 
-    public function headers(): HasMany
-    {
-        return $this->hasMany(Header::class, 'site_id');
-    }
-
     public function defaultHeader(): BelongsTo
     {
         return $this->belongsTo(Header::class, "header_id");
     }
 
-    public function footers(): HasMany
-    {
-        return $this->hasMany(Footer::class, 'site_id');
-    }
-
     public function defaultFooter(): BelongsTo
     {
         return $this->belongsTo(Footer::class, 'footer_id');
-    }
-
-    public function menus(): HasMany
-    {
-        return $this->hasMany(Menu::class, 'site_id');
-    }
-
-    public function defaultMenu(): BelongsTo
-    {
-        return $this->belongsTo(Menu::class, 'menu_id');
-    }
-
-    public function cssSheets():HasMany
-    {
-        return $this->hasMany(CssSheet::class, 'site_id');
     }
 
     public function siteCss(): BelongsToMany
@@ -84,9 +68,16 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
             'site_id', 'sheet_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
-    public function jsScripts():HasMany
+    public function CssLinks(): Collection
     {
-        return $this->hasMany(JsScript::class, 'site_id');
+        $links = $this->siteCss()->links()->get()->pluck('href');
+        $links->push(DiCMS::dicmsPublicCss($this));
+        return $links;
+    }
+
+    public function CssText(): string
+    {
+        return $this->siteCss()->text()->get()->pluck('sheet')->join("\n");
     }
 
     public function siteJs(): BelongsToMany
@@ -95,9 +86,16 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
             'site_id', 'script_id')->withPivot('order_by')->orderByPivot('order_by');
     }
 
-    public function pages(): HasMany
+    public function JsLinks(): Collection
     {
-        return $this->hasMany(Page::class, 'site_id');
+        $links = $this->siteJs()->links()->get()->pluck('href');
+        $links->push(DiCMS::dicmsPublicJs($this));
+        return $links;
+    }
+
+    public function JsText(): string
+    {
+        return $this->siteJs()->text()->get()->pluck('script')->join("\n");
     }
 
     public function getCssSheets(): Collection
@@ -142,8 +140,71 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
         $this->siteJs()->updateExistingPivot($script->id, ['order_by' => $order]);
     }
 
-    public static function defaultSite(): Site
+    public static function defaultSite(): ?Site
     {
         return Site::where('active', true)->first();
+    }
+
+    public static function currentSite(): ?Site
+    {
+        $settings = config('dicms.settings_class');
+        //first, do we have a saved current site?
+        $id = $settings::get(Site::CURRENT_SITE_KEY, null);
+        if($id)
+        {
+            //we do, but is it valid?
+            $site = Site::find($id);
+            if($site)
+                return $site;
+        }
+        //not saved (or invalid), is there an active site?
+        $site = Site::defaultSite();
+        if($site)
+        {
+            //there is, save it and return it.
+            $settings::set(Site::CURRENT_SITE_KEY, $site->id);
+            return $site;
+        }
+        //there isn't, do we have A site?
+        $site = Site::first();
+        if($site)
+        {
+            //there is, save it and return it.
+            $settings::set(Site::CURRENT_SITE_KEY, $site->id);
+            return $site;
+        }
+        //nope, system is empty.
+        return null;
+    }
+
+    public function makeCurrent(): void
+    {
+        $settings = config('dicms.settings_class');
+        $settings::set(Site::CURRENT_SITE_KEY, $this->id);
+    }
+
+    public function dupe(): Site
+    {
+        $dupeSite = new Site();
+        $dupeSite->name = $this->name . "-" . __('dicms::admin.copy');
+        $dupeSite->description = $this->description;
+        $dupeSite->title = $this->title . "-" . __('dicms::admin.copy');
+        $dupeSite->body_attr = $this->body_attr;
+        $dupeSite->homepage_url = $this->homepage_url;
+        $dupeSite->active = false;
+        $dupeSite->archived = false;
+        $dupeSite->favicon = $this->favicon;
+        $dupeSite->tag = $this->tag;
+        $dupeSite->options = $this->options;
+        $dupeSite->header_id = $this->header_id;
+        $dupeSite->footer_id = $this->footer_id;
+        $dupeSite->save();
+
+        foreach($this->siteCss as $css)
+            $dupeSite->siteCss()->attach($css->id, ['order_by' => $css->pivot->order_by]);
+        foreach($this->siteJs as $js)
+            $dupeSite->siteJs()->attach($js->id, ['order_by' => $css->pivot->order_by]);
+        //now we return the new object.
+        return $dupeSite;
     }
 }

@@ -2,6 +2,51 @@
 
 All notable changes to `LaravelDropInCMS` will be documented in this file
 
+## 0.5.0
+
+Large enough update to bump it to the next revision.
+The major features of this release are:
+
+* Asset Manager
+    * Enabled the filename editor
+    * Uploaded files should now be hashed
+    * Added url copy link
+    * File uploads should now work much better
+    * Large view now display properly
+    * Added a mini asset manager version that is accessible everywhere in admin and can interact with elements in the page
+    * Looks much better.
+* New Look!
+    * Added icons instead of words, but kept the words as titles/alts
+    * Made all the admin pages use a template for better consistency across pages
+    * The nav has been redesigned with new menu options and the current site on the top
+    * There is now a page when no site exists
+    * Installation and set up are now much easier and semi-guided.
+* New Options
+    * You can now choose what kind of tags you want to use for footers/headers/menus
+    * Menu structure is now configurable
+    * Site options include favicons and header locations.
+* Sites can now be archived
+* All things can be duplicated
+* Starting fresh now directs you to create a site or restore one.
+* Started testing, some basic routes for now.
+* Sites and pages can now be previewed.
+* Added a lot of new blocks to the web editor
+    * Almost every html-element has been added
+    * New blocks with options, such as headings or menu items
+    * Cleaned up the code so that no more extra wrappers are added.
+* Changed Architecture
+    * No menus
+    * Instead, everything is done through Headers and HTML
+    * Pages are now more complete so you can customize it better
+    * All HTML-aware elements now extend a base class
+    * Pages/Headers/Menus are no longer site-specific
+* Cleaned up the web editor to make it work better.
+* All JS/CSS text was moved to its own link, instead of pasting it to the page.
+* Plugin interfaces have been updated.
+    * Moved the whole architecture to use Pages
+    * Made the Plugin Interface a single interface
+    * Added the ability for plugins to GrapesJs plugins
+
 ## 0.4.1
 
 Updates the asset manager to better work with S3-type remote storage locations. 

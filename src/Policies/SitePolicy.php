@@ -2,16 +2,14 @@
 
 namespace halestar\LaravelDropInCms\Policies;
 
-use App\Models\User;
 use halestar\LaravelDropInCms\Models\Site;
-use Illuminate\Support\Facades\Log;
 
 class SitePolicy
 {
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user = null): bool
+    public function viewAny($user = null): bool
     {
         return true;
     }
@@ -19,7 +17,7 @@ class SitePolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user = null, Site $site = null): bool
+    public function view($user = null, Site $site = null): bool
     {
         return true;
     }
@@ -27,7 +25,7 @@ class SitePolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user = null): bool
+    public function create($user = null): bool
     {
         return true;
     }
@@ -35,7 +33,7 @@ class SitePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user = null, Site $site = null): bool
+    public function update($user = null, Site $site = null): bool
     {
         return true;
     }
@@ -43,7 +41,7 @@ class SitePolicy
     /**
      * Determine whether the user can archive or unarchive the model.
      */
-    public function archive(User $user = null, Site $site = null): bool
+    public function archive($user = null, Site $site = null): bool
     {
         return true;
     }
@@ -51,7 +49,7 @@ class SitePolicy
     /**
      * Determine whether the user can activate or deactivate the model.
      */
-    public function activate(User $user = null, Site $site = null): bool
+    public function activate($user = null, Site $site = null): bool
     {
         return true;
     }
@@ -59,7 +57,7 @@ class SitePolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function delete(User $user = null, Site $site = null): bool
+    public function delete($user = null, Site $site = null): bool
     {
         return true;
     }
@@ -67,7 +65,12 @@ class SitePolicy
     /**
      * Determine whether the user can permanently backup and restore the model
      */
-    public function backup(User $user = null): bool
+    public function backup($user = null): bool
+    {
+        return true;
+    }
+
+    public function preview($user = null, Site $site = null): bool
     {
         return true;
     }

@@ -1,11 +1,7 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            {{__('dicms::pages.new')}}
-        </h1>
-        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.store', ['site' => $site->id]) }}"  enctype="multipart/form-data">
+@section('index_content')
+        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.store') }}"  enctype="multipart/form-data">
             @csrf
             <div class="mb-3">
                 <label for="name" class="form-label">{{ __('dicms::pages.name') }}</label>
@@ -35,6 +31,22 @@
             </div>
 
             <div class="mb-3">
+                <label for="path" class="form-label">{{ __('dicms::pages.path') }}</label>
+                <input
+                    type="text"
+                    name="path"
+                    id="path"
+                    aria-describedby="pathHelp"
+                    class="form-control"
+                    value="{{ old('path') }}"
+                    onkeyup="cleanPath()"
+                    onchange="cleanPath()"
+                />
+                <div id="slugHelp" class="form-text">{{ __('dicms::pages.slug.help') }}</div>
+            </div>
+
+
+            <div class="mb-3">
                 <label for="slug" class="form-label">{{ __('dicms::pages.slug') }}</label>
                 <input
                     type="text"
@@ -47,21 +59,6 @@
                     onchange="cleanSlug()"
                 />
                 <x-error-display key="slug">{{ $errors->first('slug') }}</x-error-display>
-                <div id="slugHelp" class="form-text">{{ __('dicms::pages.slug.help') }}</div>
-            </div>
-
-            <div class="mb-3">
-                <label for="path" class="form-label">{{ __('dicms::pages.path') }}</label>
-                <input
-                    type="text"
-                    name="path"
-                    id="path"
-                    aria-describedby="pathHelp"
-                    class="form-control"
-                    value="{{ old('path') }}"
-                    onkeyup="cleanPath()"
-                    onchange="cleanPath()"
-                />
                 <div id="slugHelp" class="form-text">{{ __('dicms::pages.slug.help') }}</div>
             </div>
 
@@ -99,10 +96,8 @@
 
             <div class="row">
                 <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.create') }}</button>
-                <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]) }}">{{ __('dicms::admin.cancel') }}</a>
             </div>
         </form>
-    </div>
 @endsection
 @push('scripts')
     <script>

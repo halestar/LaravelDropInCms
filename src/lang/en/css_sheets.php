@@ -2,7 +2,8 @@
 
 return
 [
-    "sheet" => "Css Sheet",
+    "sheet" => "Css Sheet|Css Sheets",
+    "sheet.none" => "There are no Css Sheets for this site. Go create some!",
     "sheet.title" => "Available Css Sheets",
     "new" => "Create New Css Sheet",
     "edit" => "Update Css Sheet",
@@ -15,6 +16,7 @@ return
     "content" => "Css Sheet Content",
     "content.help" => "This content will be included on whatever site or page this it is attached to, at the end of the <head>...</head> tags. There is no need to add your own <header></header> tags.",
     "back" => "Back to Sites",
+    'duplicate' => 'Duplicate Css Sheet',
     "text" => "Enter Text",
     "file" => "Upload File",
     "link" => "Import a Link",
@@ -22,4 +24,7 @@ return
     "link.url.help" => "This is the URl to import as a CSS Link",
     "link.type" => "Import Attributes",
     "link.type.help" => "A list of optional attributes you would like to apply to the declaration, such as type='text/css' or such",
+    'success.created' => 'Css Sheet created successfully.',
+    'success.updated' => 'Css Sheet updated successfully.',
+    'success.deleted' => 'Css Sheet deleted successfully.',
 ];

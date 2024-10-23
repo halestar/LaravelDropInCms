@@ -1,11 +1,7 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            {{__('dicms::footers.new')}}
-        </h1>
-        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.store', ['site' => $site->id]) }}">
+@section('index_content')
+        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.store') }}">
             @csrf
             <div class="mb-3">
                 <label for="name" class="form-label">{{ __('dicms::footers.name') }}</label>
@@ -32,23 +28,8 @@
                 <div id="descriptionHelp" class="form-text">{{ __('dicms::footers.description.help') }}</div>
             </div>
 
-            <div class="mb-3">
-                <label for="options" class="form-label">{{ __('dicms::footers.options') }}</label>
-                <input
-                    type="text"
-                    name="options"
-                    id="options"
-                    aria-describedby="optionsHelp"
-                    class="form-control"
-                    value="{{ old('options') }}"
-                />
-                <div id="optionsHelp" class="form-text">{{ __('dicms::footers.options.help') }}</div>
-            </div>
-
             <div class="row">
                 <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.create') }}</button>
-                <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.index', ['site' => $site->id]) }}">{{ __('dicms::admin.cancel') }}</a>
             </div>
         </form>
-    </div>
 @endsection

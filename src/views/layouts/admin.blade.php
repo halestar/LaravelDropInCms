@@ -23,8 +23,18 @@
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-    @isset($include_editor)
-        @include('dicms::layouts.editor.config', ['eConfig' => $include_editor])
+    @isset($objEditable)
+        <!-- Including GrapeJs Base Config -->
+        @include('dicms::layouts.editor.config', ['objEditable' => $objEditable])
+
+        @foreach(config('dicms.plugins') as $plugin)
+            @foreach($plugin::getGrapesJsPlugins() as $editorPlugin)
+                @if($editorPlugin->shouldInclude($objEditable))
+                    <!-- Including GrapeJs Plugin Config -->
+                    {!! $editorPlugin->getConfigView($objEditable) !!}
+                @endif
+            @endforeach
+        @endforeach
     @endisset
 
     @isset($include_text_editor)
@@ -59,7 +69,7 @@
 </head>
 <body>
 <div id="app">
-    <nav class="navbar navbar-expand-md bg-primary" data-bs-theme="dark">
+    <nav class="navbar navbar-expand-md" style="background-image: linear-gradient(#50b3eb,#2fa4e7 60%,#2c9ad9)" data-bs-theme="dark">
         <div class="container">
             <a class="navbar-brand" href="{{ config('dicms.back_to_url') }}">
                 {{ config('app.name', 'DiCMS') }}
@@ -71,19 +81,27 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav me-auto">
+                    @isset($currentSite)
                     @can("viewAny", \halestar\LaravelDropInCms\Models\Site::class)
-                        <li class="nav-item">
+                        <li class="nav-item dropdown">
                             <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.index') }}"
+                                href="#"
                                 @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('sites'))
-                                    class="nav-link active"
-                                    aria-current="page"
+                                    class="nav-link dropdown-toggle active"
                                 @else
-                                    class="nav-link"
+                                    class="nav-link dropdown-toggle"
                                 @endif
+                                role="button" data-bs-toggle="dropdown" aria-expanded="false"
                             >
-                                {{ __('dicms::admin.site_menu_item') }}
+                                {{ __('dicms::sites.site.current') }}
                             </a>
+                            <ul class="dropdown-menu">
+                                @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index') }}">{{ trans_choice('dicms::headers.header', 2) }}</a></li>@endcan
+                                @can('viewAny', \halestar\LaravelDropInCms\Models\Footer::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index') }}">{{ trans_choice('dicms::footers.footer', 2) }}</a></li>@endcan
+                                @can('viewAny', \halestar\LaravelDropInCms\Models\CssSheet::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.index') }}">{{ trans_choice('dicms::css_sheets.sheet', 2) }}</a></li>@endcan
+                                @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index') }}">{{ trans_choice('dicms::js_scripts.script', 2) }}</a></li>@endcan
+                                @can('viewAny', \halestar\LaravelDropInCms\Models\Page::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.index') }}">{{ trans_choice('dicms::pages.pages', 2) }}</a></li>@endcan
+                            </ul>
                         </li>
                     @endcan
                     @can("viewAny", \halestar\LaravelDropInCms\Models\DataItem::class)
@@ -102,22 +120,32 @@
                         </li>
                     @endcan
                     @foreach(config('dicms.plugins') as $plugin)
-                        @can('viewAny', $plugin::getEntryPoint()->getPolicyModel())
+                        @can('viewAny', $plugin::getPolicyModel())
                                 <li class="nav-item">
                                     <a
-                                        href="{{ $plugin::getEntryPoint()->getAdminUrl() }}"
-                                        @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule($plugin::getEntryPoint()->getRoutePrefix()))
+                                        href="{{ $plugin::getAdminUrl() }}"
+                                        @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule($plugin::getRoutePrefix()))
                                             class="nav-link active"
                                         aria-current="page"
                                         @else
                                             class="nav-link"
                                         @endif
                                     >
-                                        {{ $plugin::getEntryPoint()->getPluginMenuName() }}
+                                        {{ $plugin::getPluginMenuName() }}
                                     </a>
                                 </li>
                         @endcan
                     @endforeach
+                    @else
+                        <li class="nav-item">
+                            <a
+                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create') }}"
+                                class="nav-link"
+                            >
+                                {{ __('dicms::sites.new_site') }}
+                            </a>
+                        </li>
+                    @endisset
                     @can('backup', \halestar\LaravelDropInCms\Models\Site::class)
                             <li class="nav-item">
                                 <a
@@ -134,6 +162,29 @@
                             </li>
                     @endcan
                 </ul>
+
+                @isset($currentSite)
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <div class="input-group">
+                            <label class="input-group-text" for="current-site">{{ __('dicms::sites.site.current') }}</label>
+                            <select
+                                class="form-select"
+                                id="current-site"
+                                name="current_site"
+                                onchange="window.location.href='{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.home') }}/sites/' + $(this).val() + '/current'"
+                            >
+                                @foreach($allSites as $site)
+                                    <option value="{{ $site->id }}" @if($currentSite->id == $site->id) selected @endif >{{ $site->name }}</option>
+                                @endforeach
+                            </select>
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.show', ['site' => $currentSite->id]) }}" class="btn btn-outline-dark" type="button" title="{{ __('dicms::sites.site.current') }}"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create') }}" class="btn btn-outline-success" type="button" title="{{ __('dicms::sites.new_site') }}"><i class="fa-regular fa-square-plus"></i></a>
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.index') }}" class="btn btn-outline-primary" type="button" title="{{ __('dicms::sites.sites_title') }}"><i class="fa-solid fa-bars-progress"></i></a>
+                        </div>
+                    </li>
+                </ul>
+                @endif
 
             </div>
         </div>
@@ -158,23 +209,34 @@
     <main class="py-4">
         @yield('content')
     </main>
+    @isset($currentSite)
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
         @session('success-status')
-        <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast show" data-bs-delay="5000" role="alert" aria-live="assertive" aria-atomic="true" id="success-toast">
             <div class="toast-header bg-primary-subtle">
-                <strong class="me-auto">{{ __('common.success') }}</strong>
+                <strong class="me-auto">{{ __('dicms::admin.success') }}</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">
                 {{ $value }}
             </div>
         </div>
+        <script>
+            $(document).ready(function()
+                {
+                    setTimeout(function()
+                    {
+                        $('#success-toast').hide();
+                    }, 5000)
+                })
+        </script>
         @endsession
     </div>
+    @endisset
 </div>
 
-@isset($include_editor)
-    @include('dicms::layouts.editor.instance', ['eConfig' => $include_editor])
+@isset($objEditable)
+    @include('dicms::layouts.editor.instance', ['objEditable' => $objEditable])
 @endisset
 
 @isset($include_text_editor)

@@ -10,7 +10,9 @@ use halestar\LaravelDropInCms\Controllers\HeaderController;
 use halestar\LaravelDropInCms\Controllers\JsScriptController;
 use halestar\LaravelDropInCms\Controllers\MenuController;
 use halestar\LaravelDropInCms\Controllers\PageController;
+use halestar\LaravelDropInCms\Controllers\PreviewController;
 use halestar\LaravelDropInCms\Controllers\SiteController;
+use halestar\LaravelDropInCms\Middleware\CurrentSiteExistsMiddleware;
 use halestar\LaravelDropInCms\Models\CssSheet;
 use halestar\LaravelDropInCms\Models\DataItem;
 use halestar\LaravelDropInCms\Models\Footer;
@@ -28,9 +30,12 @@ final class DiCMS
 {
     public static function adminRoutes(): void
     {
-        Route::name('dicms.admin.')->group(function ()
+        Route::name('dicms.admin.')
+            ->middleware(CurrentSiteExistsMiddleware::class)
+            ->group(function ()
         {
-            Route::get('/', [SiteController::class, 'index'])->name('home');
+
+            Route::get('/', [SiteController::class, 'show'])->name('home');
 
             Route::post('/upload', function(Request $request)
             {
@@ -56,47 +61,61 @@ final class DiCMS
                 });
 
 
+            Route::get('/sites/{site}/current', [SiteController::class, 'currentSite'])->name('sites.current');
             Route::put('/sites/{site}/update/settings', [SiteController::class, 'updateSettings'])->name('sites.update.settings');
             Route::get('/sites/{site}/enable', [SiteController::class, 'enableSite'])->name('sites.enable');
             Route::get('/sites/{site}/disable', [SiteController::class, 'disableSite'])->name('sites.disable');
             Route::get('/sites/{site}/archive', [SiteController::class, 'archiveSite'])->name('sites.archive');
             Route::get('/sites/{site}/restore', [SiteController::class, 'restoreSite'])->name('sites.restore');
-            Route::post('/sites/{site}/css/add', [SiteController::class, 'addCss'])->name('sites.css.add');
-            Route::get('/sites/{site}/css/{cssSheet}/remove', [SiteController::class, 'removeCss'])->name('sites.css.remove');
-            Route::post('/sites/{site}/js/add', [SiteController::class, 'addJs'])->name('sites.js.add');
-            Route::get('/sites/{site}/js/{jsScript}/remove', [SiteController::class, 'removeJs'])->name('sites.js.remove');
+            Route::get('/sites/{site}/duplicate', [SiteController::class, 'duplicateSite'])->name('sites.duplicate');
 
-            Route::put('/sites/headers/{header}/content', [HeaderController::class, 'updateContent'])->name('sites.headers.update.content');
-            Route::put('/sites/footers/{footer}/content', [FooterController::class, 'updateContent'])->name('sites.footers.update.content');
-            Route::put('/sites/menu/{menu}/content', [MenuController::class, 'updateContent'])->name('sites.menus.update.content');
+            Route::put('/headers/{header}/content', [HeaderController::class, 'updateContent'])->name('headers.update.content');
+            Route::get('/headers/{header}/duplicate', [HeaderController::class, 'duplicate'])->name('headers.duplicate');
+            Route::put('/footers/{footer}/content', [FooterController::class, 'updateContent'])->name('footers.update.content');
+            Route::get('/footers/{footer}/duplicate', [FooterController::class, 'duplicate'])->name('footers.duplicate');
+            Route::put('/menu/{menu}/content', [MenuController::class, 'updateContent'])->name('menus.update.content');
+            Route::get('/menu/{menu}/duplicate', [MenuController::class, 'duplicate'])->name('menus.duplicate');
 
-            Route::get('/pages/{page}/edit/settings', [PageController::class, 'editSettings'])->name('sites.pages.edit.settings');
-            Route::put('/pages/{page}/update/settings', [PageController::class, 'updateSettings'])->name('sites.pages.update.settings');
-            Route::put('/pages/{page}/update/contents', [PageController::class, 'updateContent'])->name('sites.pages.update.content');
+            Route::get('/sheets/{sheet}/duplicate', [CssSheetController::class, 'duplicate'])->name('sheets.duplicate');
+            Route::get('/scripts/{script}/duplicate', [JsScriptController::class, 'duplicate'])->name('scripts.duplicate');
 
-            Route::post('/pages/{page}/css/add', [PageController::class, 'addCss'])->name('sites.pages.css.add');
-            Route::get('/pages/{page}/css/{cssSheet}/remove', [PageController::class, 'removeCss'])->name('sites.pages.css.remove');
-            Route::post('/pages/{page}/js/add', [PageController::class, 'addJs'])->name('sites.pages.js.add');
-            Route::get('/pages/{page}/js/{jsScript}/remove', [PageController::class, 'removeJs'])->name('sites.pages.js.remove');
+            Route::put('/pages/{page}/update/settings', [PageController::class, 'updateSettings'])->name('pages.update.settings');
+            Route::put('/pages/{page}/update/contents', [PageController::class, 'updateContent'])->name('pages.update.content');
 
-            Route::get('/pages/{page}/publish', [PageController::class, 'publishPage'])->name('sites.pages.publish');
-            Route::get('/pages/{page}/unpublish', [PageController::class, 'unpublishPage'])->name('sites.pages.unpublish');
+            Route::get('/pages/{page}/publish', [PageController::class, 'publishPage'])->name('pages.publish');
+            Route::get('/pages/{page}/unpublish', [PageController::class, 'unpublishPage'])->name('pages.unpublish');
+            Route::get('/pages/{page}/duplicate', [PageController::class, 'duplicatePage'])->name('pages.dupe');
 
             Route::resource('sites', SiteController::class);
-            Route::resource('sites.headers', HeaderController::class)->except('show');
-            Route::resource('sites.footers', FooterController::class)->except('show');
-            Route::resource('sites.sheets', CssSheetController::class)->except('show');
-            Route::resource('sites.scripts', JsScriptController::class)->except('show');
-            Route::resource('sites.pages', PageController::class);
-            Route::resource('sites.menus', MenuController::class);
+            Route::resource('headers', HeaderController::class)->except('show');
+            Route::resource('footers', FooterController::class)->except('show');
+            Route::resource('menus', MenuController::class)->except('show');
+            Route::resource('sheets', CssSheetController::class)->except('show');
+            Route::resource('scripts', JsScriptController::class)->except('show');
+            Route::resource('pages', PageController::class);
 
 
             Route::get('/assets', [DataItemController::class, 'index'])->name('assets.index');
+
+            Route::prefix('preview')
+                ->name('preview.')
+                ->controller(PreviewController::class)
+                ->group(function ()
+                {
+                    Route::get('/script.js', 'siteJs')->name('js.site');
+                    Route::get('/style.css', 'siteCss')->name('css.site');
+                    Route::get('/plugin/script.js', 'pluginJs')->name('js.plugin');
+                    Route::get('/plugin/style.css', 'pluginCss')->name('css.plugin');
+                    Route::get('/{page}/script.js', 'js')->name('js');
+                    Route::get('/{page}/style.css', 'css')->name('css');
+                    Route::any('/{path?}', 'index')->where('path', '.*')->name('home');
+                });
 
             foreach(config('dicms.plugins') as $plugin)
             {
                 $plugin::adminRoutes();
             }
+
         });
     }
 
@@ -109,6 +128,8 @@ final class DiCMS
                 {
                     Route::get('/site/{site}/script.js', [FrontController::class, 'siteJs'])->name('front.js.site');
                     Route::get('/site/{site}/style.css', [FrontController::class, 'siteCss'])->name('front.css.site');
+                    Route::get('/plugin/script.js', [FrontController::class, 'pluginJs'])->name('front.js.plugin');
+                    Route::get('/plugin/style.css', [FrontController::class, 'pluginCss'])->name('front.css.plugin');
                     Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
                     Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
                 });
@@ -193,7 +214,6 @@ final class DiCMS
             config('dicms.settings_class'),
             Footer::class,
             Header::class,
-            Menu::class,
             JsScript::class,
             CssSheet::class,
             Site::class,

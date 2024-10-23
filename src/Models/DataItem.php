@@ -4,6 +4,7 @@ namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\Traits\BackUpable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
@@ -26,10 +27,11 @@ class DataItem extends Model
         if($this->thumb)
             return $this->thumb;
 
-        if(preg_match('/image\/.+/', $this->mime))
+        Log::debug("mime is " . $this->mime);
+        if(preg_match('/image\/.+/', $this->mime) && $this->mime != "image/x-icon")
         {
             $manager = new ImageManager(new Driver());
-            $thmb = $manager->read(Storage::disk(config('dicms.media_upload_disk'))->get($this->name));
+            $thmb = $manager->read(Storage::disk(config('dicms.media_upload_disk'))->get($this->path));
             if($thmb)
                 $thmb->scaleDown(height: config('dicms.thumb_max_height'));
             $path = config('dicms.thumb_folder') . "/" . pathinfo($this->path, PATHINFO_FILENAME) . ".png";

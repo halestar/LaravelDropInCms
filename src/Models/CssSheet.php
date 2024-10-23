@@ -3,11 +3,13 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\Enums\HeadElementType;
+use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ScopedBy([OrderByNameScope::class])]
 class CssSheet extends Model
 {
     use BackUpable;
@@ -28,10 +30,6 @@ class CssSheet extends Model
         parent::__construct($attributes);
     }
 
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class, 'site_id');
-    }
 
     public function scopeLinks(Builder $query): void
     {
@@ -41,6 +39,19 @@ class CssSheet extends Model
     public function scopeText(Builder $query): void
     {
         $query->where('type', '=', HeadElementType::Text);
+    }
+
+    public function dupe(Site $site = null): CssSheet
+    {
+        $dupeSheet = new CssSheet();
+        $dupeSheet->name = $this->name . "-" . __('dicms::admin.copy');
+        $dupeSheet->type = $this->type;
+        $dupeSheet->description = $this->description;
+        $dupeSheet->sheet = $this->sheet;
+        $dupeSheet->href = $this->href;
+        $dupeSheet->link_type = $this->link_type;
+        $dupeSheet->save();
+        return $dupeSheet;
     }
 
 }

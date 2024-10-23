@@ -61,6 +61,11 @@ class AssetManager extends Component
         $this->assets = $query->get();
     }
 
+    public function clearFiter()
+    {
+        $this->filterTerms = "";
+    }
+
     public function updateName(DataItem $asset, $name)
     {
         $asset->name = $name;
@@ -88,32 +93,49 @@ class AssetManager extends Component
             {
                 if(!preg_match('/image\/.+/', $file->getMimeType()))
                     continue;
-                $img = $manager->read($file->get());
-                if($img)
-                    $img->scaleDown(height: config('dicms.img_max_height'));
-                $path = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME) . ".png";
-                Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
+
+                if($file->getMimeType() == "image/x-icon")
+                {
+                    //store the file
+                    $path = $file->store('', config('dicms.media_upload_disk'));
+                }
+                else
+                {
+                    $img = $manager->read($file->get());
+                    if ($img)
+                        $img->scaleDown(height: config('dicms.img_max_height'));
+                    $path = pathinfo($file->hashName(), PATHINFO_FILENAME) . ".png";
+                    Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
+                }
                 $this->createDataItem(
                     [
-                        'name' => $file->getClientOriginalName(),
+                        'name' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
                         'path' => $path,
-                        'mime' => $file->getMimeType(),
+                        'mime' => ($file->getMimeType() == "image/x-icon")?? "image/png",
                         'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                     ]);
             }
         }
         elseif(preg_match('/image\/.+/', $this->dataItem->getMimeType()))
         {
-            $img = $manager->read($this->dataItem->get());
-            if($img)
-                $img->scaleDown(height: config('dicms.img_max_height'));
-            $path = pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME) . ".png";
-            Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
+            if($this->dataItem->getMimeType() == "image/x-icon")
+            {
+                //store the file
+                $path = $this->dataItem->store('', config('dicms.media_upload_disk'));
+            }
+            else
+            {
+                $img = $manager->read($this->dataItem->get());
+                if ($img)
+                    $img->scaleDown(height: config('dicms.img_max_height'));
+                $path = pathinfo($this->dataItem->hashName(), PATHINFO_FILENAME) . ".png";
+                Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
+            }
             $this->createDataItem(
                 [
-                    'name' => $this->dataItem->getClientOriginalName(),
+                    'name' => pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME),
                     'path' => $path,
-                    'mime' => $this->dataItem->getMimeType(),
+                    'mime' => ($this->dataItem->getMimeType() == "image/x-icon")?? "image/png",
                     'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                 ]);
         }

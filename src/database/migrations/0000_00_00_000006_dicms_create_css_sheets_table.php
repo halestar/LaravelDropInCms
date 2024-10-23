@@ -1,5 +1,6 @@
 <?php
 
+use halestar\LaravelDropInCms\Enums\HeadElementType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,9 +14,7 @@ return new class extends Migration
     {
         Schema::create(config('dicms.table_prefix') . 'css_sheets', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('site_id');
-            $table->foreign('site_id')->references('id')->on(config('dicms.table_prefix') . 'sites')->onDelete('cascade');
-            $table->enum('type', [\halestar\LaravelDropInCms\Enums\HeadElementType::Link->value, \halestar\LaravelDropInCms\Enums\HeadElementType::Text->value]);
+            $table->enum('type', HeadElementType::values())->default(HeadElementType::Text->value);
             $table->string('name');
             $table->string('description')->nullable();
             $table->longText('sheet')->nullable();

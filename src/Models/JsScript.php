@@ -3,11 +3,13 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\Enums\HeadElementType;
+use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ScopedBy([OrderByNameScope::class])]
 class JsScript extends Model
 {
     use BackUpable;
@@ -27,11 +29,6 @@ class JsScript extends Model
         parent::__construct($attributes);
     }
 
-    public function site(): BelongsTo
-    {
-        return $this->belongsTo(Site::class, 'site_id');
-    }
-
     public function scopeLinks(Builder $query): void
     {
         $query->where('type', '=', HeadElementType::Link);
@@ -40,5 +37,18 @@ class JsScript extends Model
     public function scopeText(Builder $query): void
     {
         $query->where('type', '=', HeadElementType::Text);
+    }
+
+    public function dupe(Site $site = null): JsScript
+    {
+        $dupeScript = new JsScript();
+        $dupeScript->name = $this->name . "-" . __('dicms::admin.copy');
+        $dupeScript->type = $this->type;
+        $dupeScript->description = $this->description;
+        $dupeScript->script = $this->script;
+        $dupeScript->href = $this->href;
+        $dupeScript->link_type = $this->link_type;
+        $dupeScript->save();
+        return $dupeScript;
     }
 }

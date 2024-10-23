@@ -14,7 +14,8 @@
     "license": "GPL-3.0-or-later",
     "autoload": {
         "psr-4": {
-            "halestar\\LaravelDropInCms\\": "src/"
+            "halestar\\LaravelDropInCms\\": "src/",
+            "halestar\\LaravelDropInCms\\Tests\\": "tests/"
         }
     },
     "extra": {

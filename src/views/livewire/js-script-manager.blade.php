@@ -1,17 +1,22 @@
 <div>
-    <h4 class="border-bottom mt-5">{{ __('dicms::sites.scripts') }}</h4>
+    <h4 class="border-bottom">{{ $title }}</h4>
     <div class="input-group" aria-describedby="jsScriptHelp">
         <label for="script_id" class="input-group-text">{{ __('dicms::sites.scripts.add') }}</label>
         <select name="script_id" id="script_id" class="form-select"
                 wire:change="addJsScript($('#script_id').val())">
-            <option value="">{{ __('dicms::sites.scripts.add.select') }}</option>
-            @foreach(\halestar\LaravelDropInCms\Models\JsScript::where('site_id', $siteId)->whereNotIn('id', $jsScripts->pluck('id'))->get() as $script)
-                <option value="{{ $script->id }}">{{ $script->name }}</option>
+            @foreach(\halestar\LaravelDropInCms\Models\JsScript::whereNotIn('id', $jsScripts->pluck('id'))->get() as $script)
+                @if($loop->first)
+                    <option value="" selected>{{ __('dicms::sites.scripts.add.select') }}</option>
+                @endif
+                <option value="{{ $script->id }}" wire:key="{{ $script->id }}">{{ $script->name }}</option>
             @endforeach
         </select>
         @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)
-            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $siteId]) }}"
-               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_js_scripts') }}</a>
+            <a
+                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index') }}"
+                class="btn btn-outline-secondary"
+                title="{{ __('dicms::admin.manage_js_scripts') }}"
+            ><i class="fa-solid fa-bars-progress"></i></a>
         @endcan
     </div>
     <div id="jsScriptHelp" class="form-text mb-3">{{ __('dicms::pages.scripts.add.help') }}</div>
@@ -21,18 +26,20 @@
             @foreach($jsScripts as $js)
                 <li class="list-group-item d-flex justify-content-start align-items-center" wire:key="js-script-{{ $js->id }}" wire:sortable.item="{{ $js->id }}">
                     <span class="ms-1 me-2" wire:sortable.handle><i class="fa-solid fa-grip-lines-vertical"></i></span>
-                    {{ $js->name }}
+                    <span class="fw-bolder fs-6">{{ $js->name }}</span>
                     <span class="ms-auto">
                         <a
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.edit', ['site' => $siteId, 'script' => $js->id]) }}"
+                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.edit', ['script' => $js->id]) }}"
                             class="btn btn-primary btn-sm me-1"
                             role="button"
-                        >{{ __('dicms::admin.edit') }}</a>
+                            title="{{ __('dicms::admin.edit') }}"
+                        ><i class="fa fa-edit"></i></a>
                         <button
                             type="button"
                             class="btn btn-danger btn-sm"
                             wire:click="removeJsScript({{ $js->id }})"
-                        >{{ __('dicms::admin.remove') }}</button>
+                            title="{{ __('dicms::admin.remove') }}"
+                        ><i class="fa fa-times"></i></button>
                     </span>
                 </li>
             @endforeach

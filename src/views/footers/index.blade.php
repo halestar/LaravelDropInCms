@@ -1,29 +1,50 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            <span>{{ $site->name }}: {{__('dicms::footers.footer.title')}}</span>
-            <div>
-                <a class="btn btn-primary" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.create', ['site' => $site->id]) }}" role="button">{{ __('dicms::footers.new') }}</a>
-                <a class="btn btn-secondary" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.show', ['site' => $site->id]) }}" role="button">{{ __('dicms::footers.back') }}</a>
-            </div>
-        </h1>
+@section('index_content')
+    @if(\halestar\LaravelDropInCms\Models\Footer::count() > 0)
+        <div class="ms-1 row">
+            <div class="col-2">{{ __('dicms::admin.name') }}</div>
+            <div class="col-9">{{ __('dicms::admin.description') }}</div>
+        </div>
         <ul class="list-group">
-            @foreach($site->footers as $footer)
-                <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                <a
-                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.edit', ['site' => $site->id, 'footer' => $footer->id]) }}"
-                    class=""
-                >
-                    {{ $footer->name }}
-                </a>
-                <button
-                    type="button"
-                    onclick="confirmDelete('{{ __('dicms::footers.delete.confirm') }}', '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.destroy', ['site' => $site->id, 'footer' => $footer->id]) }}')"
-                    class="btn btn-danger"
-                >{{ __('dicms::admin.delete') }}</button>
+            @foreach(\halestar\LaravelDropInCms\Models\Footer::all() as $footer)
+                <li class="list-group-item list-group-item-action">
+                    <div class="row align-items-center">
+                        <div class="col-2">{{ $footer->name }}</div>
+                        <div class="col-8 text-muted small">{{ $footer->description }}</div>
+                        <div class="col-2 text-end">
+                            @can('create', \halestar\LaravelDropInCms\Models\Footer::class)
+                            <a
+                                role="button"
+                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.edit', ['footer' => $footer->id]) }}"
+                                class="btn btn-primary btn-sm ms-2"
+                                title="{{ __('dicms::admin.edit') }}"
+                            ><i class="fa fa-edit"></i></a>
+                            @endcan
+                            @can('create', \halestar\LaravelDropInCms\Models\Footer::class)
+                                <a
+                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.duplicate', ['footer' => $footer->id]) }}"
+                                    role="button"
+                                    class="btn btn-warning btn-sm ms-2"
+                                    title="{{ __('dicms::footers.duplicate') }}"
+                                ><i class="fa-solid fa-clone"></i></a>
+                            @endcan
+                            @can('delete', \halestar\LaravelDropInCms\Models\Footer::class)
+                            <button
+                                type="button"
+                                onclick="confirmDelete('{{ __('dicms::footers.delete.confirm') }}', '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.destroy', ['footer' => $footer->id]) }}')"
+                                class="btn btn-danger btn-sm ms-2"
+                                title="{{ __('dicms::admin.delete') }}"
+                            ><i class="fa fa-trash"></i></button>
+                            @endcan
+                        </div>
+                    </div>
+                </li>
             @endforeach
         </ul>
-    </div>
+    @else
+        <div class="alert alert-info">
+            {{ __('dicms::footers.footer.none') }}
+        </div>
+    @endif
 @endsection

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 final class TableBackup
 {
     private array $table_data;
-    public function __construct(private string $table_name, private array $table_fields, array $table_data = null)
+    public function __construct(public string $table_name, private array $table_fields, array $table_data = null)
     {
         $this->table_data = $table_data?? DB::table($this->table_name)->select($this->table_fields)->get()->toArray();
     }

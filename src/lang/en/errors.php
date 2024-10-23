@@ -18,4 +18,9 @@ return
     'pages.slug' => 'A page slug is required. The combination of a slug and a path, makes a URL, the URL must be unique.',
     'pages.url' => 'The URL is a duplicate. Please change the slug or path to make it unique.',
     'menus.name' => 'You must enter a name for this menu. It must be unique',
+    'empty_site' => 'Warning! You must create a new site to begin (it doesn\'t have to be active!). Alternatively, you can <a href=":url">restore from a backup</a>',
+    'empty_site.new_site' => 'DiCms: New Site Coming!',
+    'empty_site.new_site.header' => 'There isn\'t a site published yet, but one is coming soon!',
+    'empty_site.new_site.lead' => 'Click the button below to start creating one (assuming you have permissions, of course)',
+    'empty_site.new_site.link' => 'Start Creating!',
 ];

@@ -1,10 +1,11 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            {{__('dicms::sites.new_site')}}
-        </h1>
+@section('index_content')
+        @empty($currentSite)
+            <div class="alert alert-info">
+                {!! __('dicms::errors.empty_site', ['url' => \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.index')]) !!}
+            </div>
+        @endif
         <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.store') }}">
             @csrf
             <div class="mb-3">
@@ -21,6 +22,17 @@
                 <div id="nameHelp" class="form-text">{{ __('dicms::sites.site_name_help') }}</div>
             </div>
             <div class="mb-3">
+                <label for="name" class="form-label">{{ __('dicms::sites.site_description') }}</label>
+                <textarea
+                    type="text"
+                    name="description"
+                    id="description"
+                    aria-describedby="descriptionHelp"
+                    class="form-control"
+                >{{ old('description') }}</textarea>
+                <div id="descriptionHelp" class="form-text">{{ __('dicms::sites.site_name_description') }}</div>
+            </div>
+            <div class="mb-3">
                 <label for="title" class="form-label">{{ __('dicms::sites.site_title') }}</label>
                 <input
                     type="text"
@@ -33,9 +45,7 @@
                 <div id="titleHelp" class="form-text">{{ __('dicms::sites.site_title_help') }}</div>
             </div>
             <div class="row">
-                <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.create') }}</button>
-                <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.index') }}">{{ __('dicms::admin.cancel') }}</a>
+                <button type="submit" class="btn btn-primary col mt-2">{{ __('dicms::admin.create') }}</button>
             </div>
         </form>
-    </div>
 @endsection

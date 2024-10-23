@@ -3,11 +3,8 @@
 namespace halestar\LaravelDropInCms\Controllers;
 
 use halestar\LaravelDropInCms\DiCMS;
-use halestar\LaravelDropInCms\Models\CssSheet;
-use halestar\LaravelDropInCms\Models\JsScript;
 use halestar\LaravelDropInCms\Models\Page;
 use halestar\LaravelDropInCms\Models\Site;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
@@ -25,21 +22,51 @@ class PageController
         ];
     }
 
-    public function index(Site $site)
+    public function index()
     {
         Gate::authorize('viewAny', Page::class);
-        return view('dicms::pages.index', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::pages.pages.title'),
+                'buttons' => []
+            ];
+        if(Gate::allows('create', Page::class))
+        {
+            $template['buttons']['create'] =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.pages.create'),
+                    'text' => "<i class='fa fa-plus-square'></i>",
+                    'classes' => 'bg-text-primary',
+                    'title' => __('dicms::pages.new'),
+                ];
+        }
+        return view('dicms::pages.index', compact('template'));
     }
 
-    public function create(Site $site)
+    public function create()
     {
         Gate::authorize('create', Page::class);
-        return view('dicms::pages.create', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::pages.new'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.pages.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        return view('dicms::pages.create', compact('template'));
     }
 
-    public function store(Request $request, Site $site)
+    public function store(Request $request)
     {
         Gate::authorize('create', Page::class);
+        $currentSite = Site::currentSite();
         $data = $request->validate(
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'pages',
@@ -55,60 +82,88 @@ class PageController
 
         $page = new Page();
         $page->fill($data);
-        $site->pages()->save($page);
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $site->id, 'page' => $page->id]));
+        $page->save();
+        return redirect(DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]))
+            ->with('success-status', __('dicms::pages.success.created'));
     }
 
-    public function show(Site $site, Page $page)
-    {
-        $editor =
-            [
-                'editor' => '#page_editor',
-                'styles' => '"' . $site->siteCss()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicCss($site) . '"',
-                'scripts' => '"' . $site->siteJs()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicJs($site) . '"',
-                'projectData' => $page->data,
-            ];
-        return view('dicms::pages.show', compact('site', 'page', 'editor'));
-    }
-
-    public function edit(Site $site, Page $page)
+    public function show(Page $page)
     {
         Gate::authorize('update', $page);
-        $page =
+        $template =
             [
-                'header' => '',//$page->header(),
-                'body_style' => $page->site->body_style,
-                'body_classes' => $page->site->body_classes,
-                'page_header' => $page->pageHeader(),
-                'page_footer' => $page->pageFooter(),
-                'css' => $site->siteCss->pluck('sheet')->join("\n"),
-                'js' => $site->siteJs->pluck('script')->join("\n"),
-                'page_title' => $site->title,
-                'page' => $page,
+                'title' => $page->name,
+                'buttons' => []
             ];
-        return view('dicms::layouts.webeditor', $page);
+        $currentSite = Site::currentSite();
+        if(Gate::allows('preview', $currentSite))
+        {
+            $template['buttons']['preview']  =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.preview.home', ['path' => $page->url]),
+                    'text' => "<i class='fa-solid fa-eye'></i>",
+                    'classes' => 'text-info',
+                    'title' => __('dicms::sites.preview_site'),
+                ];
+        }
+        if(Gate::allows('update', $page) && !$page->plugin_page)
+        {
+            $template['buttons']['edit']  =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.pages.edit', ['page' => $page->id]),
+                    'text' => "<i class='fa-solid fa-gear'></i>",
+                    'classes' => 'text-primary',
+                    'title' => __('dicms::sites.edit_site'),
+                ];
+        }
+        $template['buttons']['manage'] =
+            [
+                'link' => DiCMS::dicmsRoute('admin.pages.index'),
+                'text' => '<i class="fa-solid fa-bars-progress"></i>',
+                'classes' => 'text-secondary',
+                'title' => __('dicms::sites.page_management'),
+            ];
+        $objEditable = $page;
+        return view('dicms::pages.show', compact('template', 'page', 'objEditable'));
     }
 
-    public function update(Request $request, Site $site, Page $page)
+    public function edit(Page $page)
+    {
+        Gate::authorize('update', $page);
+        $template =
+            [
+                'title' => __('dicms::pages.edit'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        return view('dicms::pages.settings', compact('page', 'template'));
+    }
+
+    public function update(Request $request, Page $page)
     {
         Gate::authorize('update', $page);
         $data = $request->validate(
             [
                 'title' => 'nullable',
+                'override_css' => 'required|boolean',
+                'override_js' => 'required|boolean',
+                'override_header' => 'required|boolean',
                 'header_id' => 'nullable|exists:' . config('dicms.table_prefix') . 'headers,id',
+                'override_footer' => 'required|boolean',
                 'footer_id' => 'nullable|exists:' . config('dicms.table_prefix') . 'footers,id',
             ], $this->errors());
-        $page->title = $data['title'];
-        $page->header_id = $data['header_id'];
-        $page->footer_id = $data['footer_id'];
+        $page->fill($data);
         $page->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $site->id, 'page' => $page->id]));
-    }
-
-    public function editSettings(Page $page)
-    {
-        Gate::authorize('update', $page);
-        return view('dicms::pages.settings', compact('page'));
+        return redirect(DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]))
+            ->with('success-status', __('dicms::pages.success.updated'));
     }
 
     public function updateSettings(Request $request, Page $page)
@@ -128,7 +183,8 @@ class PageController
             ], $this->errors())->validate();
         $page->fill($data);
         $page->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
+        return redirect(DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]))
+            ->with('success-status', __('dicms::pages.success.updated'));
     }
 
     public function updateContent(Request $request, Page $page)
@@ -138,7 +194,8 @@ class PageController
         $page->data = $request->input('data', null);
         $page->css = $request->input('css', null);
         $page->save();
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success-status', __('dicms::pages.success.updated'));
     }
 
     public function publishPage(Request $request, Page $page)
@@ -146,7 +203,8 @@ class PageController
         Gate::authorize('publish', $page);
         $page->published = true;
         $page->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
+        return redirect(DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]))
+            ->with('success-status', __('dicms::pages.success.updated'));
     }
 
     public function unpublishPage(Request $request, Page $page)
@@ -154,62 +212,22 @@ class PageController
         Gate::authorize('activate', $page);
         $page->published = false;
         $page->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
-
+        return redirect(DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]))
+            ->with('success-status', __('dicms::pages.success.updated'));
     }
 
-    public function addCss(Request $request, Page $page)
+    public function duplicatePage(Request $request, Page $page)
     {
-        Gate::authorize('update', $page);
-        $sheet_id = $request->input('sheet_id', 0);
-        try
-        {
-            $cssSheet = CssSheet::findOrFail($sheet_id);
-        }
-        catch (ModelNotFoundException $e)
-        {
-            return redirect()->back();
-        }
-        $order = $page->pageCss()->count();
-        $page->pageCss()->attach($cssSheet->id, ['order_by' => $order]);
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
+        Gate::authorize('create', Page::class);
+        $dupe = $page->dupe();
+        return redirect(DiCMS::dicmsRoute('admin.pages.edit', ['page' => $dupe->id]))
+            ->with('success-status', __('dicms::pages.success.created'));
     }
 
-    public function removeCss(Request $request, Page $page, CssSheet $cssSheet)
-    {
-        Gate::authorize('update', $page);
-        $page->pageCss()->detach($cssSheet->id);
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
-    }
-
-    public function addJs(Request $request, Page $page)
-    {
-        Gate::authorize('update', $page);
-        $script_id = $request->input('script_id', 0);
-        try
-        {
-            $jsScript = JsScript::findOrFail($script_id);
-        }
-        catch (ModelNotFoundException $e)
-        {
-            return redirect()->back();
-        }
-        $order = $page->pageJs()->count();
-        $page->pageJs()->attach($jsScript->id, ['order_by' => $order]);
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
-    }
-
-    public function removeJs(Request $request, Page $page, JsScript $jsScript)
-    {
-        Gate::authorize('update', $page);
-        $page->pageJs()->detach($jsScript->id);
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]));
-    }
-
-    public function destroy(Site $site, Page $page)
+    public function destroy(Page $page)
     {
         Gate::authorize('delete', $page);
         $page->delete();
-        return redirect(DiCMS::dicmsRoute('admin.sites.pages.index', ['site' => $site->id]));
+        return redirect(DiCMS::dicmsRoute('admin.pages.index'));
     }
 }

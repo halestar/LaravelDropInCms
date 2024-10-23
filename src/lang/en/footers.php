@@ -2,7 +2,8 @@
 
 return
 [
-    "footer" => "Page Footer",
+    "footer" => "Page Footer|Page Footers",
+    "footer.none" => "There are no Page Footers for this site. Go create some!",
     "footer.title" => "Available Page Footers",
     "new" => "Create New Page Footer",
     "edit" => "Update Page Footer",
@@ -18,7 +19,12 @@ return
     "content.here" => "Your content goes here",
     'settings.advanced' => 'Advanced Settings',
     'settings.advanced.update' => 'Update Advanced Settings',
-    'options' => 'Footer Attributes',
-    'options.help' => 'Attributes that will be added to the header declaration.',
+    'options' => 'Footer Container',
+    'options.help' => 'The tag and options that will be assigned to this footer.',
+    'duplicate' => 'Duplicate Footer',
+
+    'success.created' => 'Page Footer created successfully.',
+    'success.updated' => 'Page Footer updated successfully.',
+    'success.deleted' => 'Page Footer deleted successfully.',
 
 ];

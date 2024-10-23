@@ -19,58 +19,96 @@ class HeaderController
         ];
     }
 
-    public function index(Site $site)
+    public function index()
     {
         Gate::authorize('viewAny', Header::class);
-        return view('dicms::headers.index', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::headers.headers_title'),
+                'buttons' => []
+            ];
+        if(Gate::allows('create', Header::class))
+        {
+            $template['buttons']['create'] =
+                        [
+                            'link' => DiCMS::dicmsRoute('admin.headers.create'),
+                            'text' => "<i class='fa fa-plus-square'></i>",
+                            'classes' => 'bg-text-primary',
+                            'title' => __('dicms::headers.new'),
+                        ];
+        }
+        return view('dicms::headers.index', compact('template'));
     }
 
-    public function create(Site $site)
+    public function create()
     {
         Gate::authorize('create', Header::class);
-        return view('dicms::headers.create', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::headers.new'),
+                'buttons' =>
+                [
+                    'back' =>
+                    [
+                        'link' => DiCMS::dicmsRoute('admin.headers.index'),
+                        'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                        'classes' => 'text-secondary',
+                        'title' => __('dicms::admin.back'),
+                    ]
+                ]
+            ];
+        return view('dicms::headers.create', compact('template'));
     }
 
-    public function store(Request $request, Site $site)
+    public function store(Request $request)
     {
         Gate::authorize('create', Header::class);
+        $currentSite = Site::currentSite();
         $data = $request->validate(
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'headers',
                 'description' => 'nullable',
-                'options' => 'nullable',
             ], $this->errors());
         $header = new Header();
         $header->fill($data);
-        $site->headers()->save($header);
-        return redirect(DiCMS::dicmsRoute('admin.sites.headers.edit', ['site' => $site->id, 'header' => $header->id]));
+        $header->save();
+        return redirect(DiCMS::dicmsRoute('admin.headers.edit', ['header' => $header->id]))
+            ->with('success-status', __('dicms::headers.success.created'));
     }
 
-    public function edit(Site $site, Header $header)
+    public function edit(Header $header)
     {
         Gate::authorize('update', $header);
-        $editor =
+        $template =
             [
-                'editor' => '#header_editor',
-                'styles' => '"' . $site->siteCss()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicCss($site) . '"',
-                'scripts' => '"' . $site->siteJs()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicJs($site) . '"',
-                'projectData' => $header->data,
+                'title' => __('dicms::headers.edit'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.headers.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
             ];
-        return view('dicms::headers.edit', compact('site', 'header', 'editor'));
+        $objEditable = $header;
+        return view('dicms::headers.edit', compact('header', 'objEditable', 'template'));
     }
 
-    public function update(Request $request, Site $site, Header $header)
+    public function update(Request $request, Header $header)
     {
         Gate::authorize('update', $header);
         $data = $request->validate(
             [
                 'name' => ['required', 'max:255', Rule::unique(config('dicms.table_prefix') . 'headers')->ignore($header)],
                 'description' => 'nullable',
-                'options' => 'nullable',
             ], $this->errors());
         $header->fill($data);
         $header->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.headers.index', ['site' => $site->id]));
+        return redirect()->back()
+            ->with('success-status', __('dicms::headers.success.updated'));
     }
 
     public function updateContent(Request $request, Header $header)
@@ -80,13 +118,23 @@ class HeaderController
         $header->data = $request->input('data', null);
         $header->css = $request->input('css', null);
         $header->save();
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success-status', __('dicms::headers.success.updated'));
     }
 
-    public function destroy(Site $site, Header $header)
+    public function destroy(Header $header)
     {
         Gate::authorize('delete', $header);
         $header->delete();
-        return redirect(DiCMS::dicmsRoute('admin.sites.headers.index', ['site' => $site->id]));
+        return redirect(DiCMS::dicmsRoute('admin.headers.index'))
+            ->with('success-status', __('dicms::headers.success.deleted'));
+    }
+
+    public function duplicate(Header $header)
+    {
+        Gate::authorize('create', Header::class);
+        $newHeader = $header->dupe();
+        return redirect(DiCMS::dicmsRoute('admin.headers.edit', ['header' => $newHeader->id]))
+            ->with('success-status', __('dicms::headers.success.created'));
     }
 }

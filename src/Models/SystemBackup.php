@@ -34,14 +34,18 @@ class SystemBackup
         return json_encode($data);
     }
 
-    public static function restore($dataString): bool
+    public static function restore($dataString, ?array $tables = null): bool
     {
         $data = json_decode($dataString, true);
         if(!isset($data['tables']) || empty($data['tables']))
             return false;
         Schema::disableForeignKeyConstraints();
         foreach($data['tables'] as $table)
-            TableBackup::loadBackupData($table)->restore();
+        {
+            $tBackup = TableBackup::loadBackupData($table);
+            if($tables === null || in_array($tBackup->table_name, $tables))
+                $tBackup->restore();
+        }
         Schema::enableForeignKeyConstraints();
         return true;
     }

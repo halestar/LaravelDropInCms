@@ -2,14 +2,16 @@
 
 namespace halestar\LaravelDropInCms\Models;
 
+use halestar\LaravelDropInCms\Classes\GrapesJsEditableItem;
+use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 
-class Header extends Model
+#[ScopedBy([OrderByNameScope::class])]
+class Header extends GrapesJsEditableItem
 {
     use BackUpable;
-    protected $fillable = ['name','description','html', 'options', 'data', 'css'];
+    protected $fillable = ['name','description', 'html', 'data', 'css'];
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "headers" ]; }
     protected function casts(): array
     {
@@ -24,8 +26,15 @@ class Header extends Model
         parent::__construct($attributes);
     }
 
-    public function site(): BelongsTo
+    public function dupe(Site $site = null): Header
     {
-        return $this->belongsTo(Site::class, 'site_id');
+        $newHeader = new Header();
+        $newHeader->name = $this->name . "-" . __('dicms::admin.copy');
+        $newHeader->description = $this->description;
+        $newHeader->html = $this->html;
+        $newHeader->css = $this->css;
+        $newHeader->data = $this->data;
+        $newHeader->save();
+        return $newHeader;
     }
 }

@@ -4,72 +4,74 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{{ $page->Title() }}</title>
+    @if($site->favicon)
+        <link rel="icon" href="{{ $site->favicon }}" />
+    @endif
 
-    @foreach($page->Css()->links()->get() as $css)
+
+    @if(!$page->override_css)
+        @foreach($site->siteCss()->links()->get() as $css)
+            <link href="{{ $css->href }}" {{ $css->link_type }} />
+        @endforeach
+    @endif
+
+    @foreach($page->pageCss()->links()->get() as $css)
         <link href="{{ $css->href }}" {{ $css->link_type }} />
     @endforeach
+    <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($page) }}">
+
+    @if($page->Header())
+        <style>
+            {!! $page->Header()->css !!}
+        </style>
+    @else
+
+    @endif
+
+    @if($page->Footer())
+        <style>
+            {!! $page->Footer()->css !!}
+        </style>
+    @endif
+
     <style>
-        {!! $page->Css()->text()->get()->pluck('sheet')->join("\n\n"); !!}
+        {!! $page->projectCss() !!}
     </style>
 
-    @if($page->Header)
-        <style>
-            {!! $page->Header->css !!}
-        </style>
+    @if(!$page->override_js)
+        @foreach($site->siteJs()->links()->get() as $js)
+            <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
+        @endforeach
     @endif
-    @if($page->Footer)
-        <style>
-            {!! $page->Footer->css !!}
-        </style>
-    @endif
-
-    @if($page->css)
-        <style>
-            {!! $page->css !!}
-        </style>
-    @endif
-
-    @foreach($page->Js()->links()->get() as $js)
+    @foreach($page->pageJs()->links()->get() as $js)
         <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
     @endforeach
-    <script>
-        {!! $site->siteJs()->text()->get()->pluck('script')->join("\n\n"); !!}
-    </script>
+
 
 </head>
-<body style="{{ $site->body_styles }}" class="{{ $site->body_classes }}">
-@if($site->defaultMenu)
-    <nav class="{!! $site->defaultMenu->nav_classes !!}">
-        <ul class="{!! $site->defaultMenu->container_classes !!}">
-            @foreach($site->defaultMenu->menu as $menuItem)
-                <li class="{!! $site->defaultMenu->element_classes !!}">
-                    <a
-                        class="{!! $site->defaultMenu->link_classes !!}"
-                        @if($menuItem['type'] == "LINK")
-                            href="{{ $menuItem['url'] }}"
-                        @elseif($menuItem['type'] == "PAGE")
-                            href="{{ \halestar\LaravelDropInCms\Models\Page::url($menuItem['page_id']) }}"
-                        @else
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicRoute() . $menuItem['plugin_url'] }}"
-                        @endif
-                    >{!! $menuItem['name'] !!}</a>
-                </li>
-            @endforeach
-        </ul>
-    </nav>
+<body
+@if($site->body_attr)
+    {!! $site->body_attr !!}
+    @endif
+>
+@if($site->tag)
+    <{{ $site->tag }} {!! $site->options !!}>
 @endif
-@if($page->Header)
-    <header {!! $page->Header->options !!} >
-        {!! $page->Header->html !!}
-    </header>
+
+@if($page->Header())
+    {!! $page->Header()->html !!}
 @endif
-<section>
-    {!! $page->html !!}
-</section>
-@if($page->Footer)
-    <footer {!! $page->Footer->options !!} >
-        {!! $page->Footer->html !!}
-    </footer>
+
+
+{!! $page->projectHtml() !!}
+
+@if($page->Footer())
+    {!! $page->Footer()->html !!}
 @endif
+@if($site->tag)
+</{{ $site->tag }}>
+@endif
+<script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($page) }}" ></script>
+
 </body>
 </html>

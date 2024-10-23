@@ -1,6 +1,6 @@
 <?php
 
-namespace halestar\LaravelDropInCms\Plugins;
+namespace halestar\LaravelDropInCms\Interfaces;
 
 interface DiCmsSetting
 {

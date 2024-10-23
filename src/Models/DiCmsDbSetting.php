@@ -2,7 +2,7 @@
 
 namespace halestar\LaravelDropInCms\Models;
 
-use halestar\LaravelDropInCms\Plugins\DiCmsSetting;
+use halestar\LaravelDropInCms\Interfaces\DiCmsSetting;
 use halestar\LaravelDropInCms\Traits\BackUpable;
 use Illuminate\Database\Eloquent\Model;
 

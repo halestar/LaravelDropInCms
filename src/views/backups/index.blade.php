@@ -2,9 +2,15 @@
 
 @section('content')
     <div class="container">
+        @isset($currentSite)
         <div class="row">
             <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.export') }}" class="btn btn-primary col mx-2">{{ __('dicms::admin.backup.download') }}</a>
         </div>
+        @else
+            <div class="alert alert-info">
+                {!! __('dicms::admin.backups.new_site', ['url' => \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create')]) !!}
+            </div>
+        @endisset
         <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.restore') }}"  enctype="multipart/form-data">
             @csrf
             <div class="mb-3">

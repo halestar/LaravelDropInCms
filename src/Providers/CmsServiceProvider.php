@@ -2,14 +2,17 @@
 
 namespace halestar\LaravelDropInCms\Providers;
 
+use App\Http\ViewComposers\CurrentSiteViewComposer;
 use halestar\LaravelDropInCms\Commands\BackupCms;
 use halestar\LaravelDropInCms\Commands\RestoreCms;
 use halestar\LaravelDropInCms\Livewire\AssetManager;
 use halestar\LaravelDropInCms\Livewire\CssSheetManager;
 use halestar\LaravelDropInCms\Livewire\JsScriptManager;
 use halestar\LaravelDropInCms\View\Components\ErrorDisplay;
+use halestar\LaravelDropInCms\View\Components\TagSelector;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -31,11 +34,15 @@ class CmsServiceProvider extends ServiceProvider
             __DIR__.'/../database/migrations' => database_path('migrations'),
         ], 'dicms');
 
+
         foreach(config('dicms.policies', []) as $objClass => $policyClass)
             Gate::policy($objClass, $policyClass);
+
+
         $this->loadViewsFrom(__DIR__.'/../views', 'dicms');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dicms');
         Blade::component('error-display', ErrorDisplay::class);
+        Blade::component('tag-selector', TagSelector::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -46,5 +53,7 @@ class CmsServiceProvider extends ServiceProvider
         Livewire::component('css-sheet-manager', CssSheetManager::class);
         Livewire::component('js-script-manager', JsScriptManager::class);
         Livewire::component('asset-manager', AssetManager::class);
+
+        View::composer('dicms::*', CurrentSiteViewComposer::class);
     }
 }

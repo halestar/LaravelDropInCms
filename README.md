@@ -300,11 +300,11 @@ I will cross them out (probably) as I build things.
 The following features need to be implemented in order to release v1.0:
 
  - Comments need to be added. Heredoc and config comments.
- - The user interface needs to be overhauled. It is very ugly and needs to be updated.
+ - ~~The user interface needs to be overhauled. It is very ugly and needs to be updated.~~
  - ~~The system needs to be able to be backed-up programmatically through an API and through an artisan command~~
  - ~~Make css and js script re-arrangeable~~
- - Archive and de-archive sites
- - Preview needs to be enabled
+ - ~~Archive and de-archive sites~~
+ - ~~Preview needs to be enabled~~
  - ~~Better asset supports for images and stuff~~
  - ~~Better editor support~~
  - GrapesJs needs to be heavily customized
@@ -314,10 +314,11 @@ The following features need to be implemented in order to release v1.0:
  - Document how to create a simple site, with pictures.
  - Make backups more secure by zipping, creating SHA's etc.
  - Provide a sample backup file that will build a default site.
- - Add alternatives for other kinds of settings mechanisms, such as redis.
+ - ~~Add alternatives for other kinds of settings mechanisms, such as redis.~~
  - ~~Add publishable policies for users to easily extend. Possibly through artisan commands.~~
  - ~~Create an asset storage management system for centralized, shared management. Maybe a plugin?~~
- - Duplicate sites.
+ - ~~Duplicate sites.~~
  - Update README to include better instructions and define the roadmap to include version milestones.
+ - Write tests
 
 Other things may be added to this list, or taken away.

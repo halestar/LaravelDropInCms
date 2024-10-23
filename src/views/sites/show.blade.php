@@ -1,30 +1,6 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-
-        <h1 class="border-bottom pb-2 d-flex justify-content-between align-items-center">
-            <span>{{ $site->name }} {{ __('dicms::sites.site') }}</span>
-            <div>
-                <a
-                        class="btn btn-info"
-                        href="#"
-                >{{ __('dicms::sites.preview_site') }}</a>
-                @can('update', $site)
-                    <a
-                            class="btn btn-primary"
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.edit', ['site' => $site->id]) }}"
-                    >{{ __('dicms::sites.edit_site') }}</a>
-                @endcan
-                @can('delete', $site)
-                    <a
-                            class="btn btn-danger"
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.destroy', ['site' => $site->id]) }}"
-                    >{{ __('dicms::sites.delete_site') }}</a>
-                @endcan
-            </div>
-        </h1>
-
+@section('index_content')
         @if($site->active)
             <div class="alert alert-warning">
                 <strong>{{ __('dicms::admin.warning') }}</strong> {{ __('dicms::errors.active.warning') }}
@@ -33,6 +9,7 @@
         <div class="row">
             <div class="col-md">
                 <livewire:css-sheet-manager :siteId="$site->id" :container="$site" />
+                <br />
                 <livewire:js-script-manager :siteId="$site->id" :container="$site" />
             </div>
             <div class="col-md">
@@ -45,30 +22,9 @@
                         <input type="text" name="title" id="title" value="{{ $site->title }}" class="form-control"
                                @cannot('update', $site) disabled @endcan />
                         <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
+                                @cannot('update', $site) disabled @endcan title="{{ __('dicms::admin.update') }}"><i class="fa-solid fa-floppy-disk"></i></button>
                     </div>
                     <div id="titleHelp" class="form-text mb-3">{{ __('dicms::sites.site_title_help') }}</div>
-
-                    <div class="input-group" aria-describedby="menuHelp">
-                        <label for="menu_id"
-                               class="input-group-text">{{ __('dicms::sites.default_menu') }}</label>
-                        <select name="menu_id" id="menu_id" class="form-select"
-                                @cannot('update', $site) disabled @endcan>
-                            <option value="">{{ __('dicms::sites.select_default_menu') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Menu::where('site_id', $site->id)->get() as $menu)
-                                <option value="{{ $menu->id }}"
-                                        @if($menu->id == $site->menu_id) selected @endif>{{ $menu->name }}</option>
-                            @endforeach
-                        </select>
-                        <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
-                        @can('viewAny', \halestar\LaravelDropInCms\Models\Menu::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.menus.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_menus') }}</a>
-                        @endcan
-                    </div>
-                    <div id="menuHelp"
-                         class="form-text mb-3">{{ __('dicms::sites.select_default_menu_help') }}</div>
 
                     <div class="input-group" aria-describedby="headerHelp">
                         <label for="header_id"
@@ -76,16 +32,25 @@
                         <select name="header_id" id="header_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_header') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Header::where('site_id', $site->id)->get() as $header)
+                            @foreach(\halestar\LaravelDropInCms\Models\Header::all() as $header)
                                 <option value="{{ $header->id }}"
                                         @if($header->id == $site->header_id) selected @endif>{{ $header->name }}</option>
                             @endforeach
                         </select>
                         <button type="submit" class="btn btn-outline-primary"
-                                @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
+                                @cannot('update', $site) disabled @endcan title="{{ __('dicms::admin.update') }}"><i class="fa-solid fa-floppy-disk"></i></button>
+                        @if($site->header_id)
+                            @can('update', $site->defaultHeader)
+                                <a
+                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.edit', ['header' => $site->header_id]) }}"
+                                    class="btn btn-outline-info" title="{{ __('dicms::headers.edit') }}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            @endcan
+                        @endif
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.headers.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_headers') }}</a>
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index') }}"
+                               class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_headers') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>
                     <div id="headerHelp"
@@ -96,16 +61,26 @@
                         <select name="footer_id" id="footer_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_footer') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Footer::where('site_id', $site->id)->get() as $footer)
+                            @foreach(\halestar\LaravelDropInCms\Models\Footer::all() as $footer)
                                 <option value="{{ $footer->id }}"
                                         @if($footer->id == $site->footer_id) selected @endif>{{ $footer->name }}</option>
                             @endforeach
                         </select>
+
+                        <button type="submit" class="btn btn-outline-primary"
+                                @cannot('update', $site) disabled @endcan title="{{ __('dicms::admin.update') }}"><i class="fa-solid fa-floppy-disk"></i></button>
+                        @if($site->footer_id)
+                            @can('update', $site->defaultFooter)
+                                <a
+                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.edit', ['footer' => $site->footer_id]) }}"
+                                    class="btn btn-outline-info" title="{{ __('dicms::headers.edit') }}">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            @endcan
+                        @endif
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Footer::class)
-                            <button type="submit" class="btn btn-outline-primary"
-                                    @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.footers.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_footers') }}</a>
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index') }}"
+                               class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_footers') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>
                     <div id="footerHelp"
@@ -127,11 +102,12 @@
                                 @endforeach
                             @endforeach
                         </select>
+                        <button type="submit" class="btn btn-outline-primary"
+                                @cannot('update', $site) disabled @endcan title="{{ __('dicms::admin.update') }}"><i class="fa-solid fa-floppy-disk"></i></button>
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Page::class)
-                            <button type="submit" class="btn btn-outline-primary"
-                                    @cannot('update', $site) disabled @endcan>{{ __('dicms::admin.update') }}</button>
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.index', ['site' => $site->id]) }}"
-                               class="btn btn-outline-secondary">{{ __('dicms::admin.manage_pages') }}</a>
+
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.index') }}"
+                               class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_pages') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>
                     <div id="homepageHelp" class="form-text mb-3">{{ __('dicms::sites.select_homepage_help') }}</div>
@@ -178,5 +154,4 @@
                 </div>
             @endif
         @endcan
-    </div>
 @endsection

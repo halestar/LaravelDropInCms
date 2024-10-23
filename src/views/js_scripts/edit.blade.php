@@ -1,11 +1,7 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            {{__('dicms::js_scripts.edit')}}
-        </h1>
-        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.scripts.update', ['site' => $site->id, 'script' => $script->id]) }}"  enctype="multipart/form-data">
+@section('index_content')
+        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.update', ['script' => $script->id]) }}"  enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-3">
@@ -108,7 +104,7 @@
             <div class="tab-content" id="tab-content">
                 <div
                     @if($script->type == \halestar\LaravelDropInCms\Enums\HeadElementType::Text)
-                        class="tab-pane fade show active"
+                        class="tab-pane fade show active pt-3"
                     @else
                         class="tab-pane fade"
                     @endif
@@ -124,7 +120,7 @@
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="file-tab-pane" role="tabpanel" aria-labelledby="file-tab" tabindex="0">
+                <div class="tab-pane fade pt-3" id="file-tab-pane" role="tabpanel" aria-labelledby="file-tab" tabindex="0">
                     <div class="mb-3">
                         <label for="script_file" class="form-label">{{ __('dicms::js_scripts.file') }}</label>
                         <input class="form-control" aria-describedby="fileHelp" type="file" id="script_file" name="script_file">
@@ -157,8 +153,6 @@
             </div>
             <div class="row">
                 <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.update') }}</button>
-                <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.show', ['site' => $site->id]) }}">{{ __('dicms::admin.cancel') }}</a>
             </div>
         </form>
-    </div>
 @endsection

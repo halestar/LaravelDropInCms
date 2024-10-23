@@ -4,17 +4,19 @@ namespace halestar\LaravelDropInCms\Commands;
 
 use halestar\LaravelDropInCms\Models\SystemBackup;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 
 class RestoreCms extends Command
 {
 
+    private ?string $data;
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'dicms:restore-cms {data?} {--file= : Load data from this file.} {--string: uses the input as a string, same as blank.}';
+    protected $signature = 'dicms:restore-cms {data?} {--file= : Load data from this file.} {--string: uses the input as a string, same as blank.} {--tables=: a comma-separated list of tables to import.}';
 
     /**
      * The console command description.
@@ -28,6 +30,7 @@ class RestoreCms extends Command
      */
     public function handle()
     {
+        $this->data = null;
         $fname = $this->option('file');
         if($fname)
         {
@@ -39,21 +42,30 @@ class RestoreCms extends Command
             }
             else
             {
-                SystemBackup::restore(fgets($file));
+                $this->data = fgets($file);
             }
         }
         else
         {
-            $data = $this->option('data');
-            if(!$data)
+            $this->data = $this->option('data');
+            if(!$this->data)
             {
                 $this->error(__('dicms::admin.commands.data.error'));
                 $this->fail(new CannotWriteFileException(__('dicms::admin.commands.data.error') . ": " . $fname));
             }
-            else
+        }
+        if($this->data)
+        {
+            $tables = $this->option('tables');
+            if($tables)
             {
-                SystemBackup::restore($data);
+                Log::debug($tables);
+                $tables = explode(',', $tables);
+                Log::debug(print_r($tables, true));
             }
+
+            Log::debug(print_r($tables, true));
+            SystemBackup::restore($this->data, $tables);
         }
     }
 }

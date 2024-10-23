@@ -1,11 +1,7 @@
-@extends("dicms::layouts.admin")
+@extends("dicms::layouts.admin.index", ['template' => $template])
 
-@section('content')
-    <div class="container">
-        <h1 class="border-bottom d-flex justify-content-between align-items-center">
-            {{__('dicms::pages.edit')}}
-        </h1>
-        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.update.settings', ['page' => $page->id]) }}"  enctype="multipart/form-data">
+@section('index_content')
+        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.update.settings', ['page' => $page->id]) }}"  enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="mb-3">
@@ -75,7 +71,7 @@
                                 class="bg-dark-subtle ps-2 rounded-start border-bottom border-start border-top border-dark py-2 h3 fw-bold">{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicRoute() }}
                                 /
                             </div>
-                            <div class="form-text mx-3 text-center">The URL to your front page</div>
+                            <div class="form-text mx-3 text-center">{{ __('dicms::pages.front_url') }}</div>
                         </div>
                         <div class="col col-auto text-center px-0 mx-0 d-none" id="path_display_container">
                             <div class="bg-secondary-subtle border-bottom border-top border-secondary py-2 h3 fw-bold"
@@ -100,10 +96,8 @@
 
             <div class="row">
                 <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.update') }}</button>
-                <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.pages.show', ['site' => $page->site_id, 'page' => $page->id]) }}">{{ __('dicms::admin.cancel') }}</a>
             </div>
         </form>
-    </div>
 @endsection
 @push('scripts')
     <script>

@@ -3,7 +3,7 @@
 namespace halestar\LaravelDropInCms\Controllers;
 
 use halestar\LaravelDropInCms\DiCMS;
-use halestar\LaravelDropInCms\Models\Header;
+use halestar\LaravelDropInCms\Enums\FooterTagType;
 use halestar\LaravelDropInCms\Models\Footer;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
@@ -20,58 +20,96 @@ class FooterController
         ];
     }
 
-    public function index(Site $site)
+    public function index()
     {
         Gate::authorize('viewAny', Footer::class);
-        return view('dicms::footers.index', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::footers.footer.title'),
+                'buttons' => []
+            ];
+        if(Gate::allows('create', Footer::class))
+        {
+            $template['buttons']['create'] =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.footers.create'),
+                    'text' => "<i class='fa fa-plus-square'></i>",
+                    'classes' => 'bg-text-primary',
+                    'title' => __('dicms::footers.new'),
+                ];
+        }
+        return view('dicms::footers.index', compact('template'));
     }
 
-    public function create(Site $site)
+    public function create()
     {
         Gate::authorize('create', Footer::class);
-        return view('dicms::footers.create', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::footers.new'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.footers.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        return view('dicms::footers.create', compact('template'));
     }
 
-    public function store(Request $request, Site $site)
+    public function store(Request $request)
     {
         Gate::authorize('create', Footer::class);
+        $currentSite = Site::currentSite();
         $data = $request->validate(
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'footers',
                 'description' => 'nullable',
-                'options' => 'nullable',
             ], $this->errors());
         $footer = new Footer();
         $footer->fill($data);
-        $site->footers()->save($footer);
-        return redirect(DiCMS::dicmsRoute('admin.sites.footers.edit', ['site' => $site->id, 'footer' => $footer->id]));
+        $footer->save();
+        return redirect(DiCMS::dicmsRoute('admin.footers.edit', ['footer' => $footer->id]))
+            ->with('success-status', __('dicms::footers.success.created'));
     }
 
-    public function edit(Site $site, Footer $footer)
+    public function edit(Footer $footer)
     {
         Gate::authorize('update', $footer);
-        $editor =
+        $template =
             [
-                'editor' => '#footer_editor',
-                'styles' => '"' . $site->siteCss()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicCss($site) . '"',
-                'scripts' => '"' . $site->siteJs()->links()->get()->pluck('href')->join('","') . '","' . DiCMS::dicmsPublicJs($site) . '"',
-                'projectData' => $footer->data,
+                'title' => __('dicms::footers.edit'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.footers.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
             ];
-        return view('dicms::footers.edit', compact('site', 'footer', 'editor'));
+        $objEditable = $footer;
+        return view('dicms::footers.edit', compact( 'footer', 'objEditable', 'template'));
     }
 
-    public function update(Request $request, Site $site, Footer $footer)
+    public function update(Request $request, Footer $footer)
     {
         Gate::authorize('update', $footer);
         $data = $request->validate(
             [
                 'name' => ['required', 'max:255', Rule::unique(config('dicms.table_prefix') . 'footers')->ignore($footer)],
                 'description' => 'nullable',
-                'footer' => 'nullable',
             ], $this->errors());
         $footer->fill($data);
         $footer->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.footers.index', ['site' => $site->id]));
+        return redirect()->back()
+            ->with('success-status', __('dicms::footers.success.updated'));
     }
 
     public function updateContent(Request $request, Footer $footer)
@@ -81,13 +119,23 @@ class FooterController
         $footer->data = $request->input('data', null);
         $footer->css = $request->input('css', null);
         $footer->save();
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success-status', __('dicms::footers.success.updated'));
     }
 
-    public function destroy(Site $site, Footer $footer)
+    public function destroy(Footer $footer)
     {
         Gate::authorize('delete', $footer);
         $footer->delete();
-        return redirect(DiCMS::dicmsRoute('admin.sites.footers.index', ['site' => $site->id]));
+        return redirect(DiCMS::dicmsRoute('admin.footers.index'))
+            ->with('success-status', __('dicms::footers.success.deleted'));
+    }
+
+    public function duplicate(Footer $footer)
+    {
+        Gate::authorize('create', Footer::class);
+        $newFooter = $footer->dupe();
+        return redirect(DiCMS::dicmsRoute('admin.footers.edit', ['footer' => $newFooter->id]))
+            ->with('success-status', __('dicms::footers.success.created'));
     }
 }

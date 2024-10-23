@@ -2,7 +2,8 @@
 
 return
 [
-    "header" => "Page Header",
+    "header" => "Page Header|Page Headers",
+    "header.none" => "There are no Page Headers for this site. Go create some!",
     "headers_title" => "Available Page Headers",
     "new" => "Create New Page Header",
     "edit" => "Update Page Header",
@@ -13,11 +14,17 @@ return
     "description" => "Page Header Description",
     "description.help" => "Optional description of what this page header does.",
     "content" => "Page Header Content",
-    "content.help" => "This content will be included on whatever site or page this it is attached to, right after the menu.",
+    "content.help" => "This content will be included on whatever site or page this it is attached to, right at the top",
     "back" => "Back to Sites",
     "content.here" => "Your content goes here",
     'settings.advanced' => 'Advanced Settings',
     'settings.advanced.update' => 'Update Advanced Settings',
-    'options' => 'Header Attributes',
-    'options.help' => 'Attributes that will be added to the header declaration.',
+    'options' => 'Header Container',
+    'options.help' => 'The tag and options that will be assigned to this header.',
+    'duplicate' => 'Duplicate Header',
+
+    'success.created' => 'Page Header created successfully.',
+    'success.updated' => 'Page Header updated successfully.',
+    'success.deleted' => 'Page Header deleted successfully.',
+
 ];

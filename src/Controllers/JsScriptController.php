@@ -8,7 +8,6 @@ use halestar\LaravelDropInCms\Models\JsScript;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class JsScriptController
@@ -21,21 +20,51 @@ class JsScriptController
         ];
     }
 
-    public function index(Site $site)
+    public function index()
     {
         Gate::authorize('viewAny', JsScript::class);
-        return view('dicms::js_scripts.index', compact('site'));
+        $template =
+            [
+                'title' => trans_choice('dicms::js_scripts.script', 2),
+                'buttons' => [],
+            ];
+        if(Gate::allows('create', JsScript::class))
+        {
+            $template['buttons']['create']  =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.scripts.create'),
+                    'text' => "<i class='fa fa-plus-square'></i>",
+                    'classes' => 'bg-text-primary',
+                    'title' => __('dicms::js_scripts.new'),
+                ];
+        }
+        return view('dicms::js_scripts.index', compact('template'));
     }
 
-    public function create(Site $site)
+    public function create()
     {
         Gate::authorize('create', JsScript::class);
-        return view('dicms::js_scripts.create', compact('site'));
+        $template =
+            [
+                'title' => __('dicms::js_scripts.new'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.scripts.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        return view('dicms::js_scripts.create', compact('template'));
     }
 
-    public function store(Request $request, Site $site)
+    public function store(Request $request)
     {
         Gate::authorize('create', JsScript::class);
+        $currentSite = Site::currentSite();
         $data = $request->validate(
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'js_scripts',
@@ -63,14 +92,29 @@ class JsScriptController
             $script->type = HeadElementType::Text;
             $script->script = $request->input('script', null);
         }
-        $site->jsScripts()->save($script);
-        return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
+        $script->save();
+        return redirect(DiCMS::dicmsRoute('admin.scripts.index'))
+            ->with('success-status', __('dicms::js_scripts.success.created'));
     }
 
-    public function edit(Site $site, JsScript $script)
+    public function edit(JsScript $script)
     {
         Gate::authorize('update', $script);
-        return view('dicms::js_scripts.edit', compact('site', 'script'));
+        $template =
+            [
+                'title' => __('dicms::js_scripts.edit'),
+                'buttons' =>
+                    [
+                        'back' =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.scripts.index'),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        return view('dicms::js_scripts.edit', compact('template', 'script'));
     }
 
     public function update(Request $request, Site $site, JsScript $script)
@@ -103,13 +147,23 @@ class JsScriptController
             $script->script = $request->input('script', null);
         }
         $script->save();
-        return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
+        return redirect(DiCMS::dicmsRoute('admin.scripts.index'))
+            ->with('success-status', __('dicms::js_scripts.success.updated'));
     }
 
     public function destroy(Site $site, JsScript $script)
     {
         Gate::authorize('delete', $script);
         $script->delete();
-        return redirect(DiCMS::dicmsRoute('admin.sites.scripts.index', ['site' => $site->id]));
+        return redirect(DiCMS::dicmsRoute('admin.scripts.index'))
+            ->with('success-status', __('dicms::js_scripts.success.deleted'));
+    }
+
+    public function duplicate(JsScript $script)
+    {
+        Gate::authorize('create', JsScript::class);
+        $newJs = $script->dupe();
+        return redirect(DiCMS::dicmsRoute('admin.scripts.edit', ['script' => $newJs->id]))
+            ->with('success-status', __('dicms::js_scripts.success.created'));
     }
 }

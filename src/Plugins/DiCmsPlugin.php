@@ -1,9 +1,7 @@
 <?php
 
 namespace halestar\LaravelDropInCms\Plugins;
-use halestar\LaravelDropInCms\Models\Footer;
-use halestar\LaravelDropInCms\Models\Header;
-use Illuminate\Support\Collection;
+use halestar\LaravelDropInCms\Models\Page;
 
 interface DiCmsPlugin
 {
@@ -15,54 +13,68 @@ interface DiCmsPlugin
     public static function adminRoutes(): void;
 
     /**
-     * This function return true if the plugin has a route for the passed path.
-     * @return void
+     * THe URl to the entry point of your plugin from the ADMIN side.
+     * @return string The actual URL
      */
-    public static function hasPublicRoute($path): bool;
+    public static function getAdminUrl(): string;
 
     /**
-     * This function will return the content, in string form, for the HTML to place in the
-     * content area of the CMS.
+     * The name that will be displayed in the menu. Should be internaliionalized.
+     * @return string the name.
      */
-    public static function getPublicContent($path): string;
+    public static function getPluginMenuName(): string;
 
     /**
-     * @return array|null Returns any css files associated with this plugin for this path.
+     * This function returns the object that the main system will match agaainst the 'viewAny' permission, which is
+     * required to views the menu from the admin site.
      */
-    public static function getCssFiles($path): ?Collection;
+    public static function getPolicyModel(): string;
 
     /**
-     * @return array|null Returns any js files associated with this plugin for this path.
+     *  This is the route prefix that is applied to your routes. Mainly used to check if the user is in your
+     * section to highlight certain items.
      */
-    public static function getJsFiles($path): ?Collection;
+    public static function getRoutePrefix(): string;
 
     /**
-     * @return array|null Returns any headers associated with this plugin for this path.
+     * This function return null if there is no page for that url, else it will return the
+     * Page object to render.
+     * @param string|null $path The path that the user is trying to reach
+     * @return Page|null Null if it doesn't have a path, else the Page to display
      */
-    public static function getHeader($path): ?Header;
-
-    /**
-     * @return array|null Returns any footers associated with this plugin for this path.
-     */
-    public static function getFooter($path): ?Footer;
+    public static function hasPublicRoute(?string $path): ?Page;
 
 
     /**
      * This function will return all the public pages that this plugin will allow attachments to.
-     * @return array of DiCMSPluginPage
+     * @return array of Page objects
      */
     public static function getPublicPages(): array;
-
-    /**
-     * This function will return the Home object that the main system will use to direct the users
-     * to the entry point of the plugin.
-     */
-    public static function getEntryPoint(): DiCmsPluginHome;
 
     /**
      *  This function returns a list of classes that have the trait BackUpable that this plugin needs
      * to be able to save to go back to normal in case of a wipe.
      */
     public static function getBackUpableTables(): array;
+
+    /**
+     * This function returns an array of DiCmsGrapesJsPlugin objects to insert into the
+     * grapesjs editor.
+     */
+    public static function getGrapesJsPlugins():array;
+
+    /**
+     * This function will take a Page object that we're trying to render that is
+     * listed to belong to a plugin. It is expected to return the CSS that is supposed to be
+     * rendered for the page. You can return the same data directly from $page->css, or
+     * return something specific for your plugin
+     */
+    public static function projectCss(Page $page): string;
+
+    /**
+     *  Similar to projectHtml function, except this one is for the HTMl to be rendered.
+     */
+    public static function projectHtml(Page $page): string;
+
 
 }

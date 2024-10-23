@@ -2,7 +2,6 @@
 
 namespace halestar\LaravelDropInCms\Policies;
 
-use App\Models\User;
 use halestar\LaravelDropInCms\Models\Page;
 
 class DataItemPolicy
@@ -10,7 +9,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can view any models.
      */
-    public function viewAny(User $user = null): bool
+    public function viewAny($user = null): bool
     {
         return true;
     }
@@ -18,7 +17,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user = null, Page $page = null): bool
+    public function view($user = null, Page $page = null): bool
     {
         return true;
     }
@@ -26,7 +25,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can create models.
      */
-    public function create(User $user = null): bool
+    public function create($user = null): bool
     {
         return true;
     }
@@ -34,7 +33,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user = null, Page $page = null): bool
+    public function update($user = null, Page $page = null): bool
     {
         return true;
     }
@@ -42,7 +41,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function publish(User $user = null, Page $page = null): bool
+    public function publish($user = null, Page $page = null): bool
     {
         return true;
     }
@@ -51,7 +50,7 @@ class DataItemPolicy
     /**
      * Determine whether the user can permanently delete the model.
      */
-    public function delete(User $user = null, Page $page = null): bool
+    public function delete($user = null, Page $page = null): bool
     {
         return true;
     }
