@@ -455,7 +455,7 @@
                                         },
                                         {
                                             type: 'select',
-                                            name: 'href',
+                                            name: 'hrefSel',
                                             label: '{{ __('dicms::assets.menu.destination') }}',
                                             options:
                                                 [
@@ -481,7 +481,7 @@
                                         },
                                         {
                                             type: 'text',
-                                            name: 'hrefAlt',
+                                            name: 'hrefTxt',
                                             label: '{{ __('dicms::admin.url') }}'
                                         },
                                     ],
@@ -489,8 +489,8 @@
                         init()
                         {
                             this.on('change:attributes:menuName', this.changeContent);
-                            this.on('change:attributes:href', this.addLink)
-                            this.on('change:attributes:hrefAlt', this.addLink)
+                            this.on('change:attributes:hrefSel', this.addLink)
+                            this.on('change:attributes:hrefTxt', this.addLink)
                         },
                         changeContent()
                         {
@@ -498,10 +498,16 @@
                         },
                         addLink()
                         {
-                            if(this.getAttributes().hrefAlt === "href")
-                                this.set('href', this.getAttributes().hrefAlt);
+                            let href;
+                            if(this.getAttributes().hrefSel === "href")
+                                href = this.getAttributes().hrefTxt;
                             else
-                                this.set('href', this.getAttributes().hrefAlt);
+                                href = this.getAttributes().hrefSel;
+                            if(href !== undefined)
+                                this.addAttributes(
+                                    {
+                                        href: href,
+                                    });
                         },
                         view:
                             {
