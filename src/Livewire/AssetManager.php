@@ -135,7 +135,7 @@ class AssetManager extends Component
                 [
                     'name' => pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME),
                     'path' => $path,
-                    'mime' => ($this->dataItem->getMimeType() == "image/x-icon")?? "image/png",
+                    'mime' => ($this->dataItem->getMimeType() == "image/x-icon")? "image/x-icon": "image/png",
                     'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                 ]);
         }
