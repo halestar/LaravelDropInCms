@@ -22,6 +22,15 @@ class AssetManager extends Component
     public $selectAction;
     public $filterTerms;
 
+    private array $thumbableMimes =
+        [
+            'image/jpeg',
+            'image/png',
+            'image/gif',
+            'image/bmp',
+            'image/tiff',
+        ];
+
     public function mount($mini = false, $selectAction = null)
     {
         //load all the assets in the system
@@ -94,7 +103,7 @@ class AssetManager extends Component
                 if(!preg_match('/image\/.+/', $file->getMimeType()))
                     continue;
 
-                if($file->getMimeType() == "image/x-icon")
+                if(!in_array($file->getMimeType(), $this->thumbableMimes))
                 {
                     //store the file
                     $path = $file->store('', config('dicms.media_upload_disk'));
@@ -118,7 +127,7 @@ class AssetManager extends Component
         }
         elseif(preg_match('/image\/.+/', $this->dataItem->getMimeType()))
         {
-            if($this->dataItem->getMimeType() == "image/x-icon")
+            if(!in_array($this->dataItem->getMimeType(), $this->thumbableMimes))
             {
                 //store the file
                 $path = $this->dataItem->store('', config('dicms.media_upload_disk'));

@@ -28,7 +28,7 @@ class DataItem extends Model
             return $this->thumb;
 
         Log::debug("mime is " . $this->mime);
-        if(preg_match('/image\/.+/', $this->mime) && $this->mime != "image/x-icon")
+        if($this->mime == "image/png")
         {
             $manager = new ImageManager(new Driver());
             $thmb = $manager->read(Storage::disk(config('dicms.media_upload_disk'))->get($this->path));
