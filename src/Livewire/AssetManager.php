@@ -4,6 +4,7 @@ namespace halestar\LaravelDropInCms\Livewire;
 
 use halestar\LaravelDropInCms\Models\DataItem;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
@@ -120,13 +121,15 @@ class AssetManager extends Component
                     [
                         'name' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
                         'path' => $path,
-                        'mime' => ($file->getMimeType() == "image/x-icon")?? "image/png",
+                        'mime' => in_array($file->getMimeType(), $this->thumbableMimes)?  "image/png": $file->getMimeType(),
                         'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                     ]);
             }
         }
         elseif(preg_match('/image\/.+/', $this->dataItem->getMimeType()))
         {
+            Log::debug("mime is " . $this->dataItem->getMimeType());
+            Log::debug("!in array returns " . !in_array($this->dataItem->getMimeType(), $this->thumbableMimes));
             if(!in_array($this->dataItem->getMimeType(), $this->thumbableMimes))
             {
                 //store the file
@@ -144,7 +147,7 @@ class AssetManager extends Component
                 [
                     'name' => pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME),
                     'path' => $path,
-                    'mime' => ($this->dataItem->getMimeType() == "image/x-icon")? "image/x-icon": "image/png",
+                    'mime' => in_array($this->dataItem->getMimeType(), $this->thumbableMimes)?  "image/png": $this->dataItem->getMimeType(),
                     'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                 ]);
         }
