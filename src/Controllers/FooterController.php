@@ -112,17 +112,6 @@ class FooterController
             ->with('success-status', __('dicms::footers.success.updated'));
     }
 
-    public function updateContent(Request $request, Footer $footer)
-    {
-        Gate::authorize('update', $footer);
-        $footer->html = $request->input('footer', null);
-        $footer->data = $request->input('data', null);
-        $footer->css = $request->input('css', null);
-        $footer->save();
-        return redirect()->back()
-            ->with('success-status', __('dicms::footers.success.updated'));
-    }
-
     public function destroy(Footer $footer)
     {
         Gate::authorize('delete', $footer);

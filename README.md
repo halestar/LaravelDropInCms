@@ -289,36 +289,31 @@ If you're interested in creating plugins, head over to [DiCmsBlogger](https://gi
 <a id="roadmap"></a>
 ## Roadmap to 1.0
 
-At the time of writing this, this package is not what I consider "released". 
-My plan is officially release as a v1.0 once all the features are built. 
-This space here is meant to detail what features and upgrades I consider 
-essential to release a v1.0
+A lot of this information is described in my 
+[blog post](https://dev.kalinec.net/blogs/dicms/the-future-of-dicms), 
+I'm only including the roadmap as it is a good place to have it. Read 
+[the post](https://dev.kalinec.net/blogs/dicms/the-future-of-dicms) 
+for more detailed information.
 
-These requirements are subject (and in fact, most likely) to change and 
-I will cross them out (probably) as I build things.
+Going by the new version numbering system, I will use the 3rd place to 
+specify bug fixes. 2nd place will be used whenever I have a new milestone 
+that I have achieved, the minor revision will follow this roadmap:
 
-The following features need to be implemented in order to release v1.0:
-
- - Comments need to be added. Heredoc and config comments.
- - ~~The user interface needs to be overhauled. It is very ugly and needs to be updated.~~
- - ~~The system needs to be able to be backed-up programmatically through an API and through an artisan command~~
- - ~~Make css and js script re-arrangeable~~
- - ~~Archive and de-archive sites~~
- - ~~Preview needs to be enabled~~
- - ~~Better asset supports for images and stuff~~
- - ~~Better editor support~~
- - GrapesJs needs to be heavily customized
- - Make sure it shows up nice on mobile
- - Add REST API to all models with Policy hooks
- - ~~Upgrade the plugin system to allow for customization of css/js scripts, headers and footers from the front page.~~
- - Document how to create a simple site, with pictures.
- - Make backups more secure by zipping, creating SHA's etc.
- - Provide a sample backup file that will build a default site.
- - ~~Add alternatives for other kinds of settings mechanisms, such as redis.~~
- - ~~Add publishable policies for users to easily extend. Possibly through artisan commands.~~
- - ~~Create an asset storage management system for centralized, shared management. Maybe a plugin?~~
- - ~~Duplicate sites.~~
- - Update README to include better instructions and define the roadmap to include version milestones.
- - Write tests
-
-Other things may be added to this list, or taken away.
+- Version 0.6
+  - Introduce and complete widgets
+  - Finish all plugin interfaces so that the structure doesn't change anymore.
+  - All Editor improvements are done.
+  - REST API's need to be started by now, so that they can be included in the 
+plugin interface
+- Version 0.7
+  - New Features are to be completed
+  - REST APIs need to be completed
+  - All models are complete now
+- Version 0.8
+  - Asset manager is completed
+  - Quality of life milestones are done.
+- Version 0.9
+  - All features and milestones are done except testing.
+  - Internationalization will need to be completed
+  - I will attempt to use AI to get another language done. 
+  - Last minute testing and graphical UI issues are to be resolved.

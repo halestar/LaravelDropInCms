@@ -187,17 +187,6 @@ class PageController
             ->with('success-status', __('dicms::pages.success.updated'));
     }
 
-    public function updateContent(Request $request, Page $page)
-    {
-        Gate::authorize('update', $page);
-        $page->html = $request->input('page', null);
-        $page->data = $request->input('data', null);
-        $page->css = $request->input('css', null);
-        $page->save();
-        return redirect()->back()
-            ->with('success-status', __('dicms::pages.success.updated'));
-    }
-
     public function publishPage(Request $request, Page $page)
     {
         Gate::authorize('publish', $page);

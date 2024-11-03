@@ -45,35 +45,6 @@
             </div>
         </div>
 
-        <div class="mb-3">
-            <label for="footer" class="form-label">{{ __('dicms::footers.content') }}</label>
-            <div id="footerHelp" class="form-text border-bottom">{{ __('dicms::footers.content.help') }}</div>
-            <div id="grapes-js-editor">
-                <div style="padding: 15px; z-index: 9999;" data-gjs-type="editable">
-                    {{ $footer->html }}
-                </div>
-            </div>
-        </div>
-
-        <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.update.content', ['footer' => $footer->id]) }}" method="POST" id="update_content">
-            @csrf
-            @method('PUT')
-            <div class="row">
-                <input type="hidden" name="footer" id="footer" />
-                <input type="hidden" name="data" id="data" />
-                <input type="hidden" name="css" id="css" />
-                <button type="button" class="btn btn-primary col m-2" onclick="update();">{{ __('dicms::admin.update') }}</button>
-            </div>
-        </form>
+        <x-dicms::web-editor :editableObj="$footer" :title="__('dicms::footers.content')" :help="__('dicms::footers.content.help')" />
 @endsection
-@push('scripts')
-    <script>
-        function update()
-        {
-            $('#footer').val(editor.getHtml());
-            $('#css').val(editor.getCss());
-            $('#data').val(JSON.stringify(editor.getProjectData()));
-            $('form#update_content').submit();
-        }
-    </script>
-@endpush
+

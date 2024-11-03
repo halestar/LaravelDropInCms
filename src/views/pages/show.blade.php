@@ -195,7 +195,7 @@
                     <div class="alert alert-danger mt-3">
                         <strong>{{ __('dicms::admin.danger') }}</strong> {{ __('dicms::errors.published.danger.unpublish') }}
                     </div>
-                    <div class="row">
+                    <div class="row mb-5">
                         <a
                             href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.unpublish', ['page' => $page->id]) }}"
                             role="button"
@@ -206,7 +206,7 @@
                     <div class="alert alert-warning mt-3">
                         <strong>{{ __('dicms::admin.warning') }}</strong> {{ __('dicms::errors.published.warning.publish') }}
                     </div>
-                    <div class="row">
+                    <div class="row mb-5">
                         <a
                             role="button"
                             href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.publish', ['page' => $page->id]) }}"
@@ -217,33 +217,5 @@
             @endcan
         @endif
 
-        <h2 class="border-bottom py-2 d-flex justify-content-between align-items-center">
-            {{ __('dicms::pages.pages.web') }}
-        </h2>
-        <div id="grapes-js-editor">
-            <div style="padding: 15px; z-index: 9999;" data-gjs-type="editable">
-                {!! $page->html !!}
-            </div>
-        </div>
-        <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.update.content', ['page' => $page->id]) }}" method="POST" id="update_content">
-            @csrf
-            @method('PUT')
-            <div class="row">
-                <input type="hidden" name="page" id="page" />
-                <input type="hidden" name="data" id="data" />
-                <input type="hidden" name="css" id="css" />
-                <button type="button" class="btn btn-primary col m-2" onclick="update();">{{ __('dicms::admin.update') }}</button>
-            </div>
-        </form>
+        <x-dicms::web-editor :editableObj="$page" :title="__('dicms::pages.content')" :help="__('dicms::pages.content.help')" />
 @endsection
-@push('scripts')
-    <script>
-        function update()
-        {
-            $('#page').val(editor.getHtml());
-            $('#css').val(editor.getCss());
-            $('#data').val(JSON.stringify(editor.getProjectData()));
-            $('form#update_content').submit();
-        }
-    </script>
-@endpush

@@ -60,36 +60,33 @@ final class DiCMS
                     Route::post('/', 'restore')->name('restore');
                 });
 
+            Route::post('/content/update', [SiteController::class, 'updateContent'])->name('content.update');
 
+            //site functions
             Route::get('/sites/{site}/current', [SiteController::class, 'currentSite'])->name('sites.current');
             Route::put('/sites/{site}/update/settings', [SiteController::class, 'updateSettings'])->name('sites.update.settings');
             Route::get('/sites/{site}/enable', [SiteController::class, 'enableSite'])->name('sites.enable');
             Route::get('/sites/{site}/disable', [SiteController::class, 'disableSite'])->name('sites.disable');
             Route::get('/sites/{site}/archive', [SiteController::class, 'archiveSite'])->name('sites.archive');
             Route::get('/sites/{site}/restore', [SiteController::class, 'restoreSite'])->name('sites.restore');
+
+            //duplicate functions
             Route::get('/sites/{site}/duplicate', [SiteController::class, 'duplicateSite'])->name('sites.duplicate');
-
-            Route::put('/headers/{header}/content', [HeaderController::class, 'updateContent'])->name('headers.update.content');
             Route::get('/headers/{header}/duplicate', [HeaderController::class, 'duplicate'])->name('headers.duplicate');
-            Route::put('/footers/{footer}/content', [FooterController::class, 'updateContent'])->name('footers.update.content');
             Route::get('/footers/{footer}/duplicate', [FooterController::class, 'duplicate'])->name('footers.duplicate');
-            Route::put('/menu/{menu}/content', [MenuController::class, 'updateContent'])->name('menus.update.content');
-            Route::get('/menu/{menu}/duplicate', [MenuController::class, 'duplicate'])->name('menus.duplicate');
-
             Route::get('/sheets/{sheet}/duplicate', [CssSheetController::class, 'duplicate'])->name('sheets.duplicate');
             Route::get('/scripts/{script}/duplicate', [JsScriptController::class, 'duplicate'])->name('scripts.duplicate');
 
+            //Pages
             Route::put('/pages/{page}/update/settings', [PageController::class, 'updateSettings'])->name('pages.update.settings');
-            Route::put('/pages/{page}/update/contents', [PageController::class, 'updateContent'])->name('pages.update.content');
-
             Route::get('/pages/{page}/publish', [PageController::class, 'publishPage'])->name('pages.publish');
             Route::get('/pages/{page}/unpublish', [PageController::class, 'unpublishPage'])->name('pages.unpublish');
             Route::get('/pages/{page}/duplicate', [PageController::class, 'duplicatePage'])->name('pages.dupe');
 
+            //Resource controllers
             Route::resource('sites', SiteController::class);
             Route::resource('headers', HeaderController::class)->except('show');
             Route::resource('footers', FooterController::class)->except('show');
-            Route::resource('menus', MenuController::class)->except('show');
             Route::resource('sheets', CssSheetController::class)->except('show');
             Route::resource('scripts', JsScriptController::class)->except('show');
             Route::resource('pages', PageController::class);

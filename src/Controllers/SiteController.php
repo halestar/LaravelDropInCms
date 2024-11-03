@@ -234,4 +234,23 @@ class SiteController
         $site->delete();
         return redirect(DiCMS::dicmsRoute('admin.sites.index'));
     }
+
+    public function updateContent(Request $request)
+    {
+        //first, we attempt to load the object.
+        $obj = $request->input('objType', null);
+        $id = $request->input('id', null);
+        if($obj && $id)
+        {
+            $editableObj = $obj::find($id);
+            if(!$editableObj)
+                return response()->json(['error' => 'Could not load object'], 200);
+            $editableObj->setProjectData($request->input('data', null));
+            $editableObj->setProjectHtml($request->input('html', null));
+            $editableObj->setProjectCss($request->input('css', null));
+            $editableObj->save();
+            return response()->json(['success' => "Content Updated"]);
+        }
+        return response()->json(['error' => 'No object found'], 200);
+    }
 }

@@ -22,20 +22,10 @@
     <script src="https://cdn.jsdelivr.net/gh/livewire/sortable@v1.x.x/dist/livewire-sortable.js"></script>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
-    @isset($objEditable)
-        <!-- Including GrapeJs Base Config -->
-        @include('dicms::layouts.editor.config', ['objEditable' => $objEditable])
+    @stack('head_scripts')
 
-        @foreach(config('dicms.plugins') as $plugin)
-            @foreach($plugin::getGrapesJsPlugins() as $editorPlugin)
-                @if($editorPlugin->shouldInclude($objEditable))
-                    <!-- Including GrapeJs Plugin Config -->
-                    {!! $editorPlugin->getConfigView($objEditable) !!}
-                @endif
-            @endforeach
-        @endforeach
-    @endisset
 
     @isset($include_text_editor)
         @include('dicms::layouts.text-editor.config',['eConfig' => $include_text_editor])
@@ -235,14 +225,9 @@
     @endisset
 </div>
 
-@isset($objEditable)
-    @include('dicms::layouts.editor.instance', ['objEditable' => $objEditable])
-@endisset
-
 @isset($include_text_editor)
     @include('dicms::layouts.text-editor.instance',['eConfig' => $include_text_editor])
 @endisset
-
 
 @stack('scripts')
 </body>

@@ -54,4 +54,19 @@ abstract class GrapesJsEditableItem extends Model
     {
         return $this->css?? "";
     }
+
+    public function setProjectData($data): void
+    {
+        $this->data = $data;
+    }
+
+    public function setProjectHtml($html): void
+    {
+        $this->html = $html;
+    }
+
+    public function setProjectCss($css): void
+    {
+        $this->css = $css;
+    }
 }

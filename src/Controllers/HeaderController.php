@@ -111,17 +111,6 @@ class HeaderController
             ->with('success-status', __('dicms::headers.success.updated'));
     }
 
-    public function updateContent(Request $request, Header $header)
-    {
-        Gate::authorize('update', $header);
-        $header->html = $request->input('header', null);
-        $header->data = $request->input('data', null);
-        $header->css = $request->input('css', null);
-        $header->save();
-        return redirect()->back()
-            ->with('success-status', __('dicms::headers.success.updated'));
-    }
-
     public function destroy(Header $header)
     {
         Gate::authorize('delete', $header);

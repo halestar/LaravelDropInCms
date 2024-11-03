@@ -9,6 +9,7 @@ use halestar\LaravelDropInCms\Livewire\CssSheetManager;
 use halestar\LaravelDropInCms\Livewire\JsScriptManager;
 use halestar\LaravelDropInCms\View\Components\ErrorDisplay;
 use halestar\LaravelDropInCms\View\Components\TagSelector;
+use halestar\LaravelDropInCms\View\Components\WebEditor;
 use halestar\LaravelDropInCms\View\Composers\CurrentSiteViewComposer;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
@@ -42,6 +43,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->loadViewsFrom(__DIR__.'/../views', 'dicms');
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dicms');
         Blade::component('error-display', ErrorDisplay::class);
+        Blade::component('web-editor', WebEditor::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([

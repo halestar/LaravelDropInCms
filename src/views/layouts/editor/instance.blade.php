@@ -31,6 +31,10 @@
                     styles: {!! $objEditable->CssLinks() !!},
                     scripts: {!! $objEditable->JsLinks() !!},
                 },
+            blockManager:
+                {
+                    appendTo: '#blocks-container'
+                },
             assetManager:
                 {
                     custom:
