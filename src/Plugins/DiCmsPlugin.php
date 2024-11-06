@@ -13,6 +13,12 @@ interface DiCmsPlugin
     public static function adminRoutes(): void;
 
     /**
+     * This function registers all the API routes the wil be accessible
+     * @return void
+     */
+    public static function apiRoutes(): void;
+
+    /**
      * THe URl to the entry point of your plugin from the ADMIN side.
      * @return string The actual URL
      */

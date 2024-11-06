@@ -596,7 +596,7 @@
             });
 
         //menu item
-        Components.addType('menu-item',
+        Components.addType('page-link',
             {
                 extend: 'link',
                 model:
@@ -604,26 +604,22 @@
                         defaults:
                             {
                                 ...container_default,
-                                name: '{{ __('dicms::assets.menu.item') }}',
-                                content: '{{ __('dicms::assets.menu.label') }}',
+                                name: 'Page Link',
+                                content: 'Page',
                                 traits:
                                     [
                                         'title',
                                         {
                                             type: 'text',
                                             name: 'menuName',
-                                            label: '{{ __('dicms::assets.menu.name') }}'
+                                            label: 'Link Name'
                                         },
                                         {
                                             type: 'select',
-                                            name: 'hrefSel',
-                                            label: '{{ __('dicms::assets.menu.destination') }}',
+                                            name: 'href',
+                                            label: 'Link Destination',
                                             options:
                                                 [
-                                                    {
-                                                        label: '{{ __('dicms::assets.menu.destination.type') }}',
-                                                        value: 'href',
-                                                    },
                                                     @foreach(\halestar\LaravelDropInCms\Models\Page::where('plugin_page', false)->get() as $page)
                                                     {
                                                         label: '{{ __('dicms::pages.page') }}: {{ $page->name }}',
@@ -640,11 +636,6 @@
                                                     @endforeach
                                                 ],
                                         },
-                                        {
-                                            type: 'text',
-                                            name: 'hrefTxt',
-                                            label: '{{ __('dicms::admin.url') }}'
-                                        },
                                     ],
                             },
                         init()
@@ -656,19 +647,6 @@
                         changeContent()
                         {
                             this.set('content', this.getAttributes().menuName)
-                        },
-                        addLink()
-                        {
-                            let href;
-                            if(this.getAttributes().hrefSel === "href")
-                                href = this.getAttributes().hrefTxt;
-                            else
-                                href = this.getAttributes().hrefSel;
-                            if(href !== undefined)
-                                this.addAttributes(
-                                    {
-                                        href: href,
-                                    });
                         },
                         view:
                             {
@@ -866,6 +844,19 @@
             },
         });
 
+        Blocks.add('PageLink', {
+            select: true,
+            category: "{{ __('dicms::assets.text') }}",
+            label: "Page Link",
+            media: `<svg viewBox="0 0 24 24">
+      <path fill="currentColor" d="M3.9,12C3.9,10.29 5.29,8.9 7,8.9H11V7H7A5,5 0 0,0 2,12A5,5 0 0,0 7,17H11V15.1H7C5.29,15.1 3.9,13.71 3.9,12M8,13H16V11H8V13M17,7H13V8.9H17C18.71,8.9 20.1,10.29 20.1,12C20.1,13.71 18.71,15.1 17,15.1H13V17H17A5,5 0 0,0 22,12A5,5 0 0,0 17,7Z"></path>
+    </svg>`,
+            content:
+                {
+                    type: "page-link",
+                },
+        });
+
         Blocks.add('CodeBlock', {
             select: true,
             category: "{{ __('dicms::assets.text') }}",
@@ -1028,18 +1019,6 @@
                         type: 'my-th'
                     }
             });
-
-        //Special
-        Blocks.add('MenuItem', {
-            select: true,
-            category: "{{ __('dicms::assets.special') }}",
-            label: "{{ __('dicms::assets.menu.item') }}",
-            media: `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 96C0 78.3 14.3 64 32 64l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 128C14.3 128 0 113.7 0 96zM0 256c0-17.7 14.3-32 32-32l384 0c17.7 0 32 14.3 32 32s-14.3 32-32 32L32 288c-17.7 0-32-14.3-32-32zM448 416c0 17.7-14.3 32-32 32L32 448c-17.7 0-32-14.3-32-32s14.3-32 32-32l384 0c17.7 0 32 14.3 32 32z"/></svg>`,
-            content:
-                {
-                    type: "menu-item",
-                },
-        });
 
     };
 </script>

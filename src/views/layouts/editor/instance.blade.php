@@ -7,7 +7,7 @@
             // As an alternative we could use: `components: '<h1>Hello World Component!</h1>'`,
             fromElement: true,
             // Size of the editor
-            height: '800px',
+            height: '100%',
             width: 'auto',
             storageManager: false,
             // Disable the storage manager for the moment

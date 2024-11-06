@@ -4,7 +4,6 @@ namespace halestar\LaravelDropInCms\Controllers;
 
 use halestar\LaravelDropInCms\DiCMS;
 use halestar\LaravelDropInCms\Models\Header;
-use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Validation\Rule;
@@ -63,7 +62,6 @@ class HeaderController
     public function store(Request $request)
     {
         Gate::authorize('create', Header::class);
-        $currentSite = Site::currentSite();
         $data = $request->validate(
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'headers',

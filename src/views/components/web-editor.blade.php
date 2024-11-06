@@ -4,27 +4,29 @@
             <label for="footer" class="form-label">{{ $title }}</label>
             <div id="footerHelp" class="form-text ">{{ $help }}</div>
         </div>
-        <div class="alert d-none" id="result-alert"></div>
     </div>
-    <div class="row gx-0 mb-5" id="gjs-container">
-        <div class="col-2 overflow-scroll overflow-x-hidden" id="blocks-column" style="height: 800px">
-            <div id="blocks-container"></div>
-        </div>
-        <div class="col-9">
-            <div id="grapes-js-editor">
-                <div style="padding: 15px; z-index: 9999;" data-gjs-type="editable">
-                    {{ $editableObj->html }}
+    <div id="gjs-container" style="height: 800px;">
+        <div class="row gx-0" style="height: 95%;">
+            <div class="col-2 overflow-scroll overflow-x-hidden me-0" id="blocks-column" style="height: 100%;">
+                <div id="blocks-container"></div>
+            </div>
+            <div class="col-10 m-0">
+                <div id="grapes-js-editor">
+                    <div style="padding: 15px; z-index: 9999;" data-gjs-type="editable">
+                        {{ $editableObj->html }}
+                    </div>
                 </div>
             </div>
+            <div class="col-1">
+                <div id="devices-container"></div>
+            </div>
         </div>
-        <div class="col-1">
-            <div id="devices-container"></div>
+        <div class="row" style="height: 5%;">
+            <button type="button" id="gjs-update-button" class="btn btn-primary col m-2" onclick="update();">{{ __('dicms::admin.update') }}</button>
         </div>
     </div>
 
-    <div class="row">
-        <button type="button" class="btn btn-primary col m-2" onclick="update();">{{ __('dicms::admin.update') }}</button>
-    </div>
+
 </div>
 @push('head_scripts')
     <!-- Including GrapeJs Base Config -->
@@ -61,23 +63,23 @@
                 {
                     if(response.data.success)
                     {
-                        $('#result-alert').addClass('alert-success').removeClass('d-none').html(response.data.success);
+                        $('#gjs-update-button').addClass('btn-success').removeClass('btn-primary').html(response.data.success);
                     }
                     else
                     {
-                        $('#result-alert').addClass('alert-danger').removeClass('d-none').html(response.data.error);
+                        $('#gjs-update-button').addClass('btn-danger').removeClass('btn-primary').html(response.data.error);
                     }
-                    setTimeout(destroyAlert, 5000);
+                    setTimeout(destroyAlert, 3000);
                 })
                 .catch(error => console.log(error));
         }
 
         function destroyAlert()
         {
-            $('#result-alert').removeClass('alert-danger')
-                .removeClass('alert-success')
-                .addClass('d-none')
-                .html('');
+            $('#gjs-update-button').removeClass('btn-danger')
+                .removeClass('btn-success')
+                .addClass('btn-primary')
+                .html('{{ __('dicms::admin.update') }}');
         }
     </script>
 @endpush

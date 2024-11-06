@@ -1,6 +1,10 @@
 <?php
 
 namespace halestar\LaravelDropInCms;
+use halestar\LaravelDropInCms\Controllers\API\CssSheetApiController;
+use halestar\LaravelDropInCms\Controllers\API\FooterApiController;
+use halestar\LaravelDropInCms\Controllers\API\HeaderApiController;
+use halestar\LaravelDropInCms\Controllers\API\JsScriptApiController;
 use halestar\LaravelDropInCms\Controllers\BackupController;
 use halestar\LaravelDropInCms\Controllers\CssSheetController;
 use halestar\LaravelDropInCms\Controllers\DataItemController;
@@ -8,7 +12,6 @@ use halestar\LaravelDropInCms\Controllers\FooterController;
 use halestar\LaravelDropInCms\Controllers\FrontController;
 use halestar\LaravelDropInCms\Controllers\HeaderController;
 use halestar\LaravelDropInCms\Controllers\JsScriptController;
-use halestar\LaravelDropInCms\Controllers\MenuController;
 use halestar\LaravelDropInCms\Controllers\PageController;
 use halestar\LaravelDropInCms\Controllers\PreviewController;
 use halestar\LaravelDropInCms\Controllers\SiteController;
@@ -18,7 +21,6 @@ use halestar\LaravelDropInCms\Models\DataItem;
 use halestar\LaravelDropInCms\Models\Footer;
 use halestar\LaravelDropInCms\Models\Header;
 use halestar\LaravelDropInCms\Models\JsScript;
-use halestar\LaravelDropInCms\Models\Menu;
 use halestar\LaravelDropInCms\Models\Page;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Http\Request;
@@ -112,8 +114,26 @@ final class DiCMS
             {
                 $plugin::adminRoutes();
             }
-
         });
+    }
+
+    public static function apiRoutes(): void
+    {
+        Route::name('dicms.api.')
+            ->group(function ()
+            {
+                Route::apiResources(
+                    [
+                        'headers' => HeaderApiController::class,
+                        'footers' => FooterApiController::class,
+                        'sheets' => CssSheetApiController::class,
+                        'scripts' => JsScriptApiController::class,
+                    ]);
+                foreach (config('dicms.plugins') as $plugin)
+                {
+                    $plugin::apiRoutes();
+                }
+            });
     }
 
     public static function publicRoutes(): void
