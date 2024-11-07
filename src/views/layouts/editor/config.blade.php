@@ -25,6 +25,8 @@
             view: {
                 onRender({ el }) {
                     el.style.pointerEvents = 'none';
+                    el.style.height = '100%;';
+
                 }
             }
         });
