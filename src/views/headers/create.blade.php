@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin.index", ['template' => $template])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true])
 
 @section('index_content')
         <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.store') }}">

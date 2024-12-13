@@ -59,14 +59,14 @@
 @endif
 
 @if($page->Header())
-    {!! $page->Header()->html !!}
+    {!! $page->Header()->projectHtml($page) !!}
 @endif
 
 
 {!! $page->projectHtml() !!}
 
 @if($page->Footer())
-    {!! $page->Footer()->html !!}
+    {!! $page->Footer()->projectHtml($page) !!}
 @endif
 @if($site->tag)
 </{{ $site->tag }}>

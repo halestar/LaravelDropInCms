@@ -15,6 +15,7 @@ use halestar\LaravelDropInCms\Controllers\JsScriptController;
 use halestar\LaravelDropInCms\Controllers\PageController;
 use halestar\LaravelDropInCms\Controllers\PreviewController;
 use halestar\LaravelDropInCms\Controllers\SiteController;
+use halestar\LaravelDropInCms\Controllers\WidgetController;
 use halestar\LaravelDropInCms\Middleware\CurrentSiteExistsMiddleware;
 use halestar\LaravelDropInCms\Models\CssSheet;
 use halestar\LaravelDropInCms\Models\DataItem;
@@ -22,7 +23,9 @@ use halestar\LaravelDropInCms\Models\Footer;
 use halestar\LaravelDropInCms\Models\Header;
 use halestar\LaravelDropInCms\Models\JsScript;
 use halestar\LaravelDropInCms\Models\Page;
+use halestar\LaravelDropInCms\Models\PageView;
 use halestar\LaravelDropInCms\Models\Site;
+use halestar\LaravelDropInCms\Widgets\PageViewsCounterWidget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Route;
@@ -114,6 +117,16 @@ final class DiCMS
             {
                 $plugin::adminRoutes();
             }
+
+            //widgets
+            Route::controller(WidgetController::class)
+                ->prefix('widgets')
+                ->name('widgets.')
+                ->group(function ()
+                {
+                    Route::get('/', 'index')->name('index');
+                    Route::get('/{widget}', 'config')->name('config');
+                });
         });
     }
 
@@ -224,6 +237,14 @@ final class DiCMS
         return implode(", ", $assets);
     }
 
+    public static function widgets(): array
+    {
+        $widgets = [PageViewsCounterWidget::class];
+        foreach(config('dicms.plugins') as $plugin)
+            $widgets += $plugin::widgets();
+        return $widgets;
+    }
+
     public static function getCoreBackupTables(): array
     {
         return
@@ -236,6 +257,7 @@ final class DiCMS
             Site::class,
             Page::class,
             DataItem::class,
+            PageView::class,
         ];
     }
 }

@@ -82,5 +82,13 @@ interface DiCmsPlugin
      */
     public static function projectHtml(Page $page): string;
 
+    /**
+     * This function returns an array of all the widgets that this plugin
+     * provides. The array must contain objects extending the
+     * DiCmsWidget interface
+     * @see DiCmsWidget
+     */
+    public static function widgets(): array;
+
 
 }

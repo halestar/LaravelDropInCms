@@ -17,7 +17,7 @@
         @endisset
     </h5>
     @yield('index_content')
-    @isset($currentSite)
+    @if(isset($currentSite) && (!isset($excludeAssetManager) || !$excludeAssetManager))
     <button
         class="position-fixed top-50 start-0 border-start-0 rounded-start-0 btn btn-outline-secondary p-3 "
         title="{{ __('dicms::assets.assets') }}"
@@ -41,6 +41,6 @@
             @endisset
         </div>
     </div>
-    @endisset
+    @endif
 </div>
 @endsection

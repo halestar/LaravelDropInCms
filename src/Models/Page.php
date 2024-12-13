@@ -226,11 +226,11 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
         return $dupe;
     }
 
-    public function projectHtml(): string
+    public function projectHtml(Page $page = null): string
     {
         if($this->plugin_page)
             return $this->plugin::projectHtml($this);
-        return parent::projectHtml();
+        return parent::projectHtml($this);
     }
 
     public function projectCss(): string

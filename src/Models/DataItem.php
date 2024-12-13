@@ -2,20 +2,33 @@
 
 namespace halestar\LaravelDropInCms\Models;
 
+use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
 
+#[ScopedBy(OrderByNameScope::class)]
 class DataItem extends Model
 {
     use BackUpable;
 
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "data_items" ]; }
 
-    protected $fillable = ['name','path','url', 'mime'];
+    protected $fillable = ['name','path','url', 'mime', 'thumb','is_folder'];
+
+    protected function casts(): array
+    {
+        return
+            [
+                'is_folder' => 'boolean',
+            ];
+    }
     public function __construct(array $attributes = [])
     {
         $this->table = config('dicms.table_prefix') . "data_items";
@@ -24,10 +37,12 @@ class DataItem extends Model
 
     public function thumb(): string
     {
+        if($this->is_folder)
+            return 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M64 480H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H288c-10.1 0-19.6-4.7-25.6-12.8L243.2 57.6C231.1 41.5 212.1 32 192 32H64C28.7 32 0 60.7 0 96V416c0 35.3 28.7 64 64 64z"/></svg>';
+
         if($this->thumb)
             return $this->thumb;
 
-        Log::debug("mime is " . $this->mime);
         if($this->mime == "image/png")
         {
             $manager = new ImageManager(new Driver());
@@ -45,10 +60,28 @@ class DataItem extends Model
 
     public function delete()
     {
-        Storage::disk(config('dicms.media_upload_disk'))->delete($this->path);
-        $thmb_path = config('dicms.thumb_folder') . "/" . pathinfo($this->path, PATHINFO_FILENAME) . ".png";
-        Storage::disk(config('dicms.media_upload_disk'))->delete($thmb_path);
+        if(!$this->is_folder)
+        {
+            Storage::disk(config('dicms.media_upload_disk'))->delete($this->path);
+            $thmb_path = config('dicms.thumb_folder') . "/" . pathinfo($this->path, PATHINFO_FILENAME) . ".png";
+            Storage::disk(config('dicms.media_upload_disk'))->delete($thmb_path);
+        }
         return parent::delete();
+    }
+
+    public static function root(): Collection
+    {
+        return DataItem::whereNull('parent_id')->get();
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(DataItem::class, 'parent_id');
+    }
+
+    public function itemParent(): BelongsTo
+    {
+        return $this->belongsTo(DataItem::class, 'parent_id');
     }
 
 

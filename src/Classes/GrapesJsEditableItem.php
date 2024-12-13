@@ -3,9 +3,11 @@
 namespace halestar\LaravelDropInCms\Classes;
 
 use halestar\LaravelDropInCms\DiCMS;
+use halestar\LaravelDropInCms\Models\Page;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Blade;
 
 abstract class GrapesJsEditableItem extends Model
 {
@@ -45,9 +47,9 @@ abstract class GrapesJsEditableItem extends Model
         return $this->data?? "";
     }
 
-    public function projectHtml(): string
+    public function projectHtml(Page $page): string
     {
-        return $this->html?? "";
+        return Blade::render($this->html, ['page' => $page]);
     }
 
     public function projectCss(): string

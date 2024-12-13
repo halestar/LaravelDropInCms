@@ -660,6 +660,35 @@
                     }
             });
 
+        //here, we add all the widgets
+        @foreach(\halestar\LaravelDropInCms\DiCMS::widgets() as $widget)
+            Components.addType('{{ $widget::widgetId() }}',
+                {
+                    isComponent: el => (el.tagName === '{{ $widget::widgetId() }}'),
+                    model:
+                        {
+                            defaults:
+                                {
+                                    ...container_default,
+                                    tagName: '{{ $widget::widgetId() }}',
+                                    content: '{!! $widget::widgetControlHtml() !!}',
+                                },
+                            toHTML: function()
+                            {
+                                return '{!! $widget::widgetHtml() !!}';
+                            },
+                        },
+                    view:
+                        {
+                            tagName: '{{ $widget::widgetId() }}',
+                            onRender({el})
+                            {
+                                $(el).css('padding', '1em').css('width', '100%').addClass('article-summary');
+                            }
+                        }
+                });
+        @endforeach
+
 
         //Containers first
         Blocks.add('MainContainer', {
@@ -1021,6 +1050,20 @@
                         type: 'my-th'
                     }
             });
+
+        @foreach(\halestar\LaravelDropInCms\DiCMS::widgets() as $widget)
+            Blocks.add('{{ $widget::widgetName() }}',
+                {
+                    select: true,
+                    category: 'Widgets',
+                    label: '{{ $widget::widgetName() }}',
+                    media: `{!! $widget::widgetIcon() !!}`,
+                    content:
+                        {
+                            type: '{{ $widget::widgetId() }}'
+                        }
+                });
+        @endforeach
 
     };
 </script>

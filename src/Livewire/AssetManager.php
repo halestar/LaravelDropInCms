@@ -4,7 +4,6 @@ namespace halestar\LaravelDropInCms\Livewire;
 
 use halestar\LaravelDropInCms\Models\DataItem;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
@@ -22,6 +21,7 @@ class AssetManager extends Component
     public bool $mini = false;
     public $selectAction;
     public $filterTerms;
+    public ?DataItem $selectedFolder = null;
 
     private array $thumbableMimes =
         [
@@ -35,7 +35,7 @@ class AssetManager extends Component
     public function mount($mini = false, $selectAction = null)
     {
         //load all the assets in the system
-        $assets = DataItem::all();
+        $assets = DataItem::root();
         $files =  Storage::disk(config('dicms.media_upload_disk'))->files();
         if($assets->count() != count($files))
         {
@@ -48,9 +48,11 @@ class AssetManager extends Component
                     DataItem::create(
                         [
                             'name' => basename($file),
+                            'parent_id' => null,
                             'path' => $file,
                             'url' => Storage::disk(config('dicms.media_upload_disk'))->url($file),
                             'mime' => Storage::disk(config('dicms.media_upload_disk'))->mimeType($file),
+                            'is_folder' => false,
                         ]
                     );
                 }
@@ -65,7 +67,10 @@ class AssetManager extends Component
 
     public function refreshAssets()
     {
-        $query = DataItem::orderBy('name');
+        if($this->selectedFolder)
+            $query = DataItem::where('parent_id', $this->selectedFolder->id);
+        else
+            $query = DataItem::whereNull('parent_id');
         if($this->filterTerms)
             $query->where('name', 'like', '%'.$this->filterTerms.'%');
         $this->assets = $query->get();
@@ -90,20 +95,26 @@ class AssetManager extends Component
         $newItem->path = $attributes['path'];
         $newItem->mime = $attributes['mime'];
         $newItem->url = $attributes['url'];
+        $newItem->is_folder = false;
+        $newItem->parent_id = $this->selectedFolder? $this->selectedFolder->id: null;
         $newItem->save();
         return $newItem;
     }
 
     public function addFile()
     {
+        //we need the manager to convert the images.
         $manager = new ImageManager(new Driver());
         if(is_array($this->dataItem))
         {
+            //first, since we're uploading multiple files, we will need to go through each one.
             foreach($this->dataItem as $file)
             {
+                //if it's not an image, we don't really need to do anything.
                 if(!preg_match('/image\/.+/', $file->getMimeType()))
                     continue;
 
+                // if it IS an image and it is not an image that we can manipulate, then just store the file.
                 if(!in_array($file->getMimeType(), $this->thumbableMimes))
                 {
                     //store the file
@@ -111,12 +122,14 @@ class AssetManager extends Component
                 }
                 else
                 {
+                    // else, we will first convert it into a PNG, scale it to our settings and save it.
                     $img = $manager->read($file->get());
                     if ($img)
                         $img->scaleDown(height: config('dicms.img_max_height'));
                     $path = pathinfo($file->hashName(), PATHINFO_FILENAME) . ".png";
                     Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
                 }
+                // with this new item, we create the data item.
                 $this->createDataItem(
                     [
                         'name' => pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME),
@@ -128,8 +141,7 @@ class AssetManager extends Component
         }
         elseif(preg_match('/image\/.+/', $this->dataItem->getMimeType()))
         {
-            Log::debug("mime is " . $this->dataItem->getMimeType());
-            Log::debug("!in array returns " . !in_array($this->dataItem->getMimeType(), $this->thumbableMimes));
+            //if we're doing a single image file and we can't thumb it, then store it.
             if(!in_array($this->dataItem->getMimeType(), $this->thumbableMimes))
             {
                 //store the file
@@ -137,12 +149,14 @@ class AssetManager extends Component
             }
             else
             {
+                //for a single file that IS thubable, convert it into a PNG, scale it and store it.
                 $img = $manager->read($this->dataItem->get());
                 if ($img)
                     $img->scaleDown(height: config('dicms.img_max_height'));
                 $path = pathinfo($this->dataItem->hashName(), PATHINFO_FILENAME) . ".png";
                 Storage::disk(config('dicms.media_upload_disk'))->put($path, $img->toPng());
             }
+            // with this new item, we create the data item.
             $this->createDataItem(
                 [
                     'name' => pathinfo($this->dataItem->getClientOriginalName(), PATHINFO_FILENAME),
@@ -151,7 +165,21 @@ class AssetManager extends Component
                     'url' => Storage::disk(config('dicms.media_upload_disk'))->url($path),
                 ]);
         }
+        //after uploading, we refresh the assets.
         $this->refreshAssets();
+    }
+
+    public function addFolder()
+    {
+        $newItem = new DataItem();
+        $newItem->name = __('dicms::assets.folder.new');
+        $newItem->path = null;
+        $newItem->mime = null;
+        $newItem->url = null;
+        $newItem->is_folder = true;
+        $newItem->parent_id = $this->selectedFolder? $this->selectedFolder->id: null;
+        $newItem->save();
+        return $newItem;
     }
 
     function removeDataItem(DataItem $item)
@@ -160,9 +188,38 @@ class AssetManager extends Component
         $this->refreshAssets();
     }
 
+    function moveDataItem(DataItem $item, DataItem $folder)
+    {
+        $item->parent_id = $folder->id;
+        $item->save();
+        $this->refreshAssets();
+    }
+
+    function moveToRoot(DataItem $item)
+    {
+        $item->parent_id = null;
+        $item->save();
+        $this->refreshAssets();
+    }
+
     function viewItem(DataItem $item)
     {
         $this->viewingItem = $item;
+    }
+
+    function viewFolder(DataItem $folder)
+    {
+        if($folder->is_folder)
+        {
+            $this->selectedFolder = $folder;
+            $this->refreshAssets();
+        }
+    }
+
+    public function viewRoot()
+    {
+        $this->selectedFolder = null;
+        $this->refreshAssets();
     }
 
     function closeView()

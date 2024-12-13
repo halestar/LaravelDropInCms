@@ -74,4 +74,9 @@ class SitePolicy
     {
         return true;
     }
+
+    public function widgets($user = null): bool
+    {
+        return true;
+    }
 }

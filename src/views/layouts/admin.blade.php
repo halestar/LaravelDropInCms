@@ -27,10 +27,6 @@
     @stack('head_scripts')
 
 
-    @isset($include_text_editor)
-        @include('dicms::layouts.text-editor.config',['eConfig' => $include_text_editor])
-    @endisset
-
     <script>
         function confirmDelete(msg, url)
         {
@@ -136,6 +132,21 @@
                             </a>
                         </li>
                     @endisset
+                    @can('widgets', \halestar\LaravelDropInCms\Models\Site::class)
+                        <li class="nav-item">
+                            <a
+                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.widgets.index') }}"
+                                @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('widgets'))
+                                    class="nav-link active"
+                                aria-current="page"
+                                @else
+                                    class="nav-link"
+                                @endif
+                            >
+                                {{ trans_choice('dicms::admin.widget', 2) }}
+                            </a>
+                        </li>
+                    @endcan
                     @can('backup', \halestar\LaravelDropInCms\Models\Site::class)
                             <li class="nav-item">
                                 <a
@@ -224,10 +235,6 @@
     </div>
     @endisset
 </div>
-
-@isset($include_text_editor)
-    @include('dicms::layouts.text-editor.instance',['eConfig' => $include_text_editor])
-@endisset
 
 @stack('scripts')
 </body>

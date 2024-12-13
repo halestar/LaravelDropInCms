@@ -50,4 +50,11 @@ return
     'commands.file.write.error' => "Unable to create file",
     'commands.file.read.error' => "Unable to read file",
     'commands.data.read.error' => "There is no data to read",
+
+    'widget' => 'Widget|Widgets',
+
+    'widget.page_view_counter' => 'Page View Counter',
+    'widget.page_view_counter.desc' => 'This is a counter that can be placed in any page and it will keep track of everyone viewing the page, by ip address.',
+    'widget.page_view_counter.views' => 'Page Views',
+
 ];

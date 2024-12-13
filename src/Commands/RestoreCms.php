@@ -4,7 +4,6 @@ namespace halestar\LaravelDropInCms\Commands;
 
 use halestar\LaravelDropInCms\Models\SystemBackup;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\File\Exception\CannotWriteFileException;
 
 class RestoreCms extends Command
@@ -16,7 +15,7 @@ class RestoreCms extends Command
      *
      * @var string
      */
-    protected $signature = 'dicms:restore-cms {data?} {--file= : Load data from this file.} {--string: uses the input as a string, same as blank.} {--tables=: a comma-separated list of tables to import.}';
+    protected $signature = 'dicms:restore-cms {data?} {--file= : Load data from this file.} {--string: uses the input as a string, same as blank.} {--tables= : a comma-separated list of tables to import.}';
 
     /**
      * The console command description.
@@ -57,14 +56,9 @@ class RestoreCms extends Command
         if($this->data)
         {
             $tables = $this->option('tables');
+            $this->info("tables is " . print_r($tables, true));
             if($tables)
-            {
-                Log::debug($tables);
                 $tables = explode(',', $tables);
-                Log::debug(print_r($tables, true));
-            }
-
-            Log::debug(print_r($tables, true));
             SystemBackup::restore($this->data, $tables);
         }
     }

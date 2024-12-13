@@ -8,6 +8,8 @@ return
     'search' => 'Filter Assets',
     'search.no' => 'No Assets Found',
     'delete.confirm' => 'Are you sure you want to delete this asset?',
+    'folder' => 'Folder',
+    'folder.new' => 'New Folder',
 
     'containers' => 'Containers',
     'containers.icontainer' => "I-Container",

@@ -20,7 +20,6 @@ return
         \halestar\LaravelDropInCms\Models\JsScript::class => env('DICMS_JS_SCRIPT_POLICY', \halestar\LaravelDropInCms\Policies\JsScriptPolicy::class),
         \halestar\LaravelDropInCms\Models\Page::class => env('DICMS_PAGE_POLICY', \halestar\LaravelDropInCms\Policies\PagePolicy::class),
         \halestar\LaravelDropInCms\Models\DataItem::class => env('DICMS_DATA_ITEMS_POLICY', \halestar\LaravelDropInCms\Policies\DataItemPolicy::class),
-
     ],
 
     'plugins' => []

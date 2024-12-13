@@ -7,8 +7,9 @@ use halestar\LaravelDropInCms\Commands\RestoreCms;
 use halestar\LaravelDropInCms\Livewire\AssetManager;
 use halestar\LaravelDropInCms\Livewire\CssSheetManager;
 use halestar\LaravelDropInCms\Livewire\JsScriptManager;
+use halestar\LaravelDropInCms\Livewire\PageViewsCounterConfig;
 use halestar\LaravelDropInCms\View\Components\ErrorDisplay;
-use halestar\LaravelDropInCms\View\Components\TagSelector;
+use halestar\LaravelDropInCms\View\Components\PageViewsCounter;
 use halestar\LaravelDropInCms\View\Components\WebEditor;
 use halestar\LaravelDropInCms\View\Composers\CurrentSiteViewComposer;
 use Illuminate\Support\Facades\Blade;
@@ -44,6 +45,7 @@ class CmsServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(__DIR__ . '/../lang', 'dicms');
         Blade::component('error-display', ErrorDisplay::class);
         Blade::component('web-editor', WebEditor::class);
+        Blade::component('page-views-counter', PageViewsCounter::class);
 
         if ($this->app->runningInConsole()) {
             $this->commands([
@@ -54,6 +56,7 @@ class CmsServiceProvider extends ServiceProvider
         Livewire::component('css-sheet-manager', CssSheetManager::class);
         Livewire::component('js-script-manager', JsScriptManager::class);
         Livewire::component('asset-manager', AssetManager::class);
+        Livewire::component('page-views-counter-config', PageViewsCounterConfig::class);
 
         View::composer('dicms::*', CurrentSiteViewComposer::class);
     }
