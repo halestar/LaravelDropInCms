@@ -63,4 +63,6 @@ return
         'success.created' => 'Page created successfully.',
         'success.updated' => 'Page updated successfully.',
         'success.deleted' => 'Page deleted successfully.',
+
+        'metadata' => 'Page Meta Data',
     ];

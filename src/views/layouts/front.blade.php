@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
+    @foreach($page->getMetadata() as $meta)
+        {!! $meta->toHTML() !!}
+    @endforeach
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
     <title>{{ $page->Title() }}</title>
     @if($site->favicon)
@@ -64,7 +67,6 @@
 
 
 {!! $page->projectHtml() !!}
-
 @if($page->Footer())
     {!! $page->Footer()->projectHtml($page) !!}
 @endif

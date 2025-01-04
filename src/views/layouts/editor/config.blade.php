@@ -671,7 +671,9 @@
                                 {
                                     ...container_default,
                                     tagName: '{{ $widget::widgetId() }}',
-                                    content: '{!! $widget::widgetControlHtml() !!}',
+                                    content: `
+{!! str_replace(['\n', '\r'], '', $widget::widgetControlHtml()) !!}
+`,
                                 },
                             toHTML: function()
                             {

@@ -2,11 +2,13 @@
 
 namespace halestar\LaravelDropInCms\Providers;
 
+use halestar\LaravelDropInCms\Classes\MetadataEntrySynth;
 use halestar\LaravelDropInCms\Commands\BackupCms;
 use halestar\LaravelDropInCms\Commands\RestoreCms;
 use halestar\LaravelDropInCms\Livewire\AssetManager;
 use halestar\LaravelDropInCms\Livewire\CssSheetManager;
 use halestar\LaravelDropInCms\Livewire\JsScriptManager;
+use halestar\LaravelDropInCms\Livewire\MetadataEditor;
 use halestar\LaravelDropInCms\Livewire\PageViewsCounterConfig;
 use halestar\LaravelDropInCms\View\Components\ErrorDisplay;
 use halestar\LaravelDropInCms\View\Components\PageViewsCounter;
@@ -57,6 +59,8 @@ class CmsServiceProvider extends ServiceProvider
         Livewire::component('js-script-manager', JsScriptManager::class);
         Livewire::component('asset-manager', AssetManager::class);
         Livewire::component('page-views-counter-config', PageViewsCounterConfig::class);
+        Livewire::component('metadata-editor', MetadataEditor::class);
+        Livewire::propertySynthesizer(MetadataEntrySynth::class);
 
         View::composer('dicms::*', CurrentSiteViewComposer::class);
     }

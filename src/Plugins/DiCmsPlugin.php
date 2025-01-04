@@ -78,9 +78,15 @@ interface DiCmsPlugin
     public static function projectCss(Page $page): string;
 
     /**
-     *  Similar to projectHtml function, except this one is for the HTMl to be rendered.
+     *  Similar to projectCss function, except this one is for the HTMl to be rendered.
      */
     public static function projectHtml(Page $page): string;
+
+    /**
+     * Similar to projectCss only this will get custom metadata from the plugin,
+     * based on a passed page.
+     */
+    public static function projectMetadata(Page $page): array;
 
     /**
      * This function returns an array of all the widgets that this plugin

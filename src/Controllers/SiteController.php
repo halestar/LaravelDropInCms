@@ -110,6 +110,13 @@ class SiteController
                     'classes' => 'text-primary',
                     'title' => __('dicms::sites.edit_site'),
                 ];
+            $template['buttons']['metadata']  =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.sites.metadata', ['site' => $site->id]),
+                    'text' => "<i class='fa-solid fa-info'></i>",
+                    'classes' => 'text-primary',
+                    'title' => __('dicms::sites.site.metadata'),
+                ];
         }
         return view('dicms::sites.show', compact('site', 'template'));
     }
@@ -252,5 +259,26 @@ class SiteController
             return response()->json(['success' => "Content Updated"]);
         }
         return response()->json(['error' => 'No object found'], 200);
+    }
+
+    public function editMetadata(Site $site)
+    {
+        Gate::authorize('update', $site);
+        $template =
+            [
+                'title' => __('dicms::sites.site.metadata'),
+                'buttons' =>
+                    [
+                        'back'  =>
+                        [
+                            'link' => DiCMS::dicmsRoute('admin.sites.show', ['site' => $site->id]),
+                            'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                            'classes' => 'text-secondary',
+                            'title' => __('dicms::admin.back'),
+                        ]
+                    ]
+            ];
+        $obj = $site;
+        return view('dicms::sites.metadata', compact('obj', 'template'));
     }
 }

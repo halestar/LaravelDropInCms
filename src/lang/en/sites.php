@@ -8,6 +8,7 @@ return
     "new_site" => "Create New Site",
     "edit_site" => "Edit Site",
     "site_name" => "Site Name",
+    "site.metadata" => "Site Metadata",
     "site_description" => "Site Description",
     "site_name_help" => "This is the name for the site. Required.",
     "site_name_description" => "An optional description for the site.",
@@ -69,4 +70,13 @@ return
     'header_location' => 'Place Header',
     'header_location.above' => 'Above Menu',
     'header_location.below' => 'Below Menu',
+
+    'metadata.add' => 'Add Entry',
+    'metadata.import' => 'Import Metadata from Site',
+    'metadata.import.confirm' => 'Are you sure you wish to import the site metadata? It will overwrite any existing metadata.',
+    'metadata.import.twitter' => 'Import Twitter Metadata',
+    'metadata.import.og' => 'Import Open Graph Metadata',
+    'metadata.clear' => 'Clear All Metadata Entries',
+    'metadata.clear.confirm' => 'Are you sure you wish to clear all metadata entries?',
+    'metadata.remove.confirm' => 'Are you sure you wish to remove this entry?',
 ];

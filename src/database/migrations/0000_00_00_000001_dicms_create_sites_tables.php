@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('favicon')->nullable();
             $table->enum('tag', WrapperTagType::values())->nullable()->default(null);
             $table->text('options')->nullable();
+            $table->json('metadata')->nullable();
             $table->timestamps();
         });
     }

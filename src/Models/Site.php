@@ -6,9 +6,11 @@ use halestar\LaravelDropInCms\DiCMS;
 use halestar\LaravelDropInCms\Enums\WrapperTagType;
 use halestar\LaravelDropInCms\Interfaces\ContainsCssSheets;
 use halestar\LaravelDropInCms\Interfaces\ContainsJsScripts;
+use halestar\LaravelDropInCms\Interfaces\ContainsMetadata;
 use halestar\LaravelDropInCms\Models\Scopes\AvailableOnlyScope;
 use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use halestar\LaravelDropInCms\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -16,9 +18,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 
 #[ScopedBy([AvailableOnlyScope::class, OrderByNameScope::class])]
-class Site extends Model implements ContainsCssSheets, ContainsJsScripts
+class Site extends Model implements ContainsCssSheets, ContainsJsScripts, ContainsMetadata
 {
-    use BackUpable;
+    use BackUpable, HasMetadata;
 
     public const CURRENT_SITE_KEY = "sites.current_site_id";
 
@@ -39,6 +41,7 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
                 'archived' => 'boolean',
                 'headers_count' => 'boolean',
                 'tag' => WrapperTagType::class,
+                'metadata' => 'array',
             ];
     }
 
@@ -198,6 +201,7 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
         $dupeSite->options = $this->options;
         $dupeSite->header_id = $this->header_id;
         $dupeSite->footer_id = $this->footer_id;
+        $dupeSite->metadata = $this->metadata;
         $dupeSite->save();
 
         foreach($this->siteCss as $css)
@@ -206,5 +210,16 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts
             $dupeSite->siteJs()->attach($js->id, ['order_by' => $css->pivot->order_by]);
         //now we return the new object.
         return $dupeSite;
+    }
+
+    public function getMetadata(): array
+    {
+        return $this->metadata;
+    }
+
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+        $this->save();
     }
 }

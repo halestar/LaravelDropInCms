@@ -18,6 +18,34 @@ Along with the milestone release, the following was also done:
 * The first widget, a page counter that will count visitors to the page
 * The asset manager now supports a folder-like structure
 
+## 0.6.1
+
+A significant update, but not enough to bump it up to next revision. 
+The really meaty stuff will be in blogger.  For this update the following 
+enhancements were done:
+
+* New Feature: Metadata!
+  * This was not in the original requirements, but it ws needed for blogger 
+and it made more sense to add it here
+  * Site now has default metadata
+  * Each individual page can have metadata assigned to it
+  * Made shortcuts to assign Twitter/OG metadata.
+* Moved to a font awesome kit for more icons.
+* Removed the text editor component from here. DiCMS doesn't use it anyways.
+
+## 0.6.0
+A lot of work has gone into this update, which includes so much that it is enough
+to complete my first milestone! The following new features are all included:
+
+* Introduce and complete widgets
+* Finish all plugin interfaces so that the structure doesn't change anymore.
+* All Editor improvements are done.
+* REST API's need to be started by now, so that they can be included in the plugin interface
+
+Along with the milestone release, the following was also done:
+
+* The first widget, a page counter that will count visitors to the page
+* The asset manager now supports a folder-like structure
 
 ## 0.5.0
 

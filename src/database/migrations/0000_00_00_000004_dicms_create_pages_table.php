@@ -38,6 +38,7 @@ return new class extends Migration
             $table->longText('css')->nullable();
             $table->json('data')->nullable();
             $table->boolean('published')->default(false);
+            $table->json('metadata')->nullable();
             $table->unique(['slug', 'path']);
             $table->unique('url');
             $table->timestamps();

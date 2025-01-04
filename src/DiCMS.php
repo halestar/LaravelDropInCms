@@ -74,6 +74,7 @@ final class DiCMS
             Route::get('/sites/{site}/disable', [SiteController::class, 'disableSite'])->name('sites.disable');
             Route::get('/sites/{site}/archive', [SiteController::class, 'archiveSite'])->name('sites.archive');
             Route::get('/sites/{site}/restore', [SiteController::class, 'restoreSite'])->name('sites.restore');
+            Route::get('/sites/{site}/metadata', [SiteController::class, 'editMetadata'])->name('sites.metadata');
 
             //duplicate functions
             Route::get('/sites/{site}/duplicate', [SiteController::class, 'duplicateSite'])->name('sites.duplicate');
@@ -87,6 +88,7 @@ final class DiCMS
             Route::get('/pages/{page}/publish', [PageController::class, 'publishPage'])->name('pages.publish');
             Route::get('/pages/{page}/unpublish', [PageController::class, 'unpublishPage'])->name('pages.unpublish');
             Route::get('/pages/{page}/duplicate', [PageController::class, 'duplicatePage'])->name('pages.dupe');
+            Route::get('/pages/{page}/metadata', [PageController::class, 'editMetadata'])->name('pages.metadata');
 
             //Resource controllers
             Route::resource('sites', SiteController::class);
@@ -241,7 +243,7 @@ final class DiCMS
     {
         $widgets = [PageViewsCounterWidget::class];
         foreach(config('dicms.plugins') as $plugin)
-            $widgets += $plugin::widgets();
+            $widgets = array_merge($widgets, $plugin::widgets());
         return $widgets;
     }
 

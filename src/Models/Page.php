@@ -6,8 +6,10 @@ use halestar\LaravelDropInCms\Classes\GrapesJsEditableItem;
 use halestar\LaravelDropInCms\DiCMS;
 use halestar\LaravelDropInCms\Interfaces\ContainsCssSheets;
 use halestar\LaravelDropInCms\Interfaces\ContainsJsScripts;
+use halestar\LaravelDropInCms\Interfaces\ContainsMetadata;
 use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use halestar\LaravelDropInCms\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,9 +17,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Collection;
 
 #[ScopedBy([OrderByNameScope::class])]
-class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJsScripts
+class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJsScripts, ContainsMetadata
 {
-    use BackUpable;
+    use BackUpable, HasMetadata;
 
     protected static function getTablesToBackup(): array
     {
@@ -43,6 +45,7 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
                 'override_js' => 'boolean',
                 'override_header' => 'boolean',
                 'override_footer' => 'boolean',
+                'metadata' => 'array',
             ];
     }
 
@@ -216,6 +219,7 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
         $dupe->css = $this->css;
         $dupe->data = $this->data;
         $dupe->published = false;
+        $dupe->metadata = $this->metadata;
         $dupe->save();
         foreach($this->pageCss as $pageCss)
             $dupe->pageCss()->attach($pageCss->id, ['order_by' => $pageCss->pivot->order_by]);
@@ -239,6 +243,18 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
             return $this->plugin::projectCss($this);
         return parent::projectCss();
     }
+    public function getMetadata(): array
+    {
+        if($this->plugin_page)
+            return $this->plugin::projectMetadata($this);
+        if(count($this->metadata) == 0)
+            return Site::defaultSite()->getMetadata();
+        return $this->metadata;
+    }
 
-
+    public function setMetadata(array $metadata)
+    {
+        $this->metadata = $metadata;
+        $this->save();
+    }
 }

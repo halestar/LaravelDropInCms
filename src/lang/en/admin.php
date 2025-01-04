@@ -14,6 +14,7 @@ return
     'edit' => 'Edit',
     'back' => 'Back',
     'name' => 'Name',
+    'content' => 'Content',
     'archived' => 'archived',
     'active' => 'active',
     'inactive' => 'inactive',

@@ -113,7 +113,14 @@ class PageController
                     'link' => DiCMS::dicmsRoute('admin.pages.edit', ['page' => $page->id]),
                     'text' => "<i class='fa-solid fa-gear'></i>",
                     'classes' => 'text-primary',
-                    'title' => __('dicms::sites.edit_site'),
+                    'title' => __('dicms::pages.edit'),
+                ];
+            $template['buttons']['metadata']  =
+                [
+                    'link' => DiCMS::dicmsRoute('admin.pages.metadata', ['page' => $page->id]),
+                    'text' => "<i class='fa-solid fa-info'></i>",
+                    'classes' => 'text-primary',
+                    'title' => __('dicms::pages.metadata'),
                 ];
         }
         $template['buttons']['manage'] =
@@ -218,5 +225,26 @@ class PageController
         Gate::authorize('delete', $page);
         $page->delete();
         return redirect(DiCMS::dicmsRoute('admin.pages.index'));
+    }
+
+    public function editMetadata(Page $page)
+    {
+        Gate::authorize('update', $page);
+        $template =
+            [
+                'title' => __('dicms::pages.metadata'),
+                'buttons' =>
+                    [
+                        'back'  =>
+                            [
+                                'link' => DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]),
+                                'text' => '<i class="fa-solid fa-rotate-left"></i>',
+                                'classes' => 'text-secondary',
+                                'title' => __('dicms::admin.back'),
+                            ]
+                    ]
+            ];
+        $obj = $page;
+        return view('dicms::sites.metadata', compact('obj', 'template'));
     }
 }
