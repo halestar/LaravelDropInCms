@@ -69,6 +69,7 @@ class FooterController
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'footers',
                 'description' => 'nullable',
+                'html' => 'nullable',
             ], $this->errors());
         $footer = new Footer();
         $footer->fill($data);

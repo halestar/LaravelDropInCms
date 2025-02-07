@@ -13,7 +13,7 @@
             <div class="col-10 m-0">
                 <div id="grapes-js-editor">
                     <div style="padding: 15px; z-index: 9999;" data-gjs-type="editable">
-                        {{ $editableObj->html }}
+                        {!! $editableObj->html !!}
                     </div>
                 </div>
             </div>
@@ -25,8 +25,6 @@
             <button type="button" id="gjs-update-button" class="btn btn-primary col m-2" onclick="update();">{{ __('dicms::admin.update') }}</button>
         </div>
     </div>
-
-
 </div>
 @push('head_scripts')
     <!-- Including GrapeJs Base Config -->

@@ -28,6 +28,18 @@
                 <div id="descriptionHelp" class="form-text">{{ __('dicms::headers.description.help') }}</div>
             </div>
 
+            <div class="mb-3">
+                <label for="description" class="form-label">{{ __('dicms::headers.html') }}</label>
+                <textarea
+                    type="text"
+                    name="html"
+                    id="html"
+                    aria-describedby="htmlHelp"
+                    class="form-control"
+                >{{ old('html') }}</textarea>
+                <div id="htmlHelp" class="form-text">{{ __('dicms::headers.html.help') }}</div>
+            </div>
+
             <div class="row">
                 <button type="submit" class="btn btn-primary col mt-2">{{ __('dicms::admin.create') }}</button>
             </div>

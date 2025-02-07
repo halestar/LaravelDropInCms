@@ -64,5 +64,8 @@ return
         'success.updated' => 'Page updated successfully.',
         'success.deleted' => 'Page deleted successfully.',
 
+        'html' => 'Starting HTML',
+        'html.help' => 'Starting HTML for the page. You can paste in some raw HTML here that will be included as the base for the page when you edit it.',
+
         'metadata' => 'Page Meta Data',
     ];

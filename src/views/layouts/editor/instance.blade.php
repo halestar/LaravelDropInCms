@@ -24,6 +24,10 @@
                         @endforeach
                     @endforeach
                 ],
+            styleManager:
+                {
+                    clearProperties: true,
+                },
             pluginsOpts:
                 {},
             canvas:
@@ -70,6 +74,21 @@
     {
         $('#grapesjs-assets-modal').trigger('asset-selected', [url]);
     }
+    editor.on('component:selected', (selectedComponent) =>
+    {
+        const commandToAdd = 'clear-style';
+        const commandIcon = 'fa-solid fa-broom';
+
+        // get the selected componnet and its default toolbar
+        const defaultToolbar = selectedComponent.get('toolbar');
+
+        const commandExists = defaultToolbar.some(item => item.command === commandToAdd);
+        if (!commandExists) {
+            selectedComponent.set({
+                toolbar: [ ...defaultToolbar, {  attributes: {class: commandIcon}, command: commandToAdd }]
+            });
+        }
+    });
 </script>
 <div class="modal" tabindex="-1" id="grapesjs-assets-modal">
     <div class="modal-dialog modal-xl">

@@ -73,6 +73,7 @@ class PageController
                 'title' => 'nullable',
                 'slug' => 'required|max:255',
                 'path' => 'nullable',
+                'html' => 'nullable',
             ], $this->errors());
         $data['url'] = (isset($data['path'])? $data['path'] . "/": '' ) . $data['slug'];
         Validator::make(['url' => $data['url']],

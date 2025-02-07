@@ -2,21 +2,9 @@
 
 All notable changes to `LaravelDropInCMS` will be documented in this file
 
-## 0.6.0
+## 0.6.2
 
-My first milestone!
-A lot of work has gone into this update, which includes so much that it is enough
-to complete my first milestone!  The following new features are all included:
-
-* Introduce and complete widgets
-* Finish all plugin interfaces so that the structure doesn't change anymore.
-* All Editor improvements are done.
-* REST API's need to be started by now, so that they can be included in the plugin interface
-
-Along with the milestone release, the following was also done:
-
-* The first widget, a page counter that will count visitors to the page
-* The asset manager now supports a folder-like structure
+A small feature update that adds an initial HTML entry into Headers, Footers and Pages.
 
 ## 0.6.1
 

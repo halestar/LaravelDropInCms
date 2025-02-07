@@ -66,6 +66,7 @@ class HeaderController
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'headers',
                 'description' => 'nullable',
+                'html' => 'nullable',
             ], $this->errors());
         $header = new Header();
         $header->fill($data);

@@ -5,7 +5,7 @@
 
 <script>
     const plhPlugin = editor => {
-        const { Components, Blocks, Panels } = editor;
+        const { Components, Blocks, Panels, Commands } = editor;
 
         // Update the main wrapper
         Components.addType('wrapper', {
@@ -1066,6 +1066,16 @@
                         }
                 });
         @endforeach
+
+        Commands.add('clear-style', (editor) =>
+        {
+            let component = editor.getSelected();
+            if (component)
+            {
+                component.removeClass(component.getClasses());
+                component.setStyle({});
+            }
+        });
 
     };
 </script>

@@ -13,6 +13,8 @@ return
     "name.help" => "The name of the page header. Required",
     "description" => "Page Header Description",
     "description.help" => "Optional description of what this page header does.",
+    'html' => 'Starting HTML',
+    'html.help' => 'Starting HTML for the header. You can paste in some raw HTML here that will be included as the base for the header when you edit it.',
     "content" => "Page Header Content",
     "content.help" => "This content will be included on whatever site or page this it is attached to, right at the top",
     "back" => "Back to Sites",

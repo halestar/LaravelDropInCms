@@ -26,5 +26,8 @@ return
     'success.created' => 'Page Footer created successfully.',
     'success.updated' => 'Page Footer updated successfully.',
     'success.deleted' => 'Page Footer deleted successfully.',
+    'html' => 'Starting HTML',
+    'html.help' => 'Starting HTML for the footer. You can paste in some raw HTML here that will be included as the base for the footer when you edit it.',
+
 
 ];
