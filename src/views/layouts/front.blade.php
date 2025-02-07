@@ -14,12 +14,12 @@
 
     @if(!$page->override_css)
         @foreach($site->siteCss()->links()->get() as $css)
-            <link href="{{ $css->href }}" {{ $css->link_type }} />
+            <link href="{{ $css->href }}" {!! $css->link_type !!} />
         @endforeach
     @endif
 
     @foreach($page->pageCss()->links()->get() as $css)
-        <link href="{{ $css->href }}" {{ $css->link_type }} />
+        <link href="{{ $css->href }}" {!! $css->link_type !!} />
     @endforeach
     <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($page) }}">
 

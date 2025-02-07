@@ -248,7 +248,7 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
         if($this->plugin_page)
             return $this->plugin::projectMetadata($this);
         if(count($this->metadata) == 0)
-            return Site::defaultSite()->getMetadata();
+            return Site::currentSite()->getMetadata();
         return $this->metadata;
     }
 
