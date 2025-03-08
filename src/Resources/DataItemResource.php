@@ -22,7 +22,7 @@ class DataItemResource extends JsonResource
                 'path' => $this->path,
                 'url' => $this->url,
                 'mime' => $this->mime,
-                'thumb' => $this->thumb,
+                'thumb' => $this->thumb(),
                 'is_folder' => $this->is_folder,
                 'created_at' => $this->created_at->format('Y-m-d H:i:s'),
                 'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),

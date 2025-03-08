@@ -98,7 +98,7 @@ class DataItem extends Model implements Arrayable
             'path' => $this->path,
             'url' => $this->url,
             'mime' => $this->mime,
-            'thumb' => $this->thumb,
+            'thumb' => $this->thumb(),
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
             'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
