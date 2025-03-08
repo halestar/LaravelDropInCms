@@ -20,6 +20,8 @@ class JsScript extends Model
         return
             [
                 'type' => HeadElementType::class,
+                'created_at' => 'datetime:Y-m-d H:i:s',
+                'updated_at' => 'datetime:Y-m-d H:i:s',
             ];
     }
     protected $fillable = ['name','description','script', 'href', 'link_type','type'];
@@ -50,5 +52,21 @@ class JsScript extends Model
         $dupeScript->link_type = $this->link_type;
         $dupeScript->save();
         return $dupeScript;
+    }
+
+    public function toArray(): array
+    {
+        return
+            [
+                'id' => $this->id,
+                'type' => $this->type->value,
+                'name' => $this->name,
+                'description' => $this->description,
+                'script' => $this->script,
+                'href' => $this->href,
+                'link_type' => $this->link_type,
+                'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+                'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+            ];
     }
 }

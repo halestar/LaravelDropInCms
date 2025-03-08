@@ -31,9 +31,9 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
             ];
     }
 
-    protected $fillable = ['name','slug','title', 'path', 'html', 'url', 'css', 'data','override_css',
-        'override_js','override_header', 'override_footer', 'header_id',
-        'footer_id'];
+    protected $fillable = ['name','slug','title', 'path', 'html', 'css', 'data','override_css',
+        'override_js','override_header', 'override_footer', 'header_id', 'published','metadata',
+        'footer_id', 'url'];
 
     protected function casts(): array
     {
@@ -46,6 +46,8 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
                 'override_header' => 'boolean',
                 'override_footer' => 'boolean',
                 'metadata' => 'array',
+                'created_at' => 'datetime:Y-m-d H:i:s',
+                'updated_at' => 'datetime:Y-m-d H:i:s',
             ];
     }
 
@@ -97,7 +99,6 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
     {
         return $this->title?? ($this->currentSite->title?? "");
     }
-
 
     public function Header(): ?Header
     {

@@ -2,9 +2,13 @@
 
 namespace halestar\LaravelDropInCms;
 use halestar\LaravelDropInCms\Controllers\API\CssSheetApiController;
+use halestar\LaravelDropInCms\Controllers\API\DataItemApiController;
 use halestar\LaravelDropInCms\Controllers\API\FooterApiController;
 use halestar\LaravelDropInCms\Controllers\API\HeaderApiController;
 use halestar\LaravelDropInCms\Controllers\API\JsScriptApiController;
+use halestar\LaravelDropInCms\Controllers\API\PageApiController;
+use halestar\LaravelDropInCms\Controllers\API\SettingApiController;
+use halestar\LaravelDropInCms\Controllers\API\SiteApiController;
 use halestar\LaravelDropInCms\Controllers\BackupController;
 use halestar\LaravelDropInCms\Controllers\CssSheetController;
 use halestar\LaravelDropInCms\Controllers\DataItemController;
@@ -143,7 +147,21 @@ final class DiCMS
                         'footers' => FooterApiController::class,
                         'sheets' => CssSheetApiController::class,
                         'scripts' => JsScriptApiController::class,
+                        'pages' => PageApiController::class,
+                        'data-items' => DataItemApiController::class,
+                        'sites' => SiteApiController::class,
                     ]);
+                Route::get('/settings', [SettingApiController::class, 'get']);
+                Route::post('/settings', [SettingApiController::class, 'set']);
+                //page linking
+                Route::post('/pages/{page}/link/css', [PageApiController::class, 'linkCss'])->name('pages.link.css');
+                Route::post('/pages/{page}/link/js', [PageApiController::class, 'linkJs'])->name('pages.link.js');
+                //site linking
+                Route::post('/sites/{site}/link/css', [SiteApiController::class, 'linkCss'])->name('sites.link.css');
+                Route::post('/sites/{site}/link/js', [SiteApiController::class, 'linkJs'])->name('sites.link.js');
+                //settings
+                Route::get('/settings', [SettingApiController::class, 'get'])->name('settings.get');
+                Route::post('/settings', [SettingApiController::class, 'set'])->name('settings.set');
                 foreach (config('dicms.plugins') as $plugin)
                 {
                     $plugin::apiRoutes();

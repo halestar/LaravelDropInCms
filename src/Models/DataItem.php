@@ -4,6 +4,7 @@ namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\Models\Scopes\OrderByNameScope;
 use halestar\LaravelDropInCms\Traits\BackUpable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,19 +15,21 @@ use Intervention\Image\Drivers\Imagick\Driver;
 use Intervention\Image\ImageManager;
 
 #[ScopedBy(OrderByNameScope::class)]
-class DataItem extends Model
+class DataItem extends Model implements Arrayable
 {
     use BackUpable;
 
     protected static function getTablesToBackup(): array { return [ config('dicms.table_prefix') . "data_items" ]; }
 
-    protected $fillable = ['name','path','url', 'mime', 'thumb','is_folder'];
+    protected $fillable = ['parent_id', 'name','path','url', 'mime', 'thumb','is_folder'];
 
     protected function casts(): array
     {
         return
             [
                 'is_folder' => 'boolean',
+                'created_at' => 'datetime:Y-m-d H:i:s',
+                'updated_at' => 'datetime:Y-m-d H:i:s',
             ];
     }
     public function __construct(array $attributes = [])
@@ -84,5 +87,21 @@ class DataItem extends Model
         return $this->belongsTo(DataItem::class, 'parent_id');
     }
 
+    public function toArray()
+    {
+        return
+        [
+            'id' => $this->id,
+            'name' => $this->name,
+            'is_folder' => $this->is_folder,
+            'parent_id' => $this->parent_id,
+            'path' => $this->path,
+            'url' => $this->url,
+            'mime' => $this->mime,
+            'thumb' => $this->thumb,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
+        ];
+    }
 
 }

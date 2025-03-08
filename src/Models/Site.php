@@ -42,12 +42,14 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
                 'headers_count' => 'boolean',
                 'tag' => WrapperTagType::class,
                 'metadata' => 'array',
+                'created_at' => 'datetime:Y-m-d H:i:s',
+                'updated_at' => 'datetime:Y-m-d H:i:s',
             ];
     }
 
 
-    protected $fillable = ['name', 'title', 'description', 'body_attr', 'favicon',
-        'tag','options'];
+    protected $fillable = ['name', 'title', 'description', 'body_attr', 'favicon', 'active', 'archived', 'homepage_url',
+        'tag','options', 'header_id', 'footer_id', 'metadata'];
 
     public function __construct(array $attributes = [])
     {

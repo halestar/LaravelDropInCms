@@ -31,8 +31,9 @@ class SiteResource extends JsonResource
             'options' => $this->options,
             'siteCss' => CssSheetResource::collection($this->siteCss),
             'siteJs' => JsScriptResource::collection($this->siteJs),
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'metadata' => $this->metadata,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

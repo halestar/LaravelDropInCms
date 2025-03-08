@@ -17,14 +17,14 @@ class JsScriptResource extends JsonResource
         return
         [
             'id' => $this->id,
-            'type' => $this->type->value,
+            'type' => $this->type,
             'name' => $this->name,
             'description' => $this->description,
             'script' => $this->script,
             'href' => $this->href,
             'link_type' => $this->link_type,
-            'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at->format('Y-m-d H:i:s'),
         ];
     }
 }

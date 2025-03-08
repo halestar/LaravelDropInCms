@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use halestar\LaravelDropInCms\Models\Footer;
 use halestar\LaravelDropInCms\Resources\FooterResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class FooterApiController extends Controller
 {
@@ -17,7 +19,7 @@ class FooterApiController extends Controller
     public function index()
     {
         if(!Gate::allows('viewAny', Footer::class))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         return FooterResource::collection(Footer::all());
     }
 
@@ -27,20 +29,23 @@ class FooterApiController extends Controller
     public function store(Request $request)
     {
         if(!Gate::allows('create', Footer::class))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'footers',
+                'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'headers',
                 'description' => 'nullable',
+                'html' => 'nullable',
+                'css' => 'nullable',
+                'data' => 'nullable|array',
             ]);
         if($validator->fails())
-            return response()->json($validator->errors()->toArray(), 400);
+            return response()->json($validator->errors()->toArray(), Response::HTTP_BAD_REQUEST);
         $footer = new Footer();
         $footer->fill($validator->validated());
         $footer->save();
         return FooterResource::make($footer)
             ->response()
-            ->setStatusCode(201);
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
@@ -49,7 +54,7 @@ class FooterApiController extends Controller
     public function show(Footer $footer)
     {
         if(!Gate::allows('view', $footer))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         return new FooterResource($footer);
     }
 
@@ -59,16 +64,22 @@ class FooterApiController extends Controller
     public function update(Request $request, Footer $footer)
     {
         if(!Gate::allows('update', $footer))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'footers',
+                'name' =>
+                    [
+                        'required',
+                        'max:255',
+                        Rule::unique(config('dicms.table_prefix') . 'footers')->ignore($footer->id),
+                    ],
                 'description' => 'nullable',
                 'html' => 'nullable',
                 'css' => 'nullable',
+                'data' => 'nullable|array',
             ]);
         if($validator->fails())
-            return response()->json($validator->errors()->toArray(), 400);
+            return response()->json($validator->errors()->toArray(), Response::HTTP_BAD_REQUEST);
         $footer->fill($validator->validated());
         $footer->save();
         return new FooterResource($footer);
@@ -80,7 +91,7 @@ class FooterApiController extends Controller
     public function destroy(Footer $footer)
     {
         if(!Gate::allows('delete', $footer))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         $footer->delete();
         return response()->json([], 204);
     }

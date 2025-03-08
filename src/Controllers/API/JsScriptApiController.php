@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use halestar\LaravelDropInCms\Models\JsScript;
 use halestar\LaravelDropInCms\Resources\JsScriptResource;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class JsScriptApiController extends Controller
 {
@@ -17,7 +19,7 @@ class JsScriptApiController extends Controller
     public function index()
     {
         if(!Gate::allows('viewAny', JsScript::class))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         return JsScriptResource::collection(JsScript::all());
     }
 
@@ -27,67 +29,72 @@ class JsScriptApiController extends Controller
     public function store(Request $request)
     {
         if(!Gate::allows('create', JsScript::class))
-            return response()->json([], 403);
+            return response()->json([], Response::HTTP_FORBIDDEN);
         $validator = Validator::make($request->all(),
             [
                 'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'css_sheets',
                 'description' => 'nullable',
                 'type' => 'required|in:Link,Text',
-                'sheet' => 'nullable',
-                'href' => 'nullable',
+                'script' => 'required_if:type,Text',
+                'href' => 'required_if:type,Link',
                 'link_type' => 'nullable',
             ]);
         if($validator->fails())
-            return response()->json($validator->errors()->toArray(), 400);
+            return response()->json($validator->errors()->toArray(), Response::HTTP_BAD_REQUEST);
         $jsScript = new JsScript();
         $jsScript->fill($validator->validated());
         $jsScript->save();
         return JsScriptResource::make($jsScript)
             ->response()
-            ->setStatusCode(201);
+            ->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(JsScript $jsScript)
+    public function show(JsScript $script)
     {
-        if(!Gate::allows('view', $jsScript))
-            return response()->json([], 403);
-        return new JsScriptResource($jsScript);
+        if(!Gate::allows('view', $script))
+            return response()->json([], Response::HTTP_FORBIDDEN);
+        return new JsScriptResource($script);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, JsScript $jsScript)
+    public function update(Request $request, JsScript $script)
     {
-        if(!Gate::allows('update', $jsScript))
-            return response()->json([], 403);
+        if(!Gate::allows('update', $script))
+            return response()->json([], Response::HTTP_FORBIDDEN);
         $validator = Validator::make($request->all(),
             [
-                'name' => 'required|max:255|unique:' . config('dicms.table_prefix') . 'css_sheets',
+                'name' =>
+                    [
+                        'nullable',
+                        'max:255',
+                        Rule::unique(config('dicms.table_prefix') . 'js_scripts')->ignore($script->id),
+                    ],
                 'description' => 'nullable',
                 'type' => 'required|in:Link,Text',
-                'sheet' => 'nullable',
-                'href' => 'nullable',
+                'script' => 'required_if:type,Text',
+                'href' => 'required_if:type,Link',
                 'link_type' => 'nullable',
             ]);
         if($validator->fails())
-            return response()->json($validator->errors()->toArray(), 400);
-        $jsScript->fill($validator->validated());
-        $jsScript->save();
-        return new JsScriptResource($jsScript);
+            return response()->json($validator->errors()->toArray(), Response::HTTP_BAD_REQUEST);
+        $script->fill($validator->validated());
+        $script->save();
+        return new JsScriptResource($script);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(JsScript $jsScript)
+    public function destroy(JsScript $script)
     {
-        if(!Gate::allows('delete', $jsScript))
-            return response()->json([], 403);
-        $jsScript->delete();
-        return response()->json([], 204);
+        if(!Gate::allows('delete', $script))
+            return response()->json([], Response::HTTP_FORBIDDEN);
+        $script->delete();
+        return response()->json([], Response::HTTP_NO_CONTENT);
     }
 }
