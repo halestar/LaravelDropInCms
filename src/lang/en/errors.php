@@ -23,4 +23,9 @@ return
     'empty_site.new_site.header' => 'There isn\'t a site published yet, but one is coming soon!',
     'empty_site.new_site.lead' => 'Click the button below to start creating one (assuming you have permissions, of course)',
     'empty_site.new_site.link' => 'Start Creating!',
+    'headers.import' => 'You must select at least one header to import.',
+    'footers.import' => 'You must select at least one footer to import.',
+    'sheets.import' => 'You must select at least one css sheet to import.',
+    'scripts.import' => 'You must select at least one js script to import.',
+    'pages.import' => 'You must select at least one page to import.',
 ];

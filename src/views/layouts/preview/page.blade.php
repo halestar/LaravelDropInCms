@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    @foreach($page->getMetadata() as $meta)
+        {!! $meta->toHTML() !!}
+    @endforeach
     <title>{{ $page->Title() }}</title>
     @if($site->favicon)
         <link rel="icon" href="{{ $site->favicon }}" />
@@ -10,9 +12,9 @@
 
 
     @if(!$page->override_css)
-    @foreach($site->siteCss()->links()->get() as $css)
-        <link href="{{ $css->href }}" {{ $css->link_type }} />
-    @endforeach
+        @foreach($site->siteCss()->links()->get() as $css)
+            <link href="{{ $css->href }}" {{ $css->link_type }} />
+        @endforeach
     @endif
 
     @foreach($page->pageCss()->links()->get() as $css)
@@ -69,6 +71,6 @@
 @if($site->tag)
 </{{ $site->tag }}>
 @endif
-<link href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.preview.js', ['page' => $page->id]) }}" >
+<link href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.preview.js', ['site' => $site->id, 'page' => $page->id]) }}" >
 </body>
 </html>

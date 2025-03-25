@@ -20,7 +20,6 @@ use halestar\LaravelDropInCms\Controllers\PageController;
 use halestar\LaravelDropInCms\Controllers\PreviewController;
 use halestar\LaravelDropInCms\Controllers\SiteController;
 use halestar\LaravelDropInCms\Controllers\WidgetController;
-use halestar\LaravelDropInCms\Middleware\CurrentSiteExistsMiddleware;
 use halestar\LaravelDropInCms\Models\CssSheet;
 use halestar\LaravelDropInCms\Models\DataItem;
 use halestar\LaravelDropInCms\Models\Footer;
@@ -40,9 +39,9 @@ final class DiCMS
     public static function adminRoutes(): void
     {
         Route::name('dicms.admin.')
-            ->middleware(CurrentSiteExistsMiddleware::class)
             ->group(function ()
         {
+
 
             Route::get('/', [SiteController::class, 'show'])->name('home');
 
@@ -79,45 +78,60 @@ final class DiCMS
             Route::get('/sites/{site}/archive', [SiteController::class, 'archiveSite'])->name('sites.archive');
             Route::get('/sites/{site}/restore', [SiteController::class, 'restoreSite'])->name('sites.restore');
             Route::get('/sites/{site}/metadata', [SiteController::class, 'editMetadata'])->name('sites.metadata');
-
-            //duplicate functions
             Route::get('/sites/{site}/duplicate', [SiteController::class, 'duplicateSite'])->name('sites.duplicate');
-            Route::get('/headers/{header}/duplicate', [HeaderController::class, 'duplicate'])->name('headers.duplicate');
-            Route::get('/footers/{footer}/duplicate', [FooterController::class, 'duplicate'])->name('footers.duplicate');
-            Route::get('/sheets/{sheet}/duplicate', [CssSheetController::class, 'duplicate'])->name('sheets.duplicate');
-            Route::get('/scripts/{script}/duplicate', [JsScriptController::class, 'duplicate'])->name('scripts.duplicate');
 
-            //Pages
+            //Site Resource Controller
+            Route::resource('sites', SiteController::class);
+
+            //Special case for pages
+            Route::resource('pages', PageController::class)->except(['index', 'create', 'store']);
             Route::put('/pages/{page}/update/settings', [PageController::class, 'updateSettings'])->name('pages.update.settings');
             Route::get('/pages/{page}/publish', [PageController::class, 'publishPage'])->name('pages.publish');
             Route::get('/pages/{page}/unpublish', [PageController::class, 'unpublishPage'])->name('pages.unpublish');
             Route::get('/pages/{page}/duplicate', [PageController::class, 'duplicatePage'])->name('pages.dupe');
             Route::get('/pages/{page}/metadata', [PageController::class, 'editMetadata'])->name('pages.metadata');
 
-            //Resource controllers
-            Route::resource('sites', SiteController::class);
-            Route::resource('headers', HeaderController::class)->except('show');
-            Route::resource('footers', FooterController::class)->except('show');
-            Route::resource('sheets', CssSheetController::class)->except('show');
-            Route::resource('scripts', JsScriptController::class)->except('show');
-            Route::resource('pages', PageController::class);
-
-
-            Route::get('/assets', [DataItemController::class, 'index'])->name('assets.index');
-
-            Route::prefix('preview')
-                ->name('preview.')
-                ->controller(PreviewController::class)
+            //Routes for Pages, Headers, Footers, Css Sheets and JS Scripts
+            Route::prefix('sites/{site}')
                 ->group(function ()
                 {
-                    Route::get('/script.js', 'siteJs')->name('js.site');
-                    Route::get('/style.css', 'siteCss')->name('css.site');
-                    Route::get('/plugin/script.js', 'pluginJs')->name('js.plugin');
-                    Route::get('/plugin/style.css', 'pluginCss')->name('css.plugin');
-                    Route::get('/{page}/script.js', 'js')->name('js');
-                    Route::get('/{page}/style.css', 'css')->name('css');
-                    Route::any('/{path?}', 'index')->where('path', '.*')->name('home');
+                    //headers
+                    Route::resource('headers', HeaderController::class)->except('show');
+                    Route::get('/headers/{header}/duplicate', [HeaderController::class, 'duplicate'])->name('headers.duplicate');
+                    Route::get('/headers/import', [HeaderController::class, 'import'])->name('headers.import.show');
+                    Route::post('/headers/import', [HeaderController::class, 'doImport'])->name('headers.import');
+
+                    //footers
+                    Route::resource('footers', FooterController::class)->except('show');
+                    Route::get('/footers/{footer}/duplicate', [FooterController::class, 'duplicate'])->name('footers.duplicate');
+                    Route::get('/footers/import', [FooterController::class, 'import'])->name('footers.import.show');
+                    Route::post('/footers/import', [FooterController::class, 'doImport'])->name('footers.import');
+
+                    //css sheets
+                    Route::resource('sheets', CssSheetController::class)->except('show');
+                    Route::get('/sheets/{sheet}/duplicate', [CssSheetController::class, 'duplicate'])->name('sheets.duplicate');
+                    Route::get('/sheets/import', [CssSheetController::class, 'import'])->name('sheets.import.show');
+                    Route::post('/sheets/import', [CssSheetController::class, 'doImport'])->name('sheets.import');
+
+                    //js scripts
+                    Route::resource('scripts', JsScriptController::class)->except('show');
+                    Route::get('/scripts/{script}/duplicate', [JsScriptController::class, 'duplicate'])->name('scripts.duplicate');
+                    Route::get('/scripts/import', [JsScriptController::class, 'import'])->name('scripts.import.show');
+                    Route::post('/scripts/import', [JsScriptController::class, 'doImport'])->name('scripts.import');
+
+                    //pages
+                    Route::resource('pages', PageController::class)->only(['index', 'create', 'store']);
+                    Route::get('/pages/import', [PageController::class, 'import'])->name('pages.import.show');
+                    Route::post('/pages/import', [PageController::class, 'doImport'])->name('pages.import');
+
+                    //Preview Route
+                    Route::any('/preview/{path?}', [PreviewController::class, 'index'])
+                        ->where('path', '.*')
+                        ->name('preview');
                 });
+
+            //Asset Controller
+            Route::get('/assets', [DataItemController::class, 'index'])->name('assets.index');
 
             foreach(config('dicms.plugins') as $plugin)
             {
@@ -178,8 +192,6 @@ final class DiCMS
                 {
                     Route::get('/site/{site}/script.js', [FrontController::class, 'siteJs'])->name('front.js.site');
                     Route::get('/site/{site}/style.css', [FrontController::class, 'siteCss'])->name('front.css.site');
-                    Route::get('/plugin/script.js', [FrontController::class, 'pluginJs'])->name('front.js.plugin');
-                    Route::get('/plugin/style.css', [FrontController::class, 'pluginCss'])->name('front.css.plugin');
                     Route::get('/{page}/script.js', [FrontController::class, 'js'])->name('front.js');
                     Route::get('/{page}/style.css', [FrontController::class, 'css'])->name('front.css');
                 });

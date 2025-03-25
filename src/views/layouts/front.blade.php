@@ -1,79 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8" />
-    @foreach($page->getMetadata() as $meta)
-        {!! $meta->toHTML() !!}
-    @endforeach
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <title>{{ $page->Title() }}</title>
-    @if($site->favicon)
-        <link rel="icon" href="{{ $site->favicon }}" />
-    @endif
+    <head>
+        <meta charset="utf-8" />
+        @foreach($page->getMetadata() as $meta)
+            {!! $meta->toHTML() !!}
+        @endforeach
+        <title>{{ $page->Title() }}</title>
+        @if($site->favicon)
+            <link rel="icon" href="{{ $site->favicon }}" />
+        @endif
 
-
-    @if(!$page->override_css)
-        @foreach($site->siteCss()->links()->get() as $css)
+        @foreach($page->Css() as $css)
             <link href="{{ $css->href }}" {!! $css->link_type !!} />
         @endforeach
-    @endif
+        <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($page) }}">
 
-    @foreach($page->pageCss()->links()->get() as $css)
-        <link href="{{ $css->href }}" {!! $css->link_type !!} />
-    @endforeach
-    <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($page) }}">
+        @if($page->Header())
+            <style>
+                {!! $page->Header()->css !!}
+            </style>
+        @else
 
-    @if($page->Header())
+        @endif
+
+        @if($page->Footer())
+            <style>
+                {!! $page->Footer()->css !!}
+            </style>
+        @endif
+
         <style>
-            {!! $page->Header()->css !!}
+            {!! $page->projectCss() !!}
         </style>
-    @else
 
-    @endif
-
-    @if($page->Footer())
-        <style>
-            {!! $page->Footer()->css !!}
-        </style>
-    @endif
-
-    <style>
-        {!! $page->projectCss() !!}
-    </style>
-
-    @if(!$page->override_js)
-        @foreach($site->siteJs()->links()->get() as $js)
+        @foreach($page->Js() as $js)
             <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
         @endforeach
-    @endif
-    @foreach($page->pageJs()->links()->get() as $js)
-        <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
-    @endforeach
+
+    </head>
+    <body @if($site->body_attr) {!! $site->body_attr !!} @endif >
+        @if($site->tag)
+            <{{ $site->tag }} {!! $site->options !!}>
+        @endif
+
+            @if($page->Header())
+                {!! $page->Header()->projectHtml($page) !!}
+            @endif
 
 
-</head>
-<body
-@if($site->body_attr)
-    {!! $site->body_attr !!}
-    @endif
->
-@if($site->tag)
-    <{{ $site->tag }} {!! $site->options !!}>
-@endif
+            {!! $page->projectHtml() !!}
 
-@if($page->Header())
-    {!! $page->Header()->projectHtml($page) !!}
-@endif
+            @if($page->Footer())
+                {!! $page->Footer()->projectHtml($page) !!}
+            @endif
 
+        @if($site->tag)
+        </{{ $site->tag }}>
+        @endif
 
-{!! $page->projectHtml() !!}
-@if($page->Footer())
-    {!! $page->Footer()->projectHtml($page) !!}
-@endif
-@if($site->tag)
-</{{ $site->tag }}>
-@endif
-<script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($page) }}" ></script>
-
-</body>
+        <script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($page) }}" ></script>
+    </body>
 </html>

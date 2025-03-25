@@ -11,15 +11,15 @@ class JsScriptManager extends Component
 {
     public ContainsJsScripts $container;
     public Collection $jsScripts;
-    public int $siteId;
     public string $title;
+    public ?string $manageLink = null;
 
-    public function mount(ContainsJsScripts $container, int $siteId, string $title = null)
+    public function mount(ContainsJsScripts $container, string $title = null, string $manageLink = null)
     {
         $this->container = $container;
         $this->jsScripts = $container->getJsScripts();
-        $this->siteId = $siteId;
         $this->title = $title?? __('dicms::sites.scripts');
+        $this->manageLink = $manageLink;
     }
 
     public function updateOrder($scripts)

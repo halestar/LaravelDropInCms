@@ -5,6 +5,8 @@ return
     "footer" => "Page Footer|Page Footers",
     "footer.none" => "There are no Page Footers for this site. Go create some!",
     "footer.title" => "Available Page Footers",
+    "import" => "Import Page Footers",
+    "import.select" => 'Select footers to import',
     "new" => "Create New Page Footer",
     "edit" => "Update Page Footer",
     "delete" => 'Delete Page Footer',
@@ -26,6 +28,7 @@ return
     'success.created' => 'Page Footer created successfully.',
     'success.updated' => 'Page Footer updated successfully.',
     'success.deleted' => 'Page Footer deleted successfully.',
+    'success.imported' => 'Page Footers imported successfully.',
     'html' => 'Starting HTML',
     'html.help' => 'Starting HTML for the footer. You can paste in some raw HTML here that will be included as the base for the footer when you edit it.',
 

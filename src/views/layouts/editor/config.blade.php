@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="//unpkg.com/grapesjs/dist/css/grapes.min.css" />
-<script src="https://unpkg.com/grapesjs"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.22.5/grapes.min.js"></script>
 <script src="https://unpkg.com/grapesjs-style-bg"></script>
 <script src="https://unpkg.com/grapesjs-style-gradient"></script>
 
@@ -622,12 +622,21 @@
                                             label: 'Link Destination',
                                             options:
                                                 [
-                                                    @foreach(\halestar\LaravelDropInCms\Models\Page::where('plugin_page', false)->get() as $page)
-                                                    {
-                                                        label: '{{ __('dicms::pages.page') }}: {{ $page->name }}',
-                                                        value: '/{{ $page->url }}'
-                                                    },
-                                                    @endforeach
+                                                    @if($objEditable->site)
+                                                        @foreach($objEditable->site->pages as $page)
+                                                        {
+                                                            label: '{{ __('dicms::pages.page') }}: {{ $page->name }}',
+                                                            value: '/{{ $page->url }}'
+                                                        },
+                                                        @endforeach
+                                                    @elseif(\halestar\LaravelDropInCms\Models\Site::activeSite())
+                                                        @foreach(\halestar\LaravelDropInCms\Models\Site::activeSite()->pages as $page)
+                                                            {
+                                                                label: '{{ __('dicms::pages.page') }}: {{ $page->name }}',
+                                                                value: '/{{ $page->url }}'
+                                                            },
+                                                        @endforeach
+                                                    @endif
                                                     @foreach(config('dicms.plugins', []) as $plugin)
                                                         @foreach($plugin::getPublicPages() as $page)
                                                         {

@@ -11,27 +11,28 @@ use Illuminate\Support\Facades\Response;
 
 class PreviewController
 {
-    public function index(Request $request, string $path = null)
+    public function index(Request $request, Site $site,  string $path = null)
     {
 
         Debugbar::disable();
-
-        //get the active site
-        $site = Site::currentSite();
-        if(!$site)
-            abort(404);
-
         Gate::authorize('preview', $site);
         if($request->input('wrapper', 'false') == 'false')
             return view('dicms::layouts.preview.preview', compact('site'));
 
-
         //next, we get the page
         if($path == null)
             $path = $site->homepage_url;
-        $page = Page::where('url', $path)->first();
+        $page = $site->pages()->where('url', $path)->first();
         if($page)
-            return view('dicms::layouts.preview.page', compact('site', 'page'));
+            return view('dicms::layouts.front', compact('site', 'page'));
+        //else, we check plugins.
+        foreach(config('dicms.plugins', []) as $plugin)
+        {
+            if($page = $plugin::hasPublicRoute($path))
+            {
+                return view('dicms::layouts.front', compact('site', 'page'));
+            }
+        }
 
         return view('dicms::layouts.preview.site', compact('site'));
     }

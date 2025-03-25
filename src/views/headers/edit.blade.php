@@ -1,8 +1,8 @@
-@extends("dicms::layouts.admin.index", ['template' => $template, 'objEditable' => $objEditable])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'objEditable' => $objEditable, 'currentSite' => $site])
 
 @section('index_content')
             <div class="row border-end border-start border-bottom rounded-bottom p-1 collapse advanced_options" id="advanced_options">
-                <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.update', ['header' => $header->id]) }}">
+                <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.update', ['header' => $header->id, 'site' => $site->id]) }}">
                     @csrf
                     @method('PUT')
                     <div class="mb-3">

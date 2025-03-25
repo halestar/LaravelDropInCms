@@ -12,13 +12,13 @@ class FrontController
     public function index(Request $request, string $path = null)
     {
         //get the active site
-        $site = Site::defaultSite();
+        $site = Site::activeSite();
         if(!$site)
             return view('dicms::layouts.nosite');
         //next, we get the page
         if($path == null)
             $path = $site->homepage_url;
-        $page = Page::where('url', $path)->first();
+        $page = $site->pages()->where('url', $path)->first();
         if($page)
             return view('dicms::layouts.front', compact('site', 'page'));
 
@@ -49,20 +49,6 @@ class FrontController
         return $rsp;
     }
 
-    public function pluginJs(Request $request)
-    {
-        $plugin = $request->input('plugin', null);
-        if(!$plugin)
-            return abort(404);
-        $path = $request->input('path', null);
-        if(!$path)
-            return abort(404);
-        $text = $plugin::getJsFiles($path)->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Text)->pluck('script')->join("\n");
-        $rsp = Response::make($text);
-        $rsp->header('Content-Type', 'text/javascript');
-        return $rsp;
-    }
-
     public function css($page)
     {
         $page = Page::findOrFail($page);
@@ -79,17 +65,4 @@ class FrontController
         return $rsp;
     }
 
-    public function pluginCss(Request $request)
-    {
-        $plugin = $request->input('plugin', null);
-        if(!$plugin)
-            return abort(404);
-        $path = $request->input('path', null);
-        if(!$path)
-            return abort(404);
-        $text = $plugin::getCssFiles($path)->where('type', '=', \halestar\LaravelDropInCms\Enums\HeadElementType::Text)->pluck('sheet')->join("\n");
-        $rsp = Response::make($text);
-        $rsp->header('Content-Type', 'text/css');
-        return $rsp;
-    }
 }

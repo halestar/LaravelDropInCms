@@ -44,13 +44,12 @@ class SiteController
     public function create()
     {
         Gate::authorize('create', Site::class);
-        $currentSite = Site::currentSite();
         $template =
             [
                 'title' => __('dicms::sites.new_site'),
                 'buttons' => []
             ];
-        if($currentSite)
+        if(Site::count() > 0)
         {
             $template['buttons']['back']  =
                     [
@@ -75,8 +74,6 @@ class SiteController
         $site = new Site();
         $site->fill($data);
         $site->save();
-        //make this the now current site.
-        $site->makeCurrent();
         return redirect(DiCMS::dicmsRoute('admin.sites.show', ['site' => $site->id]))
             ->with('success-status', __('dicms::sites.success.created'));
     }
@@ -84,7 +81,9 @@ class SiteController
     public function show(?Site $site = null)
     {
         if(!$site)
-            $site = Site::currentSite();
+            $site = Site::activeSite();
+        if(!$site)
+            return redirect(DiCMS::dicmsRoute('admin.sites.index'));
         Gate::authorize('view', $site);
         $template =
             [
@@ -95,7 +94,7 @@ class SiteController
         {
             $template['buttons']['preview']  =
                 [
-                    'link' => DiCMS::dicmsRoute('admin.preview.home'),
+                    'link' => DiCMS::dicmsRoute('admin.preview', ['site' => $site->id]),
                     'text' => "<i class='fa-solid fa-eye'></i>",
                     'classes' => 'text-info',
                     'title' => __('dicms::sites.preview_site'),

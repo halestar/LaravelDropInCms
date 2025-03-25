@@ -31,10 +31,11 @@ class Footer extends GrapesJsEditableItem
     }
 
 
-    public function dupe(): Footer
+    public function dupe(Site $site = null): Footer
     {
         $newFooter = new Footer();
         $newFooter->name = $this->name . "-" . __('dicms::admin.copy');
+        $newFooter->site_id = $site? $site->id: $this->site_id;
         $newFooter->description = $this->description;
         $newFooter->html = $this->html;
         $newFooter->css = $this->css;

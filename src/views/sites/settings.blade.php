@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin.index", ['template' => $template])
+@extends("dicms::layouts.admin.index", ['template' => $template, ])
 
 @section('index_content')
     @if($site->active)

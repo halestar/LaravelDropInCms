@@ -8,6 +8,8 @@ return
         "pages.title" => "Available Pages",
         "pages.web" => "Web Page Content",
         "pages.web.edit" => "Edit Web Page Content",
+        "import" => "Import Pages",
+        "import.select" => 'Select pages to import',
         "new" => "Create New Page",
         "edit" => "Update Page",
         "delete" => 'Delete Page',
@@ -63,6 +65,7 @@ return
         'success.created' => 'Page created successfully.',
         'success.updated' => 'Page updated successfully.',
         'success.deleted' => 'Page deleted successfully.',
+        'success.imported' => 'Pages imported successfully.',
 
         'html' => 'Starting HTML',
         'html.help' => 'Starting HTML for the page. You can paste in some raw HTML here that will be included as the base for the page when you edit it.',

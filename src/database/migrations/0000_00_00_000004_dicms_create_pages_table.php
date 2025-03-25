@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create(config('dicms.table_prefix') . 'pages', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('site_id')->nullable();
+            $table->foreign('site_id')
+                ->references('id')
+                ->on(config('dicms.table_prefix') . 'sites')
+                ->onDelete('cascade');
             $table->boolean('plugin_page')->default(false);
             $table->string('plugin')->nullable();
             $table->string('name');

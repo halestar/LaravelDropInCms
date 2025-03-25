@@ -1,23 +1,24 @@
 <div>
-    <h4 class="border-bottom">{{ $title }}</h4>
+    <h4 class="border-bottom d-flex justify-content-between align-items-center">
+        {{ $title }}
+        @if($manageLink)
+            <a
+                href="{{ $manageLink }}"
+                class="link-secondary link-underline-opacity-0"
+            ><i class="fa-solid fa-bars-progress"></i></a>
+        @endif
+    </h4>
     <div class="input-group" aria-describedby="jsScriptHelp">
         <label for="script_id" class="input-group-text">{{ __('dicms::sites.scripts.add') }}</label>
         <select name="script_id" id="script_id" class="form-select"
                 wire:change="addJsScript($('#script_id').val())">
-            @foreach(\halestar\LaravelDropInCms\Models\JsScript::whereNotIn('id', $jsScripts->pluck('id'))->get() as $script)
+            @foreach($container->getJsScriptPool()->whereNotIn('id', $jsScripts->pluck('id')) as $script)
                 @if($loop->first)
                     <option value="" selected>{{ __('dicms::sites.scripts.add.select') }}</option>
                 @endif
                 <option value="{{ $script->id }}" wire:key="{{ $script->id }}">{{ $script->name }}</option>
             @endforeach
         </select>
-        @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)
-            <a
-                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index') }}"
-                class="btn btn-outline-secondary"
-                title="{{ __('dicms::admin.manage_js_scripts') }}"
-            ><i class="fa-solid fa-bars-progress"></i></a>
-        @endcan
     </div>
     <div id="jsScriptHelp" class="form-text mb-3">{{ __('dicms::pages.scripts.add.help') }}</div>
     @if($jsScripts->count() > 0)
@@ -29,7 +30,7 @@
                     <span class="fw-bolder fs-6">{{ $js->name }}</span>
                     <span class="ms-auto">
                         <a
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.edit', ['script' => $js->id]) }}"
+                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.edit', ['site' => $js->site_id, 'script' => $js->id]) }}"
                             class="btn btn-primary btn-sm me-1"
                             role="button"
                             title="{{ __('dicms::admin.edit') }}"

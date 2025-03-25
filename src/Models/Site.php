@@ -14,7 +14,7 @@ use halestar\LaravelDropInCms\Traits\HasMetadata;
 use Illuminate\Database\Eloquent\Attributes\ScopedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 
 #[ScopedBy([AvailableOnlyScope::class, OrderByNameScope::class])]
@@ -22,15 +22,11 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
 {
     use BackUpable, HasMetadata;
 
-    public const CURRENT_SITE_KEY = "sites.current_site_id";
-
     protected static function getTablesToBackup(): array
         {
             return
                 [
                     config('dicms.table_prefix') . "sites",
-                    config('dicms.table_prefix') . "sites_css_sheets",
-                    config('dicms.table_prefix') . "sites_js_scripts",
                 ];
         }
     protected function casts(): array
@@ -67,10 +63,9 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
         return $this->belongsTo(Footer::class, 'footer_id');
     }
 
-    public function siteCss(): BelongsToMany
+    public function siteCss(): HasMany
     {
-        return $this->belongsToMany(CssSheet::class, config('dicms.table_prefix') . 'sites_css_sheets',
-            'site_id', 'sheet_id')->withPivot('order_by')->orderByPivot('order_by');
+        return $this->hasMany(CssSheet::class, 'site_id')->orderBy('order_by');
     }
 
     public function CssLinks(): Collection
@@ -85,10 +80,9 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
         return $this->siteCss()->text()->get()->pluck('sheet')->join("\n");
     }
 
-    public function siteJs(): BelongsToMany
+    public function siteJs(): HasMany
     {
-        return $this->belongsToMany(JsScript::class, config('dicms.table_prefix') . 'sites_js_scripts',
-            'site_id', 'script_id')->withPivot('order_by')->orderByPivot('order_by');
+        return $this->hasMany(JsScript::class, 'site_id')->orderBy('order_by');
     }
 
     public function JsLinks(): Collection
@@ -105,87 +99,48 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
 
     public function getCssSheets(): Collection
     {
-        return $this->siteCss;
+        return $this->siteCss()->where('active', true)->get();
     }
 
     public function addCssSheet(CssSheet $cssSheet)
     {
-        $order = $this->siteCss()->count();
-        $this->siteCss()->attach($cssSheet->id, ['order_by' => $order]);
+        $cssSheet->active = true;
+        $cssSheet->save();
     }
 
     public function removeCssSheet(CssSheet $cssSheet)
     {
-        $this->siteCss()->detach($cssSheet->id);
+        $cssSheet->active = false;
+        $cssSheet->save();
     }
 
     public function setCssSheetOrder(CssSheet $cssSheet, int $order)
     {
-        $this->siteCss()->updateExistingPivot($cssSheet->id, ['order_by' => $order]);
+        $cssSheet->order_by = $order;
+        $cssSheet->save();
     }
 
     public function getJsScripts(): Collection
     {
-        return $this->siteJs;
+        return $this->siteJs()->where('active', true)->get();
     }
 
     public function addJsScript(JsScript $script)
     {
-        $order = $this->siteJs()->count();
-        $this->siteJs()->attach($script->id, ['order_by' => $order]);
+        $script->active = true;
+        $script->save();
     }
 
     public function removeJsScript(JsScript $script)
     {
-        $this->siteJs()->detach($script->id);
+        $script->active = false;
+        $script->save();
     }
 
     public function setJsScriptOrder(JsScript $script, int $order)
     {
-        $this->siteJs()->updateExistingPivot($script->id, ['order_by' => $order]);
-    }
-
-    public static function defaultSite(): ?Site
-    {
-        return Site::where('active', true)->first();
-    }
-
-    public static function currentSite(): ?Site
-    {
-        $settings = config('dicms.settings_class');
-        //first, do we have a saved current site?
-        $id = $settings::get(Site::CURRENT_SITE_KEY, null);
-        if($id)
-        {
-            //we do, but is it valid?
-            $site = Site::find($id);
-            if($site)
-                return $site;
-        }
-        //not saved (or invalid), is there an active site?
-        $site = Site::defaultSite();
-        if($site)
-        {
-            //there is, save it and return it.
-            $settings::set(Site::CURRENT_SITE_KEY, $site->id);
-            return $site;
-        }
-        //there isn't, do we have A site?
-        $site = Site::first();
-        if($site)
-        {
-            //there is, save it and return it.
-            $settings::set(Site::CURRENT_SITE_KEY, $site->id);
-            return $site;
-        }
-        //nope, system is empty.
-        return null;
-    }
-
-    public function makeCurrent(): void
-    {
-        $settings = config('dicms.settings_class');
-        $settings::set(Site::CURRENT_SITE_KEY, $this->id);
+        $script->order_by = $order;
+        $script->save();
     }
 
     public function dupe(): Site
@@ -207,9 +162,9 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
         $dupeSite->save();
 
         foreach($this->siteCss as $css)
-            $dupeSite->siteCss()->attach($css->id, ['order_by' => $css->pivot->order_by]);
+            $css->dupe($dupeSite);
         foreach($this->siteJs as $js)
-            $dupeSite->siteJs()->attach($js->id, ['order_by' => $css->pivot->order_by]);
+            $js->dupe($dupeSite);
         //now we return the new object.
         return $dupeSite;
     }
@@ -223,5 +178,35 @@ class Site extends Model implements ContainsCssSheets, ContainsJsScripts, Contai
     {
         $this->metadata = $metadata;
         $this->save();
+    }
+
+    public static function activeSite(): ?Site
+    {
+        return Site::where('active', true)->first();
+    }
+
+    public function headers(): HasMany
+    {
+        return $this->hasMany(Header::class, 'site_id');
+    }
+
+    public function footers(): HasMany
+    {
+        return $this->hasMany(Footer::class, 'site_id');
+    }
+
+    public function pages(): HasMany
+    {
+        return $this->hasMany(Page::class, 'site_id');
+    }
+
+    public function getCssSheetPool(): Collection
+    {
+        return $this->siteCss;
+    }
+
+    public function getJsScriptPool(): Collection
+    {
+        return $this->siteJs;
     }
 }

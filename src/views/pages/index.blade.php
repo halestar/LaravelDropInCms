@@ -1,14 +1,14 @@
-@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true, 'currentSite' => $site])
 
 @section('index_content')
-    @if(\halestar\LaravelDropInCms\Models\Page::count() > 0)
+    @if($site->pages()->count() > 0)
         <div class="ms-1 row">
             <div class="col-2">{{ __('dicms::admin.name') }}</div>
             <div class="col-6">{{ __('dicms::admin.url') }}</div>
             <div class="col-2">{{ __('dicms::admin.status') }}</div>
         </div>
         <ul class="list-group">
-            @foreach(\halestar\LaravelDropInCms\Models\Page::normal()->get() as $page)
+            @foreach($site->pages()->normal()->get() as $page)
                 <li class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                     <div class="col-2">{{ $page->name }}</div>
                     <div class="col-6 text-muted small">{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicRoute() . "/" . $page->url }}</div>
@@ -22,7 +22,7 @@
                     <div class="col-2 text-end">
                         @can('update', $page)
                             <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.show', ['page' => $page->id]) }}"
+                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.show', ['site' => $site->id, 'page' => $page->id]) }}"
                                 role="button"
                                 class="btn btn-primary btn-sm"
                                 title="{{ __('dicms::pages.edit') }}"
@@ -30,7 +30,7 @@
                         @endcan
                         @can('create', \halestar\LaravelDropInCms\Models\Page::class)
                             <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.dupe', ['page' => $page->id]) }}"
+                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.dupe', ['site' => $site->id, 'page' => $page->id]) }}"
                                 role="button"
                                 class="btn btn-warning btn-sm"
                                 title="{{ __('dicms::pages.duplicate') }}"
@@ -40,7 +40,7 @@
 
                             <button
                                 type="button"
-                                onclick="confirmDelete('{{ __('dicms::pages.delete.confirm') }}', '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.destroy', ['page' => $page->id]) }}')"
+                                onclick="confirmDelete('{{ __('dicms::pages.delete.confirm') }}', '{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.destroy', ['site' => $site->id, 'page' => $page->id]) }}')"
                                 class="btn btn-danger btn-sm"
                                 title="{{ __('dicms::admin.delete') }}"
                             ><i class="fa fa-trash"></i></button>

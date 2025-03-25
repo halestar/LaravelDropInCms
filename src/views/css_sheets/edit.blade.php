@@ -1,7 +1,7 @@
 @extends("dicms::layouts.admin.index", ['template' => $template])
 
 @section('index_content')
-    <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.update', ['sheet' => $sheet->id]) }}"  enctype="multipart/form-data">
+    <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.update', ['site' => $site->id, 'sheet' => $sheet->id]) }}"  enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="mb-3">

@@ -6,39 +6,33 @@ use halestar\LaravelDropInCms\DiCMS;
 use halestar\LaravelDropInCms\Models\Page;
 use halestar\LaravelDropInCms\Models\Site;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Blade;
 
 abstract class GrapesJsEditableItem extends Model
 {
-    protected ?Site $currentSite;
     public function __construct(array $attributes = [])
     {
-        $this->currentSite = Site::currentSite();
         parent::__construct($attributes);
+    }
+
+    public function site(): BelongsTo
+    {
+        return $this->belongsTo(Site::class, 'site_id');
     }
 
     public function CssLinks(): Collection
     {
-        if($this->currentSite)
-        {
-            $links = $this->currentSite->siteCss()->links()->get()->pluck('href');
-            $links->push(DiCMS::dicmsPublicCss($this->currentSite));
-        }
-        else
-            $links = new Collection();
+        $links = $this->site->siteCss()->links()->get()->pluck('href');
+        $links->push(DiCMS::dicmsPublicCss($this->site));
         return $links;
     }
 
     public function JsLinks(): Collection
     {
-        if($this->currentSite)
-        {
-            $links = $this->currentSite->siteJs()->links()->get()->pluck('href');
-            $links->push(DiCMS::dicmsPublicJs($this->currentSite));
-        }
-        else
-            $links = new Collection();
+        $links = $this->site->siteJs()->links()->get()->pluck('href');
+        $links->push(DiCMS::dicmsPublicJs($this->site));
         return $links;
     }
 

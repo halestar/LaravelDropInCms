@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true, 'currentSite' => $site])
 
 @section('index_content')
         @if($site->active)
@@ -8,9 +8,17 @@
         @endif
         <div class="row">
             <div class="col-md">
-                <livewire:css-sheet-manager :siteId="$site->id" :container="$site" />
+                <livewire:css-sheet-manager
+                    :siteId="$site->id"
+                    :container="$site"
+                    :manageLink="\halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.index', ['site' => $site->id])"
+                />
                 <br />
-                <livewire:js-script-manager :siteId="$site->id" :container="$site" />
+                <livewire:js-script-manager
+                    :siteId="$site->id"
+                    :container="$site"
+                    :manageLink="\halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index', ['site' => $site->id])"
+                />
             </div>
             <div class="col-md">
                 <form action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.update', ['site' => $site->id]) }}"
@@ -32,7 +40,7 @@
                         <select name="header_id" id="header_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_header') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Header::all() as $header)
+                            @foreach($site->headers as $header)
                                 <option value="{{ $header->id }}"
                                         @if($header->id == $site->header_id) selected @endif>{{ $header->name }}</option>
                             @endforeach
@@ -42,14 +50,14 @@
                         @if($site->header_id)
                             @can('update', $site->defaultHeader)
                                 <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.edit', ['header' => $site->header_id]) }}"
+                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.edit', ['header' => $site->header_id, 'site' => $site->id]) }}"
                                     class="btn btn-outline-info" title="{{ __('dicms::headers.edit') }}">
                                     <i class="fa fa-edit"></i>
                                 </a>
                             @endcan
                         @endif
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index') }}"
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index', ['site' => $site->id]) }}"
                                class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_headers') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>
@@ -61,7 +69,7 @@
                         <select name="footer_id" id="footer_id" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_default_footer') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Footer::all() as $footer)
+                            @foreach($site->footers as $footer)
                                 <option value="{{ $footer->id }}"
                                         @if($footer->id == $site->footer_id) selected @endif>{{ $footer->name }}</option>
                             @endforeach
@@ -72,14 +80,14 @@
                         @if($site->footer_id)
                             @can('update', $site->defaultFooter)
                                 <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.edit', ['footer' => $site->footer_id]) }}"
-                                    class="btn btn-outline-info" title="{{ __('dicms::headers.edit') }}">
+                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.edit', ['site' => $site->id, 'footer' => $site->footer_id]) }}"
+                                    class="btn btn-outline-info" title="{{ __('dicms::footers.edit') }}">
                                     <i class="fa fa-edit"></i>
                                 </a>
                             @endcan
                         @endif
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Footer::class)
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index') }}"
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index', ['site' => $site->id]) }}"
                                class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_footers') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>
@@ -91,7 +99,7 @@
                         <select name="homepage_url" id="homepage_url" class="form-select"
                                 @cannot('update', $site) disabled @endcan>
                             <option value="">{{ __('dicms::sites.select_homepage') }}</option>
-                            @foreach(\halestar\LaravelDropInCms\Models\Page::all() as $page)
+                            @foreach($site->pages as $page)
                                 <option value="{{ $page->url }}"
                                         @if($page->url == $site->homepage_url) selected @endif>{{ $page->name }}</option>
                             @endforeach
@@ -106,7 +114,7 @@
                                 @cannot('update', $site) disabled @endcan title="{{ __('dicms::admin.update') }}"><i class="fa-solid fa-floppy-disk"></i></button>
                         @can('viewAny', \halestar\LaravelDropInCms\Models\Page::class)
 
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.index') }}"
+                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.index', ['site' => $site->id]) }}"
                                class="btn btn-outline-secondary" title="{{ __('dicms::admin.manage_pages') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         @endcan
                     </div>

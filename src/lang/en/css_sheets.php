@@ -5,6 +5,8 @@ return
     "sheet" => "Css Sheet|Css Sheets",
     "sheet.none" => "There are no Css Sheets for this site. Go create some!",
     "sheet.title" => "Available Css Sheets",
+    "import" => "Import Css Sheets",
+    "import.select" => 'Select Css Sheets to import',
     "new" => "Create New Css Sheet",
     "edit" => "Update Css Sheet",
     "delete" => 'Delete Css Sheet',
@@ -27,4 +29,5 @@ return
     'success.created' => 'Css Sheet created successfully.',
     'success.updated' => 'Css Sheet updated successfully.',
     'success.deleted' => 'Css Sheet deleted successfully.',
+    'success.imported' => 'Css Sheets imported successfully.',
 ];

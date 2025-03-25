@@ -1,7 +1,7 @@
 @extends("dicms::layouts.admin.index", ['template' => $template])
 
 @section('index_content')
-    <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.store') }}"  enctype="multipart/form-data">
+    <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.store', ['site' => $site->id]) }}"  enctype="multipart/form-data">
         @csrf
         <div class="mb-3">
             <label for="name" class="form-label">{{ __('dicms::js_scripts.name') }}</label>
@@ -122,6 +122,7 @@
 
         <div class="row">
             <button type="submit" class="btn btn-primary col m-2">{{ __('dicms::admin.create') }}</button>
+            <a class="btn btn-secondary col m-2" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index', ['site' => $site->id]) }}">{{ __('dicms::admin.cancel') }}</a>
         </div>
     </form>
 @endsection

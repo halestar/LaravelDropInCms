@@ -1,22 +1,23 @@
 <div>
-    <h4 class="border-bottom">{{ $title }}</h4>
+    <h4 class="border-bottom d-flex justify-content-between align-items-center">
+        {{ $title }}
+        @if($manageLink)
+            <a
+                href="{{ $manageLink }}"
+                class="link-secondary link-underline-opacity-0"
+            ><i class="fa-solid fa-bars-progress"></i></a>
+        @endif
+    </h4>
     <div class="input-group" aria-describedby="cssSheetHelp">
         <label for="sheet_id" class="input-group-text">{{ __('dicms::sites.sheets.add') }}</label>
         <select name="sheet_id" id="sheet_id" class="form-select" wire:change="addCssSheet($('#sheet_id').val())">
-            @foreach(\halestar\LaravelDropInCms\Models\CssSheet::whereNotIn('id', $cssSheets->pluck('id'))->get() as $sheet)
+            @foreach($container->getCssSheetPool()->whereNotIn('id', $cssSheets->pluck('id')) as $sheet)
                 @if($loop->first)
                     <option value="" selected>{{ __('dicms::sites.sheets.add.select') }}</option>
                 @endif
                 <option value="{{ $sheet->id }}" wire:key="{{ $sheet->id }}">{{ $sheet->name }}</option>
             @endforeach
         </select>
-        @can('viewAny', \halestar\LaravelDropInCms\Models\CssSheet::class)
-            <a
-                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.index') }}"
-                class="btn btn-outline-secondary"
-                title="{{ __('dicms::admin.manage_css_sheets') }}"
-            ><i class="fa-solid fa-bars-progress"></i></a>
-        @endcan
     </div>
     <div id="cssSheetHelp" class="form-text mb-3">{{ __('dicms::sites.sheets.add.help') }}</div>
     @if($cssSheets->count() > 0)
@@ -28,7 +29,7 @@
                     <span class="fw-bolder fs-6">{{ $css->name }}</span>
                     <span class="ms-auto">
                         <a
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.edit', ['sheet' => $css->id]) }}"
+                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.edit', ['site' => $css->site_id, 'sheet' => $css->id]) }}"
                             class="btn btn-primary btn-sm me-1"
                             role="button"
                             title="{{ __('dicms::admin.edit') }}"

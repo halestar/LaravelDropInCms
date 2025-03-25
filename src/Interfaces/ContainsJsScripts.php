@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 
 interface ContainsJsScripts
 {
+    public function getJsScriptPool(): Collection;
     public function getJsScripts(): Collection;
     public function addJsScript(JsScript $script);
     public function removeJsScript(JsScript $script);

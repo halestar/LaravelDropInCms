@@ -5,6 +5,8 @@ return
     "script" => "JS Script| JS Scripts",
     "scripts.none" => "There are no JS Scripts for this site. Go create some!",
     "script.title" => "Available JS Scripts",
+    "import" => "Import JS Scripts",
+    "import.select" => 'Select JS Scripts to import',
     "new" => "Create New JS Script",
     "edit" => "Update JS Script",
     "delete" => 'Delete JS Script',
@@ -28,4 +30,5 @@ return
     'success.created' => 'JS Script created successfully.',
     'success.updated' => 'JS Script updated successfully.',
     'success.deleted' => 'JS Script deleted successfully.',
+    'success.imported' => 'JS Scripts imported successfully.',
 ];

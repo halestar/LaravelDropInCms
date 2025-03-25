@@ -2,7 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    @foreach($site->getMetadata() as $meta)
+        {!! $meta->toHTML() !!}
+    @endforeach
     <title>{{ $site->title }}</title>
     @if($site->favicon)
         <link rel="icon" href="{{ $site->favicon }}" />
@@ -11,7 +13,7 @@
     @foreach($site->siteCss()->links()->get() as $css)
         <link href="{{ $css->href }}" {{ $css->link_type }} />
     @endforeach
-    <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.preview.css.site') }}">
+    <link rel="stylesheet" type="text/css" property="stylesheet" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicCss($site) }}">
 
     @if($site->defaultHeader()->exists())
         <style>
@@ -28,7 +30,6 @@
     @foreach($site->siteJs()->links()->get() as $js)
         <script src="{{ $js->href }}" {!! $js->link_type !!} ></script>
     @endforeach
-    <link href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.preview.js.site', ['site' => $site->id]) }}" >
 
 </head>
 <body
@@ -56,5 +57,6 @@
 @if($site->tag)
 </{{ $site->tag }}>
 @endif
+<script src="{{ \halestar\LaravelDropInCms\DiCMS::dicmsPublicJs($site) }}" ></script>
 </body>
 </html>

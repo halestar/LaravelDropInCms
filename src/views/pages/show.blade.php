@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin.index", ['template' => $template, 'objEditable' => $objEditable])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'objEditable' => $objEditable, 'currentSite' => $site])
 
 @section('index_content')
 
@@ -41,7 +41,7 @@
                         </div>
                     </div>
                     <div id="page_css_manager" class="mb-5">
-                        <livewire:css-sheet-manager :siteId="$currentSite->id" :container="$page" :title="__('dicms::pages.css.include.page')" />
+                        <livewire:css-sheet-manager :container="$page" :title="__('dicms::pages.css.include.page')" />
                     </div>
                     <div class="mb-3">
                         <div class="form-check form-check-inline">
@@ -68,14 +68,14 @@
                         </div>
                     </div>
                     <div id="page_js_manager">
-                        <livewire:js-script-manager :siteId="$currentSite->id" :container="$page" :title="__('dicms::pages.js.include.page')" />
+                        <livewire:js-script-manager :container="$page" :title="__('dicms::pages.js.include.page')" />
                     </div>
                 </div>
                 <div class="col-md">
                     <div class="input-group" aria-describedby="titleHelp">
                         <label for="title" class="input-group-text">{{ __('dicms::pages.title') }}</label>
                         <input type="text" name="title" id="title" value="{{ $page->title }}" class="form-control"
-                               @cannot('update', $page) disabled @endcan placeholder="{{ $currentSite->title }}"/>
+                               @cannot('update', $page) disabled @endcan placeholder="{{ $page->Title() }}"/>
                     </div>
                     <div id="titleHelp" class="form-text mb-3">{{ __('dicms::pages.title.help') }}</div>
 
@@ -94,6 +94,7 @@
                             </div>
                             <label class="input-group-text" for="override_header_0">{{ __('dicms::pages.headers.use') }}</label>
                         </div>
+                        @if($site)
                         <div class="input-group" aria-describedby="headerHelp">
                             <div class="input-group-text">
                                 <input
@@ -110,18 +111,13 @@
                             <select name="header_id" id="header_id" class="form-select"
                                     @cannot('update', $page) disabled @endcan>
                                 <option value="">{{ __('dicms::pages.header.no') }}</option>
-                                @foreach(\halestar\LaravelDropInCms\Models\Header::all() as $header)
+                                @foreach($site->headers as $header)
                                     <option value="{{ $header->id }}"
                                             @if($header->id == $page->header_id) selected @endif>{{ $header->name }}</option>
                                 @endforeach
                             </select>
-                            @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)
-                                <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index') }}"
-                                    class="btn btn-outline-secondary"
-                                ><i class="fa-solid fa-bars-progress"></i></a>
-                            @endcan
                         </div>
+                        @endif
                         <div id="headerHelp"
                              class="form-text mb-3">{{ __('dicms::sites.select_default_header_help') }}</div>
                     </div>
@@ -141,6 +137,7 @@
                             </div>
                             <label class="input-group-text" for="override_footer_0">{{ __('dicms::pages.footer.use') }}</label>
                         </div>
+                        @if($site)
                         <div class="input-group" aria-describedby="footerHelp">
                             <div class="input-group-text">
                                 <input
@@ -157,16 +154,13 @@
                             <select name="footer_id" id="footer_id" class="form-select"
                                     @cannot('update', $page) disabled @endcan>
                                 <option value="">{{ __('dicms::pages.footer.no') }}</option>
-                                @foreach(\halestar\LaravelDropInCms\Models\Footer::all() as $footer)
+                                @foreach($site->footers as $footer)
                                     <option value="{{ $footer->id }}"
                                             @if($footer->id == $page->footer_id) selected @endif>{{ $footer->name }}</option>
                                 @endforeach
                             </select>
-                            @can('viewAny', \halestar\LaravelDropInCms\Models\Footer::class)
-                                <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index') }}"
-                                   class="btn btn-outline-secondary"><i class="fa-solid fa-bars-progress"></i></a>
-                            @endcan
                         </div>
+                        @endif
                         <div id="footerHelp"
                              class="form-text mb-3">{{ __('dicms::sites.select_default_footer_help') }}</div>
                     </div>
@@ -197,7 +191,7 @@
                     </div>
                     <div class="row mb-5">
                         <a
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.unpublish', ['page' => $page->id]) }}"
+                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.unpublish', ['site' => $site->id, 'page' => $page->id]) }}"
                             role="button"
                             class="btn btn-danger col"
                         >{{ __('dicms::pages.unpublish') }}</a>
@@ -209,7 +203,7 @@
                     <div class="row mb-5">
                         <a
                             role="button"
-                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.publish', ['page' => $page->id]) }}"
+                            href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.publish', ['site' => $site->id, 'page' => $page->id]) }}"
                             class="btn btn-warning col"
                         >{{ __('dicms::pages.publish') }}</a>
                     </div>

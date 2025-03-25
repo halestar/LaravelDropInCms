@@ -14,6 +14,11 @@ return new class extends Migration
     {
         Schema::create(config('dicms.table_prefix') . 'footers', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('site_id');
+            $table->foreign('site_id')
+                ->references('id')
+                ->on(config('dicms.table_prefix') . 'sites')
+                ->onDelete('cascade');
             $table->string('name');
             $table->string('description')->nullable();
             $table->longText('html')->nullable();

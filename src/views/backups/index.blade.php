@@ -2,7 +2,7 @@
 
 @section('content')
     <div class="container">
-        @isset($currentSite)
+        @if(\halestar\LaravelDropInCms\Models\Site::count() > 0)
         <div class="row">
             <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.export') }}" class="btn btn-primary col mx-2">{{ __('dicms::admin.backup.download') }}</a>
         </div>
@@ -10,7 +10,7 @@
             <div class="alert alert-info">
                 {!! __('dicms::admin.backups.new_site', ['url' => \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create')]) !!}
             </div>
-        @endisset
+        @endif
         <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.restore') }}"  enctype="multipart/form-data">
             @csrf
             <div class="mb-3">

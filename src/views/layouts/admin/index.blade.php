@@ -1,4 +1,4 @@
-@extends("dicms::layouts.admin", ['objEditable' => $objEditable?? null])
+@extends("dicms::layouts.admin", ['objEditable' => $objEditable?? null, 'currentSite' => $currentSite?? null])
 
 @section('content')
 <div class="container">
@@ -17,7 +17,7 @@
         @endisset
     </h5>
     @yield('index_content')
-    @if(isset($currentSite) && (!isset($excludeAssetManager) || !$excludeAssetManager))
+    @if(!isset($excludeAssetManager) || !$excludeAssetManager)
     <button
         class="position-fixed top-50 start-0 border-start-0 rounded-start-0 btn btn-outline-secondary p-3 "
         title="{{ __('dicms::assets.assets') }}"

@@ -5,6 +5,8 @@ return
     "header" => "Page Header|Page Headers",
     "header.none" => "There are no Page Headers for this site. Go create some!",
     "headers_title" => "Available Page Headers",
+    "import" => "Import Page Headers",
+    "import.select" => 'Select headers to import',
     "new" => "Create New Page Header",
     "edit" => "Update Page Header",
     "delete" => 'Delete Page Header',
@@ -28,5 +30,6 @@ return
     'success.created' => 'Page Header created successfully.',
     'success.updated' => 'Page Header updated successfully.',
     'success.deleted' => 'Page Header deleted successfully.',
+    'success.imported' => 'Page Headers imported successfully.',
 
 ];

@@ -57,6 +57,10 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
         parent::__construct($attributes);
     }
 
+    /**
+     * SCOPES
+     */
+
     public function scopePlugin(Builder $query): void
     {
         $query->where('plugin_page', true);
@@ -71,6 +75,10 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
     {
         $query->where('plugin_page', false);
     }
+
+    /**
+     * Relationships
+     */
 
     public function defaultHeader(): BelongsTo
     {
@@ -97,26 +105,82 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
     //front content
     public function Title(): string
     {
-        return $this->title?? ($this->currentSite->title?? "");
+        //if we override the title, return that.
+        if($this->title != null)
+            return $this->title;
+        //is this a plugin page?
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->title?? "";
+            return "";
+        }
+        //easy case, we return the site title.
+        return $this->site->title?? "";
     }
 
     public function Header(): ?Header
     {
-        return ($this->override_header || !$this->currentSite)? $this->defaultHeader: $this->currentSite->defaultHeader;
+        if($this->override_header)
+            return $this->defaultHeader;
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->defaultHeader;
+            return null;
+        }
+        return $this->site->defaultHeader;
     }
 
     public function Footer(): ?Footer
     {
-        return ($this->override_footer || !$this->currentSite)? $this->defaultFooter: $this->currentSite->defaultFooter;
+        if($this->override_footer)
+            return $this->defaultFooter;
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->defaultFooter;
+            return null;
+        }
+        return $this->site->defaultFooter;
+    }
+
+    public function Css(): Collection
+    {
+        if($this->override_css)
+            return $this->pageCss()->links()->get();
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->siteCss()->links()->get()->merge($this->pageCss()->links()->get());
+            else
+                return $this->pageCss()->links()->get();
+        }
+        return $this->site->siteCss()->links()->get()->merge($this->pageCss()->links()->get());
     }
 
     public function CssLinks(): Collection
     {
-        if($this->override_css || !$this->currentSite)
+        if($this->override_css)
             $links = $this->pageCss()->links()->get()->pluck('href');
         else
         {
-            $links = $this->currentSite->siteCss()->links()->get()->pluck('href');
+            //is this a pluging page?
+            if($this->plugin_page)
+            {
+                //try to get the active site
+                $activeSite = Site::activeSite();
+                if($activeSite) //easy case, we use the active site css
+                    $links = $activeSite->siteCss()->links()->get()->pluck('href');
+                else //no links.
+                    $links = new Collection();
+            }
+            else //In this case, we use the page's site links.
+                $links = $this->site->siteCss()->links()->get()->pluck('href');
             $links->merge($this->pageCss()->links()->get()->pluck('href'));
         }
         $links->push(DiCMS::dicmsPublicCss($this));
@@ -125,21 +189,55 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
 
     public function CssText(): string
     {
-        if($this->override_css || !$this->currentSite)
+        if($this->override_css)
             return $this->pageCss()->text()->get()->pluck('sheet')->join("\n");
 
-        return $this->currentSite->siteCss()->text()->get()->pluck('sheet')->join("\n") . "\n" .
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->siteCss()->text()->get()->pluck('sheet')->join("\n") . "\n" .
+                    $this->pageCss()->text()->get()->pluck('sheet')->join("\n");
+            else
+                return $this->pageCss()->text()->get()->pluck('sheet')->join("\n");
+        }
+        return $this->site->siteCss()->text()->get()->pluck('sheet')->join("\n") . "\n" .
             $this->pageCss()->text()->get()->pluck('sheet')->join("\n");
+    }
+
+    public function Js(): Collection
+    {
+        if($this->override_js)
+            return $this->pageJs()->links()->get();
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->siteJs()->links()->get()->merge($this->pageJs()->links()->get());
+            else
+                return $this->pageJs()->links()->get();
+        }
+        return $this->site->siteJs()->links()->get()->merge($this->pageJs()->links()->get());
     }
 
     public function JsLinks(): Collection
     {
-        $links = new Collection();
-        if($this->override_js || !$this->currentSite)
+        if($this->override_js)
             $links = $this->pageJs()->links()->get()->pluck('href');
         else
         {
-            $links = $this->currentSite->siteJs()->links()->get()->pluck('href');
+            //is this a pluging page?
+            if($this->plugin_page)
+            {
+                //try to get the active site
+                $activeSite = Site::activeSite();
+                if($activeSite) //easy case, we use the active site css
+                    $links = $activeSite->siteJs()->links()->get()->pluck('href');
+                else //no links.
+                    $links = new Collection();
+            }
+            else //In this case, we use the page's site links.
+                $links = $this->site->siteJs()->links()->get()->pluck('href');
             $links->merge($this->pageJs()->links()->get()->pluck('href'));
         }
         $links->push(DiCMS::dicmsPublicJs($this));
@@ -148,9 +246,19 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
 
     public function JsText(): string
     {
-        if($this->override_js || !$this->currentSite)
+        if($this->override_js)
             return $this->pageJs()->text()->get()->pluck('script')->join("\n");
-        return $this->currentSite->siteJs()->text()->get()->pluck('script')->join("\n") . "\n" .
+
+        if($this->plugin_page)
+        {
+            $activeSite = Site::activeSite();
+            if($activeSite)
+                return $activeSite->siteJs()->text()->get()->pluck('script')->join("\n") . "\n" .
+                    $this->pageJs()->text()->get()->pluck('script')->join("\n");
+            else
+                return $this->pageJs()->text()->get()->pluck('script')->join("\n");
+        }
+        return $this->site->siteJs()->text()->get()->pluck('script')->join("\n") . "\n" .
             $this->pageJs()->text()->get()->pluck('script')->join("\n");
     }
 
@@ -205,6 +313,7 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
     public function dupe(Site $site = null): Page
     {
         $dupe = new Page();
+        $dupe->site_id = $site? $site->id: $this->site_id;
         $dupe->name = $this->name . "-" . __('dicms::admin.copy');
         $dupe->slug = $this->slug . "-" . __('dicms::admin.copy');
         $dupe->title = $this->title . "-" . __('dicms::admin.copy');
@@ -249,7 +358,7 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
         if($this->plugin_page)
             return $this->plugin::projectMetadata($this);
         if(count($this->metadata) == 0)
-            return Site::currentSite()->getMetadata();
+            return $this->site->getMetadata();
         return $this->metadata;
     }
 
@@ -257,5 +366,37 @@ class Page extends GrapesJsEditableItem implements ContainsCssSheets, ContainsJs
     {
         $this->metadata = $metadata;
         $this->save();
+    }
+
+    public function getCssSheetPool(): Collection
+    {
+        //is this a plugin page?
+        if($this->plugin_page)
+        {
+            // is there an active site?
+            $site = Site::activeSite();
+            if($site)
+                return $site->siteCss;
+            //else, we can return nothing.
+            return new Collection();
+        }
+        //if now, we return the site css
+        return $this->site->siteCss;
+    }
+
+    public function getJsScriptPool(): Collection
+    {
+        //is this a plugin page?
+        if($this->plugin_page)
+        {
+            // is there an active site?
+            $site = Site::activeSite();
+            if($site)
+                return $site->siteJs;
+            //else, we can return nothing.
+            return new Collection();
+        }
+        //if now, we return the site css
+        return $this->site->siteJs;
     }
 }

@@ -16,7 +16,6 @@ use halestar\LaravelDropInCms\View\Components\WebEditor;
 use halestar\LaravelDropInCms\View\Composers\CurrentSiteViewComposer;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 
@@ -62,6 +61,5 @@ class CmsServiceProvider extends ServiceProvider
         Livewire::component('metadata-editor', MetadataEditor::class);
         Livewire::propertySynthesizer(MetadataEntrySynth::class);
 
-        View::composer('dicms::*', CurrentSiteViewComposer::class);
     }
 }

@@ -1,7 +1,7 @@
-@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true])
+@extends("dicms::layouts.admin.index", ['template' => $template, 'excludeAssetManager' => true, 'currentSite' => $site])
 
 @section('index_content')
-        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.store') }}">
+        <form method="POST" action="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.store', ['site' => $site]) }}">
         @csrf
             <div class="mb-3">
                 <label for="name" class="form-label">{{ __('dicms::headers.name') }}</label>

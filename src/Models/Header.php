@@ -32,6 +32,7 @@ class Header extends GrapesJsEditableItem
     {
         $newHeader = new Header();
         $newHeader->name = $this->name . "-" . __('dicms::admin.copy');
+        $newHeader->site_id = $site? $site->id: $this->site->id;
         $newHeader->description = $this->description;
         $newHeader->html = $this->html;
         $newHeader->css = $this->css;

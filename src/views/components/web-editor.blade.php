@@ -27,9 +27,7 @@
     </div>
 </div>
 @push('head_scripts')
-    <!-- Including GrapeJs Base Config -->
     @include('dicms::layouts.editor.config', ['objEditable' => $editableObj])
-
     @foreach(config('dicms.plugins') as $plugin)
         @foreach($plugin::getGrapesJsPlugins() as $editorPlugin)
             @if($editorPlugin->shouldInclude($editableObj))

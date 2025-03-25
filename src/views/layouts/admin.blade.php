@@ -1,3 +1,12 @@
+@use('halestar\LaravelDropInCms\Models\Site')
+@use('\halestar\LaravelDropInCms\DiCMS')
+@if(!isset($currentSite) || (!$currentSite && Site::count() > 0))
+    @php
+        $currentSite = Site::activeSite();
+        if(!$currentSite)
+            $currentSite = Site::first();
+    @endphp
+@endif
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
@@ -67,121 +76,99 @@
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <!-- Left Side Of Navbar -->
                 <ul class="navbar-nav me-auto">
-                    @isset($currentSite)
-                    @can("viewAny", \halestar\LaravelDropInCms\Models\Site::class)
-                        <li class="nav-item dropdown">
-                            <a
-                                href="#"
-                                @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('sites'))
-                                    class="nav-link dropdown-toggle active"
-                                @else
-                                    class="nav-link dropdown-toggle"
-                                @endif
-                                role="button" data-bs-toggle="dropdown" aria-expanded="false"
-                            >
-                                {{ __('dicms::sites.site.current') }}
-                            </a>
-                            <ul class="dropdown-menu">
-                                @can('viewAny', \halestar\LaravelDropInCms\Models\Header::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.headers.index') }}">{{ trans_choice('dicms::headers.header', 2) }}</a></li>@endcan
-                                @can('viewAny', \halestar\LaravelDropInCms\Models\Footer::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.footers.index') }}">{{ trans_choice('dicms::footers.footer', 2) }}</a></li>@endcan
-                                @can('viewAny', \halestar\LaravelDropInCms\Models\CssSheet::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sheets.index') }}">{{ trans_choice('dicms::css_sheets.sheet', 2) }}</a></li>@endcan
-                                @can('viewAny', \halestar\LaravelDropInCms\Models\JsScript::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.scripts.index') }}">{{ trans_choice('dicms::js_scripts.script', 2) }}</a></li>@endcan
-                                @can('viewAny', \halestar\LaravelDropInCms\Models\Page::class)<li><a class="dropdown-item" href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.pages.index') }}">{{ trans_choice('dicms::pages.pages', 2) }}</a></li>@endcan
-                            </ul>
-                        </li>
-                    @endcan
-                    @can("viewAny", \halestar\LaravelDropInCms\Models\DataItem::class)
-                        <li class="nav-item">
-                            <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.assets.index') }}"
-                                @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('assets'))
-                                    class="nav-link active"
-                                aria-current="page"
-                                @else
-                                    class="nav-link"
-                                @endif
-                            >
-                                {{ __('dicms::admin.assets_menu_item') }}
-                            </a>
-                        </li>
-                    @endcan
-                    @foreach(config('dicms.plugins') as $plugin)
-                        @can('viewAny', $plugin::getPolicyModel())
-                                <li class="nav-item">
-                                    <a
-                                        href="{{ $plugin::getAdminUrl() }}"
-                                        @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule($plugin::getRoutePrefix()))
-                                            class="nav-link active"
-                                        aria-current="page"
-                                        @else
-                                            class="nav-link"
-                                        @endif
-                                    >
-                                        {{ $plugin::getPluginMenuName() }}
-                                    </a>
-                                </li>
-                        @endcan
-                    @endforeach
-                    @else
-                        <li class="nav-item">
-                            <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create') }}"
-                                class="nav-link"
-                            >
-                                {{ __('dicms::sites.new_site') }}
-                            </a>
-                        </li>
-                    @endisset
-                    @can('widgets', \halestar\LaravelDropInCms\Models\Site::class)
-                        <li class="nav-item">
-                            <a
-                                href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.widgets.index') }}"
-                                @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('widgets'))
-                                    class="nav-link active"
-                                aria-current="page"
-                                @else
-                                    class="nav-link"
-                                @endif
-                            >
-                                {{ trans_choice('dicms::admin.widget', 2) }}
-                            </a>
-                        </li>
-                    @endcan
-                    @can('backup', \halestar\LaravelDropInCms\Models\Site::class)
+                    @if(Site::count() > 0)
+                        @can("viewAny", \halestar\LaravelDropInCms\Models\DataItem::class)
                             <li class="nav-item">
                                 <a
-                                    href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.backups.index') }}"
-                                    @if(\halestar\LaravelDropInCms\DiCMS::inAdminModule('backup'))
+                                    href="{{ DiCMS::dicmsRoute('admin.assets.index') }}"
+                                    @if(DiCMS::inAdminModule('assets'))
                                         class="nav-link active"
                                     aria-current="page"
                                     @else
                                         class="nav-link"
                                     @endif
                                 >
-                                    {{ __('dicms::admin.backups') }}
+                                    {{ __('dicms::admin.assets_menu_item') }}
                                 </a>
                             </li>
+                        @endcan
+                        @foreach(config('dicms.plugins') as $plugin)
+                            @can('viewAny', $plugin::getPolicyModel())
+                                    <li class="nav-item">
+                                        <a
+                                            href="{{ $plugin::getAdminUrl() }}"
+                                            @if(DiCMS::inAdminModule($plugin::getRoutePrefix()))
+                                                class="nav-link active"
+                                            aria-current="page"
+                                            @else
+                                                class="nav-link"
+                                            @endif
+                                        >
+                                            {{ $plugin::getPluginMenuName() }}
+                                        </a>
+                                    </li>
+                            @endcan
+                        @endforeach
+                        @can('widgets', Site::class)
+                            <li class="nav-item">
+                                <a
+                                    href="{{ DiCMS::dicmsRoute('admin.widgets.index') }}"
+                                    @if(DiCMS::inAdminModule('widgets'))
+                                        class="nav-link active"
+                                    aria-current="page"
+                                    @else
+                                        class="nav-link"
+                                    @endif
+                                >
+                                    {{ trans_choice('dicms::admin.widget', 2) }}
+                                </a>
+                            </li>
+                        @endcan
+                    @else
+                        <li class="nav-item">
+                            <a
+                                href="{{ DiCMS::dicmsRoute('admin.sites.create') }}"
+                                class="nav-link"
+                            >
+                                {{ __('dicms::sites.new_site') }}
+                            </a>
+                        </li>
+                    @endif
+                    @can('backup', Site::class)
+                        <li class="nav-item">
+                            <a
+                                href="{{ DiCMS::dicmsRoute('admin.backups.index') }}"
+                                @if(DiCMS::inAdminModule('backup'))
+                                    class="nav-link active"
+                                aria-current="page"
+                                @else
+                                    class="nav-link"
+                                @endif
+                            >
+                                {{ __('dicms::admin.backups') }}
+                            </a>
+                        </li>
                     @endcan
                 </ul>
 
-                @isset($currentSite)
+                @if(Site::count() > 0)
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <div class="input-group">
-                            <label class="input-group-text" for="current-site">{{ __('dicms::sites.site.current') }}</label>
+                            <label class="input-group-text" for="current-site">{{ __('dicms::sites.site') }}</label>
                             <select
                                 class="form-select"
                                 id="current-site"
                                 name="current_site"
-                                onchange="window.location.href='{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.home') }}/sites/' + $(this).val() + '/current'"
+                                onchange="window.location.href='{{ DiCMS::dicmsRoute('admin.home') }}/sites/' + $(this).val()"
                             >
-                                @foreach($allSites as $site)
-                                    <option value="{{ $site->id }}" @if($currentSite->id == $site->id) selected @endif >{{ $site->name }}</option>
+                                @foreach(Site::all() as $site)
+                                    <option value="{{ $site->id }}" @selected($currentSite->id == $site->id) >{{ $site->name }}</option>
                                 @endforeach
                             </select>
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.show', ['site' => $currentSite->id]) }}" class="btn btn-outline-dark" type="button" title="{{ __('dicms::sites.site.current') }}"><i class="fa-solid fa-eye"></i></a>
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.create') }}" class="btn btn-outline-success" type="button" title="{{ __('dicms::sites.new_site') }}"><i class="fa-regular fa-square-plus"></i></a>
-                            <a href="{{ \halestar\LaravelDropInCms\DiCMS::dicmsRoute('admin.sites.index') }}" class="btn btn-outline-primary" type="button" title="{{ __('dicms::sites.sites_title') }}"><i class="fa-solid fa-bars-progress"></i></a>
+                            <a href="{{ DiCMS::dicmsRoute('admin.sites.show', ['site' => $currentSite->id]) }}" class="btn btn-outline-dark" type="button" title="{{ __('dicms::sites.site.current') }}"><i class="fa-solid fa-eye"></i></a>
+                            <a href="{{ DiCMS::dicmsRoute('admin.sites.create') }}" class="btn btn-outline-success" type="button" title="{{ __('dicms::sites.new_site') }}"><i class="fa-regular fa-square-plus"></i></a>
+                            <a href="{{ DiCMS::dicmsRoute('admin.sites.index') }}" class="btn btn-outline-primary" type="button" title="{{ __('dicms::sites.sites_title') }}"><i class="fa-solid fa-bars-progress"></i></a>
                         </div>
                     </li>
                 </ul>

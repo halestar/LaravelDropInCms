@@ -11,16 +11,16 @@ class CssSheetManager extends Component
 {
     public ContainsCssSheets $container;
     public Collection $cssSheets;
-    public int $siteId;
 
     public string $title;
+    public ?string $manageLink = null;
 
-    public function mount(ContainsCssSheets $container, int $siteId, string $title = null)
+    public function mount(ContainsCssSheets $container, string $title = null, string $manageLink = null)
     {
         $this->container = $container;
         $this->cssSheets = $container->getCssSheets();
-        $this->siteId = $siteId;
         $this->title = $title?? __('dicms::sites.sheets');
+        $this->manageLink = $manageLink;
     }
 
     public function updateOrder($sheets)
