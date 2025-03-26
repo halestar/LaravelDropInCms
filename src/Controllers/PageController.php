@@ -114,7 +114,7 @@ class PageController
                 'title' => $page->name,
                 'buttons' => []
             ];
-        if(Gate::allows('preview', $page->site))
+        if(!$page->plugin_page && Gate::allows('preview', $page->site))
         {
             $template['buttons']['preview']  =
                 [
@@ -124,6 +124,7 @@ class PageController
                     'title' => __('dicms::sites.preview_site'),
                 ];
         }
+
         if(Gate::allows('update', $page) && !$page->plugin_page)
         {
             $template['buttons']['edit']  =
