@@ -36,6 +36,8 @@ class SystemBackup
 
     public static function restore($dataString, ?array $tables = null): bool
     {
+        //try ecoding the data string
+        $dataString = mb_convert_encoding($dataString, "UTF-8", mb_detect_encoding($dataString));
         $data = json_decode($dataString, true);
         if(!isset($data['tables']) || empty($data['tables']))
             return false;
