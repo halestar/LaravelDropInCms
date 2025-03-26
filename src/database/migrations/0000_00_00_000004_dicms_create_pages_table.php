@@ -44,8 +44,8 @@ return new class extends Migration
             $table->json('data')->nullable();
             $table->boolean('published')->default(false);
             $table->json('metadata')->nullable();
-            $table->unique(['slug', 'path']);
-            $table->unique('url');
+            $table->unique(['slug', 'path', 'site_id']);
+            $table->unique(['url', 'site_id']);
             $table->timestamps();
         });
     }
