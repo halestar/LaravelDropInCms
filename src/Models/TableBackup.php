@@ -3,6 +3,7 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 final class TableBackup
 {
@@ -30,8 +31,10 @@ final class TableBackup
 
     public function restore(): void
     {
+        Schema::disableForeignKeyConstraints();
         DB::table($this->table_name)->truncate();
         DB::table($this->table_name)->insert($this->table_data);
+        Schema::enableForeignKeyConstraints();
     }
 
 

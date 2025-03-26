@@ -3,7 +3,6 @@
 namespace halestar\LaravelDropInCms\Models;
 
 use halestar\LaravelDropInCms\DiCMS;
-use Illuminate\Support\Facades\Schema;
 
 class SystemBackup
 {
@@ -40,14 +39,12 @@ class SystemBackup
         $data = json_decode($dataString, true);
         if(!isset($data['tables']) || empty($data['tables']))
             return false;
-        Schema::disableForeignKeyConstraints();
         foreach($data['tables'] as $table)
         {
             $tBackup = TableBackup::loadBackupData($table);
             if($tables === null || in_array($tBackup->table_name, $tables))
                 $tBackup->restore();
         }
-        Schema::enableForeignKeyConstraints();
         return true;
     }
 }
