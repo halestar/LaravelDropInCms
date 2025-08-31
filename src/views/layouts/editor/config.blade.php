@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="//unpkg.com/grapesjs/dist/css/grapes.min.css" />
-<script src="https://cdnjs.cloudflare.com/ajax/libs/grapesjs/0.22.5/grapes.min.js"></script>
+<script src="https://unpkg.com/grapesjs"></script>
 <script src="https://unpkg.com/grapesjs-style-bg"></script>
 <script src="https://unpkg.com/grapesjs-style-gradient"></script>
 
@@ -66,14 +66,9 @@
         /**
          *  Panels
         */
-        Panels.getPanel('views').buttons.remove('open-blocks');
-        //target the full screen to include the blocks
-        editor.on('run:fullscreen:before', (opts) =>
-        {
-            opts.target = '#gjs-container';
-        });
 
-        //some defaults for components
+
+            //some defaults for components
         const container_default =
         {
             draggable: true,
@@ -1085,6 +1080,7 @@
                 component.setStyle({});
             }
         });
+
 
     };
 </script>

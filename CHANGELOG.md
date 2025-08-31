@@ -2,6 +2,111 @@
 
 All notable changes to `LaravelDropInCMS` will be documented in this file
 
+## 0.7.5.7
+
+* Changes Backups
+    * Download Backup now zips the file
+    * When restoring, you can use a regular JSON file or a zip file
+    * The name of the backup now includes a time stamp
+* Updates GrapesJS editor (again)
+    * Fixes the top control not working
+    * Changes the layout to a custom layout.
+    * Makes fullscreen include all the elements instead of just the editor.
+* Updates the Changelog
+
+## 0.7.5.6
+
+Changes the way foreign key disabling is done.
+
+## 0.7.5.5
+
+Removes the decoding.
+
+## 0.7.5.4
+
+Fixes the show for pages when it is a plugin page. Preview should not appear.
+
+## 0.7.5.3
+
+Adds the correct unique constrain for pages.
+
+## 0.7.5.2
+
+removes widgets. Seriously thinking about removing widgets alltogether.
+Changes Highlightable Posts, related posts and tags, and moved them completely to their own GrapesJs plugin. This allows
+for complete customization of all the moving pieces and allowing all the customization to happen through grapes js.
+Cleaned up the editor CSS, it no looks better an the full screen plugin works much better too.
+Moves highlightable posts to it's own section itn eh blogs.
+
+## 0.7.5.1
+
+Updates the license in composer.
+
+## 0.7.5
+
+This patch re-couples Headers, Footers, Pages, Sheets, and Scripts to Sites. It reworks a lot of the front login and
+preview login, as well as some of the plugin login. Blogger will be released with the same patch number with all the
+changes.
+
+To note in this patch, to migrate the databse manually from the old .7.3 version:
+
+1. Make a DB BACKUP!
+2. Make a DiCMS back up!
+3. Run the following commands in the database:
+
+```
+ALTER TABLE `dicms_css_sheets`
+	ADD COLUMN `site_id` BIGINT UNSIGNED NOT NULL AFTER `id`;
+UPDATE `dicms_css_sheets` SET `site_id`=1;
+ALTER TABLE `dicms_footers`
+	ADD COLUMN `site_id` BIGINT UNSIGNED NOT NULL AFTER `id`;
+UPDATE `dicms_footers` SET `site_id`=1;
+ALTER TABLE `dicms_headers`
+	ADD COLUMN `site_id` BIGINT UNSIGNED NOT NULL AFTER `id`;
+UPDATE `dicms_headers` SET `site_id`=1;
+ALTER TABLE `dicms_js_scripts`
+	ADD COLUMN `site_id` BIGINT UNSIGNED NOT NULL AFTER `id`;
+UPDATE `dicms_js_scripts` SET `site_id`=1;
+ALTER TABLE `dicms_pages`
+	ADD COLUMN `site_id` BIGINT UNSIGNED NOT NULL AFTER `id`;
+UPDATE `dicms_pages` SET `site_id`=1;
+ALTER TABLE `dicms_js_scripts`
+	ADD COLUMN `active` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `link_type`;
+UPDATE `dicms_js_scripts` SET `active`=1;
+ALTER TABLE `dicms_css_sheets`
+	ADD COLUMN `active` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `link_type`;
+UPDATE `dicms_css_sheets` SET `active`=1;
+ALTER TABLE `dicms_js_scripts`
+	ADD COLUMN `order_by` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `active`;
+ALTER TABLE `dicms_css_sheets`
+	ADD COLUMN `order_by` TINYINT UNSIGNED NOT NULL DEFAULT '0' AFTER `active`;
+```
+
+4. Make a DiCMS backup file, this is your post file
+5. Update the system
+6. DROP the DiCMS tables
+7. Re-run all migrations
+8. Restore from DiCMS
+
+You should now have all your content back.
+
+## 0.7.1
+
+First bugfix. Issue with dataitem thumbs
+
+## 0.7.0
+
+* API's are complete
+    * All routes are defined, but not documented
+    * Testing for all API calls
+* Updates the license to an MIT license.
+
+## 0.6.2.1
+
+two bug fixes: changes defaultSite to currentSite in the pages to deal with
+inactive sites and changes the behavior of the css attributes to not escape
+characters.
+
 ## 0.6.2
 
 A small feature update that adds an initial HTML entry into Headers, Footers and Pages.

@@ -24,20 +24,190 @@
                         @endforeach
                     @endforeach
                 ],
+            panels:
+                {
+                    defaults:
+                        [
+                            {
+                                id: 'gjs-top-panel',
+                                el: '#gjs-top-panel',
+                            },
+                            {
+                                id: 'gjs-right-panel',
+                                el: '#gjs-right-panel',
+                            },
+                            {
+                                id: 'gjs-top-panel-switcher',
+                                el: '#gjs-top-panel-switcher',
+                                buttons:
+                                    [
+                                        {
+                                            id: 'show-blocks',
+                                            active: true,
+                                            label: '<i class="fa-solid fa-object-group"></i>',
+                                            command:
+                                                {
+                                                    run(editor, sender) {
+                                                        $('#gjs-right-blocks-container').show();
+                                                    },
+                                                    stop(editor, sender) {
+                                                        $('#gjs-right-blocks-container').hide();
+                                                    },
+                                                },
+                                            togglable: false,
+                                        },
+                                        {
+                                            id: 'show-style',
+                                            active: true,
+                                            label: '<i class="fa-solid fa-paintbrush"></i>',
+                                            command:
+                                                {
+                                                    run(editor, sender) {
+                                                        $('#gjs-right-styles-container').show();
+                                                    },
+                                                    stop(editor, sender) {
+                                                        $('#gjs-right-styles-container').hide();
+                                                    },
+                                                },
+                                            togglable: false,
+                                        },
+                                        {
+                                            id: 'show-traits',
+                                            active: true,
+                                            label: '<i class="fa-solid fa-gear"></i>',
+                                            command:
+                                                {
+                                                    run(editor, sender) {
+                                                        $('#gjs-right-traits-container').show();
+                                                    },
+                                                    stop(editor, sender) {
+                                                        $('#gjs-right-traits-container').hide();
+                                                    },
+                                                },
+                                            togglable: false,
+                                        },
+                                        {
+                                            id: 'show-layers',
+                                            active: true,
+                                            label: '<i class="fa-solid fa-layer-group"></i>',
+                                            command:
+                                                {
+                                                    run(editor, sender) {
+                                                        $('#gjs-right-layers-container').show();
+                                                    },
+                                                    stop(editor, sender) {
+                                                        $('#gjs-right-layers-container').hide();
+                                                    },
+                                                },
+                                            // Once activated disable the possibility to turn it off
+                                            togglable: false,
+                                        }
+                                    ],
+                            },
+                            {
+                                id: 'gjs-top-device-view',
+                                el: '#gjs-top-device-view',
+                                buttons: [
+                                    {
+                                        id: 'device-desktop',
+                                        active: true,
+                                        label: '<i class="fa-solid fa-computer"></i>',
+                                        command(editor) {
+                                            editor.Devices.select('desktop');
+                                        },
+                                    },
+                                    {
+                                        id: 'device-tablet',
+                                        active: false,
+                                        label: '<i class="fa-solid fa-tablet-screen-button"></i>',
+                                        command(editor) {
+                                            editor.Devices.select('tablet');
+                                        },
+                                    },
+                                    {
+                                        id: 'device-mobileLandscape',
+                                        active: false,
+                                        label: '<i class="fa-solid fa-mobile-screen fa-rotate-90"></i>',
+                                        command(editor) {
+                                            editor.Devices.select('mobileLandscape');
+                                        },
+                                    },
+                                    {
+                                        id: 'device-mobilePortrait',
+                                        active: false,
+                                        label: '<i class="fa-solid fa-mobile-screen"></i>',
+                                        command(editor) {
+                                            editor.Devices.select('mobilePortrait');
+                                        },
+                                    },
+                                ],
+                            },
+                            {
+                                id: 'gjs-top-page-view',
+                                el: '#gjs-top-page-view',
+                                buttons: [
+                                    {
+                                        id: 'sw-visibility',
+                                        label: '<i class="fa-regular fa-square"></i>',
+                                        active: true,
+                                        command: "core:component-outline",
+                                        context: "sw-visibility",
+                                    },
+                                    {
+                                        id: 'preview',
+                                        active: false,
+                                        label: '<i class="fa fa-eye"></i>',
+                                        command: "core:preview",
+                                        context: "preview",
+                                    },
+                                    {
+                                        id: 'fullscreen',
+                                        active: false,
+                                        label: '<i class="fa-solid fa-maximize"></i>',
+                                        command:
+                                            {
+                                                run(editor) {
+                                                    editor.runCommand('core:fullscreen', {target: '#gjs-container'});
+                                                },
+                                                stop(editor) {
+                                                    editor.stopCommand('core:fullscreen');
+                                                }
+                                            },
+                                        context: "fullscreen",
+                                    },
+                                    {
+                                        id: 'code',
+                                        active: false,
+                                        label: '<i class="fa-solid fa-code"></i>',
+                                        command: "core:open-code",
+                                    },
+                                ],
+                            }
+                        ]
+                },
             styleManager:
                 {
                     clearProperties: true,
+                    appendTo: '#gjs-right-styles-container',
                 },
+            selectorManager: {
+                appendTo: '#gjs-right-styles-container',
+            },
+            layerManager: {
+                appendTo: '#gjs-right-layers-container',
+            },
+            traitManager: {
+                appendTo: '#gjs-right-traits-container',
+            },
+            blockManager: {
+                appendTo: '#gjs-right-blocks-container'
+            },
             pluginsOpts:
                 {},
             canvas:
                 {
                     styles: {!! $objEditable->CssLinks() !!},
                     scripts: {!! $objEditable->JsLinks() !!},
-                },
-            blockManager:
-                {
-                    appendTo: '#blocks-container'
                 },
             assetManager:
                 {
